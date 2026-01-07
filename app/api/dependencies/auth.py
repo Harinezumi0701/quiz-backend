@@ -6,6 +6,11 @@ from app.db.session import get_db
 from app.utils.security import decode_access_token
 from app.services import auth_service
 from app.models.users import User
+from app.constants import (
+    ERROR_COULD_NOT_VALIDATE_CREDENTIALS,
+    ERROR_USER_NOT_FOUND,
+    JWT_TOKEN_TYPE,
+)
 
 security = HTTPBearer()
 
@@ -30,8 +35,8 @@ def get_current_user(
     if user_email is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail=ERROR_COULD_NOT_VALIDATE_CREDENTIALS,
+            headers={"WWW-Authenticate": JWT_TOKEN_TYPE},
         )
 
     # Get the user from database
@@ -39,8 +44,8 @@ def get_current_user(
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail=ERROR_USER_NOT_FOUND,
+            headers={"WWW-Authenticate": JWT_TOKEN_TYPE},
         )
 
     return user

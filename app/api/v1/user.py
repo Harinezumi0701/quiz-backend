@@ -6,6 +6,7 @@ from app.services import user_service
 from app.db.session import get_db
 from app.api.dependencies.auth import get_current_user
 from app.models.users import User
+from app.constants import HTTP_STATUS_NOT_FOUND, ERROR_USER_NOT_FOUND
 
 router = APIRouter()
 
@@ -25,5 +26,5 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     """Get user by ID (public endpoint)."""
     user = user_service.get_user(db, user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=HTTP_STATUS_NOT_FOUND, detail=ERROR_USER_NOT_FOUND)
     return user

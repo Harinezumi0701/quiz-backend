@@ -2,35 +2,52 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import user, auth, question, response
+from app.constants import (
+    APP_TITLE,
+    APP_VERSION,
+    SERVICE_NAME,
+    HEALTH_STATUS,
+    WELCOME_MESSAGE,
+    CORS_ALLOW_ORIGINS,
+    CORS_ALLOW_CREDENTIALS,
+    CORS_ALLOW_METHODS,
+    CORS_ALLOW_HEADERS,
+    AUTH_PREFIX,
+    USERS_PREFIX,
+    QUESTIONS_PREFIX,
+    RESPONSES_PREFIX,
+    HEALTH_CHECK_PATH,
+    ROOT_PATH,
+)
 
 app = FastAPI(
-    title="My FastAPI Project",
-    version="1.0.0"
+    title=APP_TITLE,
+    version=APP_VERSION
 )
 
 # CORS configuration for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],  # Vite dev server ports
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=CORS_ALLOW_ORIGINS,
+    allow_credentials=CORS_ALLOW_CREDENTIALS,
+    allow_methods=CORS_ALLOW_METHODS,
+    allow_headers=CORS_ALLOW_HEADERS,
 )
 
 # Đăng ký router từ folder api/v1
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-app.include_router(user.router, prefix="/api/v1/users", tags=["users"])
-app.include_router(question.router, prefix="/api/v1/questions", tags=["questions"])
-app.include_router(response.router, prefix="/api/v1/responses", tags=["responses"])
+app.include_router(auth.router, prefix=AUTH_PREFIX, tags=["auth"])
+app.include_router(user.router, prefix=USERS_PREFIX, tags=["users"])
+app.include_router(question.router, prefix=QUESTIONS_PREFIX, tags=["questions"])
+app.include_router(response.router, prefix=RESPONSES_PREFIX, tags=["responses"])
 
-@app.get("/")
+@app.get(ROOT_PATH)
 def root():
-    return {"message": "Welcome to My FastAPI Project"}
+    return {"message": WELCOME_MESSAGE}
 
-@app.get("/api/v1/health")
+@app.get(HEALTH_CHECK_PATH)
 def health_check():
     return {
-        "status": "healthy",
-        "service": "quiz-api",
-        "version": "1.0.0"
+        "status": HEALTH_STATUS,
+        "service": SERVICE_NAME,
+        "version": APP_VERSION
     }

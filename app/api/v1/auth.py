@@ -4,11 +4,12 @@ from sqlalchemy.orm import Session
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
 from app.services import auth_service
 from app.db.session import get_db
+from app.constants import HTTP_STATUS_CREATED
 
 router = APIRouter()
 
 
-@router.post("/register", response_model=TokenResponse, status_code=201)
+@router.post("/register", response_model=TokenResponse, status_code=HTTP_STATUS_CREATED)
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
     """
     Register a new user.

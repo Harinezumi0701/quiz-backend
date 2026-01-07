@@ -3,6 +3,11 @@ from sqlalchemy.orm import Session
 from app.repository import auth_repo
 from app.utils.security import verify_password, get_password_hash, create_access_token
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
+from app.constants import (
+    ERROR_EMAIL_ALREADY_REGISTERED,
+    ERROR_INCORRECT_EMAIL_OR_PASSWORD,
+    JWT_SUBJECT_KEY,
+)
 from fastapi import HTTPException, status
 
 
@@ -12,7 +17,7 @@ def register_user(db: Session, request: RegisterRequest) -> TokenResponse:
     if auth_repo.email_exists(db, request.user_email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+            detail=ERROR_EMAIL_ALREADY_REGISTERED
         )
 
     # Hash the password
@@ -27,7 +32,7 @@ def register_user(db: Session, request: RegisterRequest) -> TokenResponse:
     )
 
     # Generate access token
-    access_token = create_access_token(data={"sub": user.user_email})
+    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.user_email})
 
     return TokenResponse(access_token=access_token)
 
@@ -41,12 +46,11 @@ def login_user(db: Session, request: LoginRequest) -> TokenResponse:
     if not user or not verify_password(request.user_password, user.user_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail=ERROR_INCORRECT_EMAIL_OR_PASSWORD,
         )
 
     # Generate access token
-    access_token = create_access_token(data={"sub": user.user_email})
+    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.user_email})
 
     return TokenResponse(access_token=access_token)
 

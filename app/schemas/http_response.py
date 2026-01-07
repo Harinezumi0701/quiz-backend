@@ -1,11 +1,13 @@
 # app/schemas/http_response.py
 from pydantic import BaseModel, Field
-from typing import Any, Optional, Union, List, Dict
+from typing import Any, Optional, Union, List, Dict, TypeVar, Generic
+
+T = TypeVar('T')
 
 
-class SuccessResponse(BaseModel):
+class SuccessResponse(BaseModel, Generic[T]):
     """Schema for success HTTP response"""
-    data: Union[List[Any], Dict[str, Any]] = Field(..., description="Response data")
+    data: T = Field(..., description="Response data")
     meta: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Metadata")
 
 

@@ -1,5 +1,6 @@
 # app/utils/response.py
 from typing import Any, Optional, Union
+from fastapi import status
 from fastapi.responses import JSONResponse
 from app.schemas.http_response import SuccessResponse, ErrorResponse, ErrorDetail
 import uuid
@@ -8,7 +9,7 @@ import uuid
 def success_response(
     data: Union[list, dict],
     meta: Optional[dict] = None,
-    status_code: int = 200
+    status_code: int = status.HTTP_200_OK
 ) -> JSONResponse:
     """
     Tạo success response theo chuẩn.
@@ -36,7 +37,7 @@ def error_response(
     message: str,
     trace_id: Optional[str] = None,
     details: Optional[Union[list, dict]] = None,
-    status_code: int = 400
+    status_code: int = status.HTTP_400_BAD_REQUEST
 ) -> JSONResponse:
     """
     Tạo error response theo chuẩn.

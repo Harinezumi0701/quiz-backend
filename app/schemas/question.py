@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
+from app.schemas.http_response import SuccessResponse
 
 
 class CategoryOut(BaseModel):
@@ -76,3 +77,18 @@ class QuestionOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CategoryListResponse(SuccessResponse[List[CategoryOut]]):
+    """Response schema for list of categories"""
+    pass
+
+
+class CategoryWithSetsListResponse(SuccessResponse[List[CategoryWithSetsOut]]):
+    """Response schema for list of categories with sets"""
+    pass
+
+
+class QuestionListResponse(SuccessResponse[List[QuestionWithAnswers]]):
+    """Response schema for list of questions with answers"""
+    pass

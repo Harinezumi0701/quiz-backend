@@ -1,5 +1,6 @@
 # app/schemas/auth.py
 from pydantic import BaseModel, EmailStr, Field
+from app.schemas.http_response import SuccessResponse
 
 
 class RegisterRequest(BaseModel):
@@ -32,8 +33,8 @@ class LoginRequest(BaseModel):
         }
 
 
-class TokenResponse(BaseModel):
-    """Response schema cho access token"""
+class TokenData(BaseModel):
+    """Token data schema"""
     access_token: str = Field(..., description="JWT access token", example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     token_type: str = Field(default="bearer", description="Token type", example="bearer")
 
@@ -46,6 +47,11 @@ class TokenResponse(BaseModel):
         }
 
 
-class TokenData(BaseModel):
-    """Token data schema"""
+class TokenResponse(SuccessResponse[TokenData]):
+    """Response schema for access token wrapped in standard response"""
+    pass
+
+
+class TokenDataInternal(BaseModel):
+    """Token data schema for internal use"""
     user_email: str | None = Field(None, description="Email from token")

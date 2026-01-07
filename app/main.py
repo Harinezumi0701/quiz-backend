@@ -1,8 +1,11 @@
 # app/main.py
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
 from app.api.v1 import user, auth, question, submission
+from app.utils.exceptions import http_exception_handler, general_exception_handler
+from app.utils.response import success_response
 from app.constants import (
     APP_TITLE,
     APP_VERSION,
@@ -83,6 +86,15 @@ app.add_middleware(
     allow_headers=CORS_ALLOW_HEADERS,
 )
 
+# Response wrapper middleware để tự động wrap success responses
+from app.middleware.response_wrapper import ResponseWrapperMiddleware
+app.add_middleware(ResponseWrapperMiddleware)
+
+# Register exception handlers
+from fastapi import HTTPException
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
+
 # Register routers from api/v1 folder
 app.include_router(auth.router, prefix=AUTH_PREFIX, tags=["auth"])
 app.include_router(user.router, prefix=USERS_PREFIX, tags=["users"])
@@ -139,7 +151,20 @@ app.openapi = custom_openapi
     ROOT_PATH,
     summary="Root endpoint",
     description="Returns the API welcome message",
-    tags=["general"]
+    tags=["general"],
+    responses={
+        200: {
+            "description": "Welcome message",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "data": {"message": WELCOME_MESSAGE},
+                        "meta": {}
+                    }
+                }
+            }
+        }
+    }
 )
 def root():
     """
@@ -148,14 +173,34 @@ def root():
     Returns:
         dict: Welcome message
     """
-    return {"message": WELCOME_MESSAGE}
+    return success_response(
+        data={"message": WELCOME_MESSAGE},
+        meta={}
+    )
 
 
 @app.get(
     HEALTH_CHECK_PATH,
     summary="Health check",
     description="Check the service operational status",
-    tags=["general"]
+    tags=["general"],
+    responses={
+        200: {
+            "description": "Service status",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "data": {
+                            "status": HEALTH_STATUS,
+                            "service": SERVICE_NAME,
+                            "version": APP_VERSION
+                        },
+                        "meta": {}
+                    }
+                }
+            }
+        }
+    }
 )
 def health_check():
     """
@@ -164,8 +209,11 @@ def health_check():
     Returns:
         dict: Service status, service name and version
     """
-    return {
-        "status": HEALTH_STATUS,
-        "service": SERVICE_NAME,
-        "version": APP_VERSION
-    }
+    return success_response(
+        data={
+            "status": HEALTH_STATUS,
+            "service": SERVICE_NAME,
+            "version": APP_VERSION
+        },
+        meta={}
+    )

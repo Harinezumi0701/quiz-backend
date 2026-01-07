@@ -1,12 +1,15 @@
 # app/api/v1/question.py
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlalchemy.orm import Session
 from typing import List
-from app.schemas.question import CategoryOut, CategoryWithSetsOut, QuestionWithAnswers
+from app.schemas.question import (
+    CategoryOut, CategoryWithSetsOut, QuestionWithAnswers,
+    CategoryListResponse, CategoryWithSetsListResponse, QuestionListResponse
+)
+from app.schemas.http_response import ErrorResponse
 from app.services import question_service
 from app.db.session import get_db
 from app.constants import (
-    HTTP_STATUS_NOT_FOUND,
     ERROR_QUESTIONS_NOT_FOUND_CATEGORY,
     ERROR_QUESTIONS_NOT_FOUND_CATEGORY_SET,
 )
@@ -16,22 +19,12 @@ router = APIRouter()
 
 @router.get(
     "/categories",
-    response_model=List[CategoryOut],
+    response_model=CategoryListResponse,
     summary="Get all categories",
     description="Get list of all question categories with question count for each category",
     responses={
         200: {
             "description": "List of categories",
-            "content": {
-                "application/json": {
-                    "example": [
-                        {
-                            "category": "DVA-C02",
-                            "question_count": 150
-                        }
-                    ]
-                }
-            }
         }
     }
 )
@@ -41,17 +34,18 @@ def get_categories(db: Session = Depends(get_db)):
     
     This endpoint does not require authentication.
     """
-    return question_service.get_categories_with_counts(db)
+    categories = question_service.get_categories_with_counts(db)
+    return CategoryListResponse(data=categories, meta={})
 
 
 @router.get(
     "/categories-with-sets",
-    response_model=List[CategoryWithSetsOut],
+    response_model=CategoryWithSetsListResponse,
     summary="Get categories with question sets",
     description="Get list of all categories with question sets/dumps in each category",
     responses={
         200: {
-            "description": "List of categories with question sets"
+            "description": "List of categories with question sets",
         }
     }
 )
@@ -66,25 +60,22 @@ def get_categories_with_sets(db: Session = Depends(get_db)):
     
     This endpoint does not require authentication.
     """
-    return question_service.get_categories_with_sets(db)
+    categories = question_service.get_categories_with_sets(db)
+    return CategoryWithSetsListResponse(data=categories, meta={})
 
 
 @router.get(
     "/by-category/{category}",
-    response_model=List[QuestionWithAnswers],
+    response_model=QuestionListResponse,
     summary="Get questions by category",
     description="Get all questions with answers in a specific category",
     responses={
         200: {
-            "description": "List of questions with answers"
+            "description": "List of questions with answers",
         },
         404: {
             "description": "Questions not found",
-            "content": {
-                "application/json": {
-                    "example": {"detail": "No questions found for category: DVA-C02"}
-                }
-            }
+            "model": ErrorResponse,
         }
     }
 )
@@ -103,29 +94,25 @@ def get_questions_by_category(
 
     if not questions:
         raise HTTPException(
-            status_code=HTTP_STATUS_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=ERROR_QUESTIONS_NOT_FOUND_CATEGORY.format(category=category)
         )
 
-    return questions
+    return QuestionListResponse(data=questions, meta={})
 
 
 @router.get(
     "/by-category/{category}/set/{question_set}",
-    response_model=List[QuestionWithAnswers],
+    response_model=QuestionListResponse,
     summary="Get questions by category and question set",
     description="Get all questions with answers in a specific category and question set",
     responses={
         200: {
-            "description": "List of questions with answers"
+            "description": "List of questions with answers",
         },
         404: {
             "description": "Questions not found",
-            "content": {
-                "application/json": {
-                    "example": {"detail": "No questions found for category: DVA-C02, set: DVA-C02_Day_1"}
-                }
-            }
+            "model": ErrorResponse,
         }
     }
 )
@@ -146,8 +133,8 @@ def get_questions_by_category_and_set(
 
     if not questions:
         raise HTTPException(
-            status_code=HTTP_STATUS_NOT_FOUND,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=ERROR_QUESTIONS_NOT_FOUND_CATEGORY_SET.format(category=category, question_set=question_set)
         )
 
-    return questions
+    return QuestionListResponse(data=questions, meta={})

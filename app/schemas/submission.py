@@ -2,6 +2,7 @@
 from pydantic import BaseModel, Field
 from typing import List
 from datetime import datetime
+from app.schemas.http_response import SuccessResponse
 
 
 class SubmissionCreate(BaseModel):
@@ -102,4 +103,19 @@ class DashboardData(BaseModel):
     overall: OverallStatistics = Field(..., description="Overall statistics")
     by_category: List[CategoryStatistics] = Field(..., description="Statistics by category")
     recent_activity: List[RecentActivity] = Field(..., description="Recent activity")
+
+
+class SubmissionResponse(SuccessResponse[SubmissionOut]):
+    """Response schema for single submission"""
+    pass
+
+
+class SubmissionListResponse(SuccessResponse[List[SubmissionOut]]):
+    """Response schema for list of submissions"""
+    pass
+
+
+class DashboardResponse(SuccessResponse[DashboardData]):
+    """Response schema for dashboard data"""
+    pass
 

@@ -3,10 +3,10 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class RegisterRequest(BaseModel):
-    """Request schema cho đăng ký người dùng mới"""
-    user_email: EmailStr = Field(..., description="Email của người dùng", example="user@example.com")
-    account_name: str = Field(..., min_length=1, max_length=100, description="Tên tài khoản", example="John Doe")
-    user_password: str = Field(..., min_length=6, description="Mật khẩu (tối thiểu 6 ký tự)", example="password123")
+    """Request schema for new user registration"""
+    user_email: EmailStr = Field(..., description="User email", example="user@example.com")
+    account_name: str = Field(..., min_length=1, max_length=100, description="Account name", example="John Doe")
+    user_password: str = Field(..., min_length=6, description="Password (minimum 6 characters)", example="password123")
 
     class Config:
         json_schema_extra = {
@@ -19,9 +19,9 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    """Request schema cho đăng nhập"""
-    user_email: EmailStr = Field(..., description="Email của người dùng", example="user@example.com")
-    user_password: str = Field(..., description="Mật khẩu", example="password123")
+    """Request schema for login"""
+    user_email: EmailStr = Field(..., description="User email", example="user@example.com")
+    user_password: str = Field(..., description="Password", example="password123")
 
     class Config:
         json_schema_extra = {
@@ -35,7 +35,7 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     """Response schema cho access token"""
     access_token: str = Field(..., description="JWT access token", example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-    token_type: str = Field(default="bearer", description="Loại token", example="bearer")
+    token_type: str = Field(default="bearer", description="Token type", example="bearer")
 
     class Config:
         json_schema_extra = {
@@ -48,4 +48,4 @@ class TokenResponse(BaseModel):
 
 class TokenData(BaseModel):
     """Token data schema"""
-    user_email: str | None = Field(None, description="Email từ token")
+    user_email: str | None = Field(None, description="Email from token")

@@ -3,10 +3,10 @@ from pydantic import BaseModel, Field
 
 
 class UserOut(BaseModel):
-    """Schema cho thông tin người dùng"""
-    id: int = Field(..., description="ID của người dùng", example=1)
-    account_name: str = Field(..., description="Tên tài khoản", example="John Doe")
-    user_email: str = Field(..., description="Email của người dùng", example="user@example.com")
+    """Schema for user information"""
+    id: int = Field(..., description="User ID", example=1)
+    account_name: str = Field(..., description="Account name", example="John Doe")
+    user_email: str = Field(..., description="User email", example="user@example.com")
 
     class Config:
         orm_mode = True

@@ -21,8 +21,8 @@ services:
   # FastAPI Backend
   api:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: ci/docker/Dockerfile
     container_name: quiz_api
     restart: unless-stopped
     environment:
@@ -36,7 +36,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./data:/app/data
+      - ../../data:/app/data
 
 volumes:
   postgres_data:

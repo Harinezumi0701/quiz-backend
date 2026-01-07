@@ -14,11 +14,11 @@ router = APIRouter()
 @router.get(
     "/",
     response_model=list[UserOut],
-    summary="Lấy danh sách tất cả người dùng",
-    description="Lấy danh sách tất cả người dùng trong hệ thống (public endpoint)",
+    summary="Get all users",
+    description="Get list of all users in the system (public endpoint)",
     responses={
         200: {
-            "description": "Danh sách người dùng",
+            "description": "List of users",
             "content": {
                 "application/json": {
                     "example": [
@@ -35,9 +35,9 @@ router = APIRouter()
 )
 def read_users(db: Session = Depends(get_db)):
     """
-    Lấy danh sách tất cả người dùng.
+    Get list of all users.
     
-    Endpoint này không yêu cầu authentication.
+    This endpoint does not require authentication.
     """
     users = user_service.list_users(db)
     return users
@@ -46,14 +46,14 @@ def read_users(db: Session = Depends(get_db)):
 @router.get(
     "/me",
     response_model=UserOut,
-    summary="Lấy thông tin người dùng hiện tại",
-    description="Lấy thông tin của người dùng đang đăng nhập (yêu cầu authentication)",
+    summary="Get current user information",
+    description="Get information of the currently logged in user (requires authentication)",
     responses={
         200: {
-            "description": "Thông tin người dùng",
+            "description": "User information",
         },
         401: {
-            "description": "Không có quyền truy cập",
+            "description": "Unauthorized access",
             "content": {
                 "application/json": {
                     "example": {"detail": "Could not validate credentials"}
@@ -64,9 +64,9 @@ def read_users(db: Session = Depends(get_db)):
 )
 def read_current_user(current_user: User = Depends(get_current_user)):
     """
-    Lấy thông tin của người dùng hiện tại.
+    Get current user information.
     
-    Yêu cầu authentication token trong header: `Authorization: Bearer <token>`
+    Requires authentication token in header: `Authorization: Bearer <token>`
     """
     return current_user
 
@@ -74,14 +74,14 @@ def read_current_user(current_user: User = Depends(get_current_user)):
 @router.get(
     "/{user_id}",
     response_model=UserOut,
-    summary="Lấy thông tin người dùng theo ID",
-    description="Lấy thông tin chi tiết của một người dùng theo ID (public endpoint)",
+    summary="Get user information by ID",
+    description="Get detailed information of a user by ID (public endpoint)",
     responses={
         200: {
-            "description": "Thông tin người dùng",
+            "description": "User information",
         },
         404: {
-            "description": "Không tìm thấy người dùng",
+            "description": "User not found",
             "content": {
                 "application/json": {
                     "example": {"detail": "User not found"}
@@ -92,11 +92,11 @@ def read_current_user(current_user: User = Depends(get_current_user)):
 )
 def read_user(user_id: int, db: Session = Depends(get_db)):
     """
-    Lấy thông tin người dùng theo ID.
+    Get user information by ID.
     
-    - **user_id**: ID của người dùng cần lấy thông tin
+    - **user_id**: ID of the user to get information for
     
-    Endpoint này không yêu cầu authentication.
+    This endpoint does not require authentication.
     """
     user = user_service.get_user(db, user_id)
     if not user:

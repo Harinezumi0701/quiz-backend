@@ -14,14 +14,14 @@ router = APIRouter()
 @router.post(
     "/submit",
     response_model=ResponseOut,
-    summary="Gửi một câu trả lời",
-    description="Gửi một câu trả lời cho một câu hỏi (yêu cầu authentication)",
+    summary="Submit a response",
+    description="Submit a response for a question (requires authentication)",
     responses={
         200: {
-            "description": "Câu trả lời đã được lưu thành công",
+            "description": "Response saved successfully",
         },
         401: {
-            "description": "Không có quyền truy cập",
+            "description": "Unauthorized access",
             "content": {
                 "application/json": {
                     "example": {"detail": "Could not validate credentials"}
@@ -36,13 +36,13 @@ def submit_response(
     db: Session = Depends(get_db)
 ):
     """
-    Gửi một câu trả lời cho một câu hỏi.
+    Submit a response for a question.
     
-    - **question_id**: ID của câu hỏi
-    - **selected_option_id**: ID của đáp án được chọn
-    - **is_correct**: Có phải đáp án đúng không
+    - **question_id**: Question ID
+    - **selected_option_id**: Selected answer option ID
+    - **is_correct**: Whether the answer is correct
     
-    Yêu cầu authentication token trong header: `Authorization: Bearer <token>`
+    Requires authentication token in header: `Authorization: Bearer <token>`
     """
     return response_service.submit_response(db, current_user.id, response_data)
 
@@ -50,14 +50,14 @@ def submit_response(
 @router.post(
     "/submit-bulk",
     response_model=List[ResponseOut],
-    summary="Gửi nhiều câu trả lời cùng lúc",
-    description="Gửi nhiều câu trả lời trong một request (yêu cầu authentication)",
+    summary="Submit multiple responses at once",
+    description="Submit multiple responses in one request (requires authentication)",
     responses={
         200: {
-            "description": "Danh sách các câu trả lời đã được lưu",
+            "description": "List of saved responses",
         },
         401: {
-            "description": "Không có quyền truy cập",
+            "description": "Unauthorized access",
             "content": {
                 "application/json": {
                     "example": {"detail": "Could not validate credentials"}
@@ -72,16 +72,16 @@ def submit_responses_bulk(
     db: Session = Depends(get_db)
 ):
     """
-    Gửi nhiều câu trả lời cùng lúc.
+    Submit multiple responses at once.
     
-    - **responses**: Danh sách các câu trả lời (tối thiểu 1 câu)
+    - **responses**: List of responses (minimum 1 response)
     
-    Mỗi response trong danh sách bao gồm:
-    - question_id: ID của câu hỏi
-    - selected_option_id: ID của đáp án được chọn
-    - is_correct: Có phải đáp án đúng không
+    Each response in the list includes:
+    - question_id: Question ID
+    - selected_option_id: Selected answer option ID
+    - is_correct: Whether the answer is correct
     
-    Yêu cầu authentication token trong header: `Authorization: Bearer <token>`
+    Requires authentication token in header: `Authorization: Bearer <token>`
     """
     return response_service.submit_responses_bulk(db, current_user.id, bulk_data.responses)
 
@@ -89,11 +89,11 @@ def submit_responses_bulk(
 @router.get(
     "/dashboard",
     response_model=DashboardData,
-    summary="Lấy dữ liệu dashboard",
-    description="Lấy thống kê và hoạt động gần đây của người dùng (yêu cầu authentication)",
+    summary="Get dashboard data",
+    description="Get user statistics and recent activity (requires authentication)",
     responses={
         200: {
-            "description": "Dữ liệu dashboard",
+            "description": "Dashboard data",
             "content": {
                 "application/json": {
                     "example": {
@@ -127,7 +127,7 @@ def submit_responses_bulk(
             }
         },
         401: {
-            "description": "Không có quyền truy cập",
+            "description": "Unauthorized access",
             "content": {
                 "application/json": {
                     "example": {"detail": "Could not validate credentials"}
@@ -141,12 +141,12 @@ def get_dashboard(
     db: Session = Depends(get_db)
 ):
     """
-    Lấy dữ liệu dashboard của người dùng bao gồm:
+    Get user dashboard data including:
     
-    - **overall**: Thống kê tổng quan (tổng số câu đã trả lời, đúng, sai, tỷ lệ chính xác)
-    - **by_category**: Thống kê theo từng danh mục
-    - **recent_activity**: Hoạt động gần đây (các câu hỏi đã trả lời gần nhất)
+    - **overall**: Overall statistics (total answered, correct, wrong, accuracy rate)
+    - **by_category**: Statistics by category
+    - **recent_activity**: Recent activity (most recently answered questions)
     
-    Yêu cầu authentication token trong header: `Authorization: Bearer <token>`
+    Requires authentication token in header: `Authorization: Bearer <token>`
     """
     return response_service.get_user_dashboard_data(db, current_user.id)

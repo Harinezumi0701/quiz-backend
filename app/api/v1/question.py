@@ -17,11 +17,11 @@ router = APIRouter()
 @router.get(
     "/categories",
     response_model=List[CategoryOut],
-    summary="Lấy danh sách tất cả danh mục",
-    description="Lấy danh sách tất cả các danh mục câu hỏi kèm số lượng câu hỏi trong mỗi danh mục",
+    summary="Get all categories",
+    description="Get list of all question categories with question count for each category",
     responses={
         200: {
-            "description": "Danh sách danh mục",
+            "description": "List of categories",
             "content": {
                 "application/json": {
                     "example": [
@@ -37,9 +37,9 @@ router = APIRouter()
 )
 def get_categories(db: Session = Depends(get_db)):
     """
-    Lấy danh sách tất cả các danh mục câu hỏi duy nhất kèm số lượng câu hỏi.
+    Get list of all unique question categories with question counts.
     
-    Endpoint này không yêu cầu authentication.
+    This endpoint does not require authentication.
     """
     return question_service.get_categories_with_counts(db)
 
@@ -47,24 +47,24 @@ def get_categories(db: Session = Depends(get_db)):
 @router.get(
     "/categories-with-sets",
     response_model=List[CategoryWithSetsOut],
-    summary="Lấy danh sách danh mục kèm question sets",
-    description="Lấy danh sách tất cả các danh mục kèm theo các question sets/dumps trong mỗi danh mục",
+    summary="Get categories with question sets",
+    description="Get list of all categories with question sets/dumps in each category",
     responses={
         200: {
-            "description": "Danh sách danh mục với question sets"
+            "description": "List of categories with question sets"
         }
     }
 )
 def get_categories_with_sets(db: Session = Depends(get_db)):
     """
-    Lấy danh sách tất cả các danh mục kèm theo các question sets/dumps.
+    Get list of all categories with question sets/dumps.
     
-    Mỗi danh mục sẽ bao gồm:
-    - Tên danh mục
-    - Tổng số câu hỏi
-    - Danh sách các question sets với số lượng câu hỏi và khoảng câu hỏi
+    Each category will include:
+    - Category name
+    - Total number of questions
+    - List of question sets with question count and question range
     
-    Endpoint này không yêu cầu authentication.
+    This endpoint does not require authentication.
     """
     return question_service.get_categories_with_sets(db)
 
@@ -72,14 +72,14 @@ def get_categories_with_sets(db: Session = Depends(get_db)):
 @router.get(
     "/by-category/{category}",
     response_model=List[QuestionWithAnswers],
-    summary="Lấy câu hỏi theo danh mục",
-    description="Lấy tất cả câu hỏi kèm câu trả lời trong một danh mục cụ thể",
+    summary="Get questions by category",
+    description="Get all questions with answers in a specific category",
     responses={
         200: {
-            "description": "Danh sách câu hỏi với câu trả lời"
+            "description": "List of questions with answers"
         },
         404: {
-            "description": "Không tìm thấy câu hỏi",
+            "description": "Questions not found",
             "content": {
                 "application/json": {
                     "example": {"detail": "No questions found for category: DVA-C02"}
@@ -89,15 +89,15 @@ def get_categories_with_sets(db: Session = Depends(get_db)):
     }
 )
 def get_questions_by_category(
-    category: str = Path(..., description="Tên danh mục", example="DVA-C02"),
+    category: str = Path(..., description="Category name", example="DVA-C02"),
     db: Session = Depends(get_db)
 ):
     """
-    Lấy tất cả câu hỏi kèm câu trả lời trong một danh mục cụ thể.
+    Get all questions with answers in a specific category.
     
-    - **category**: Tên danh mục cần lấy câu hỏi (ví dụ: "DVA-C02")
+    - **category**: Category name to get questions from (e.g., "DVA-C02")
     
-    Endpoint này không yêu cầu authentication.
+    This endpoint does not require authentication.
     """
     questions = question_service.get_questions_by_category(db, category)
 
@@ -113,14 +113,14 @@ def get_questions_by_category(
 @router.get(
     "/by-category/{category}/set/{question_set}",
     response_model=List[QuestionWithAnswers],
-    summary="Lấy câu hỏi theo danh mục và question set",
-    description="Lấy tất cả câu hỏi kèm câu trả lời trong một danh mục và question set cụ thể",
+    summary="Get questions by category and question set",
+    description="Get all questions with answers in a specific category and question set",
     responses={
         200: {
-            "description": "Danh sách câu hỏi với câu trả lời"
+            "description": "List of questions with answers"
         },
         404: {
-            "description": "Không tìm thấy câu hỏi",
+            "description": "Questions not found",
             "content": {
                 "application/json": {
                     "example": {"detail": "No questions found for category: DVA-C02, set: DVA-C02_Day_1"}
@@ -130,17 +130,17 @@ def get_questions_by_category(
     }
 )
 def get_questions_by_category_and_set(
-    category: str = Path(..., description="Tên danh mục", example="DVA-C02"),
-    question_set: str = Path(..., description="Tên question set", example="DVA-C02_Day_1"),
+    category: str = Path(..., description="Category name", example="DVA-C02"),
+    question_set: str = Path(..., description="Question set name", example="DVA-C02_Day_1"),
     db: Session = Depends(get_db)
 ):
     """
-    Lấy tất cả câu hỏi kèm câu trả lời trong một danh mục và question set cụ thể.
+    Get all questions with answers in a specific category and question set.
     
-    - **category**: Tên danh mục (ví dụ: "DVA-C02")
-    - **question_set**: Tên question set (ví dụ: "DVA-C02_Day_1")
+    - **category**: Category name (e.g., "DVA-C02")
+    - **question_set**: Question set name (e.g., "DVA-C02_Day_1")
     
-    Endpoint này không yêu cầu authentication.
+    This endpoint does not require authentication.
     """
     questions = question_service.get_questions_by_category_and_set(db, category, question_set)
 

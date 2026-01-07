@@ -1,6 +1,7 @@
 # app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 from app.api.v1 import user, auth, question, response
 from app.constants import (
     APP_TITLE,
@@ -23,36 +24,36 @@ from app.constants import (
 description = """
 ## Quiz Backend API
 
-API backend cho hệ thống quiz với các tính năng:
+Quiz system backend API with the following features:
 
-* **Authentication**: Đăng ký và đăng nhập người dùng
-* **Questions**: Quản lý câu hỏi và danh mục
-* **Responses**: Xử lý và lưu trữ câu trả lời của người dùng
-* **Users**: Quản lý thông tin người dùng
-* **Dashboard**: Thống kê và báo cáo kết quả
+* **Authentication**: User registration and login
+* **Questions**: Question and category management
+* **Responses**: Process and store user responses
+* **Users**: User information management
+* **Dashboard**: Statistics and result reports
 
 ### Authentication
 
-Hầu hết các endpoints yêu cầu authentication. Sau khi đăng nhập thành công, bạn sẽ nhận được access token.
-Sử dụng token này trong header: `Authorization: Bearer <token>`
+Most endpoints require authentication. After successful login, you will receive an access token.
+Use this token in the header: `Authorization: Bearer <token>`
 """
 
 tags_metadata = [
     {
         "name": "auth",
-        "description": "Xác thực người dùng. Đăng ký và đăng nhập để nhận access token.",
+        "description": "User authentication. Register and login to receive access token.",
     },
     {
         "name": "users",
-        "description": "Quản lý thông tin người dùng. Lấy danh sách users hoặc thông tin user hiện tại.",
+        "description": "User information management. Get list of users or current user information.",
     },
     {
         "name": "questions",
-        "description": "Quản lý câu hỏi. Lấy danh sách categories, question sets và câu hỏi theo category/set.",
+        "description": "Question management. Get list of categories, question sets and questions by category/set.",
     },
     {
         "name": "responses",
-        "description": "Xử lý câu trả lời của người dùng. Submit responses và xem dashboard statistics.",
+        "description": "Process user responses. Submit responses and view dashboard statistics.",
     },
 ]
 
@@ -68,6 +69,9 @@ app = FastAPI(
     license_info={
         "name": "MIT",
     },
+    openapi_url="/docs/openapi.json",  # Ensure OpenAPI endpoint is enabled
+    docs_url="/docs",  # Swagger UI
+    redoc_url="/redoc",  # ReDoc
 )
 
 # CORS configuration for frontend
@@ -79,24 +83,70 @@ app.add_middleware(
     allow_headers=CORS_ALLOW_HEADERS,
 )
 
-# Đăng ký router từ folder api/v1
+# Register routers from api/v1 folder
 app.include_router(auth.router, prefix=AUTH_PREFIX, tags=["auth"])
 app.include_router(user.router, prefix=USERS_PREFIX, tags=["users"])
 app.include_router(question.router, prefix=QUESTIONS_PREFIX, tags=["questions"])
 app.include_router(response.router, prefix=RESPONSES_PREFIX, tags=["responses"])
 
+
+def custom_openapi():
+    """Custom OpenAPI schema ensuring openapi version field is present."""
+    if app.openapi_schema:
+        return app.openapi_schema
+    try:
+        openapi_schema = get_openapi(
+            title=APP_TITLE,
+            version=APP_VERSION,
+            openapi_version="3.1.0",
+            description=description,
+            routes=app.routes,
+            tags=tags_metadata,
+            contact={
+                "name": "API Support",
+                "email": "support@example.com",
+            },
+            license_info={
+                "name": "MIT",
+            },
+        )
+        # Ensure openapi field is always present
+        if "openapi" not in openapi_schema:
+            openapi_schema["openapi"] = "3.1.0"
+        app.openapi_schema = openapi_schema
+        return app.openapi_schema
+    except Exception as e:
+        # Fallback: create basic schema if error occurs
+        import logging
+        logging.error(f"Error generating OpenAPI schema: {e}")
+        fallback_schema = {
+            "openapi": "3.1.0",
+            "info": {
+                "title": APP_TITLE,
+                "version": APP_VERSION,
+                "description": description,
+            },
+            "paths": {},
+        }
+        app.openapi_schema = fallback_schema
+        return fallback_schema
+
+
+# Assign custom_openapi after all routes are registered
+app.openapi = custom_openapi
+
 @app.get(
     ROOT_PATH,
     summary="Root endpoint",
-    description="Trả về thông điệp chào mừng của API",
+    description="Returns the API welcome message",
     tags=["general"]
 )
 def root():
     """
-    Root endpoint của API.
+    Root endpoint of the API.
     
     Returns:
-        dict: Thông điệp chào mừng
+        dict: Welcome message
     """
     return {"message": WELCOME_MESSAGE}
 
@@ -104,15 +154,15 @@ def root():
 @app.get(
     HEALTH_CHECK_PATH,
     summary="Health check",
-    description="Kiểm tra trạng thái hoạt động của service",
+    description="Check the service operational status",
     tags=["general"]
 )
 def health_check():
     """
-    Health check endpoint để kiểm tra service có đang hoạt động không.
+    Health check endpoint to verify if the service is running.
     
     Returns:
-        dict: Trạng thái service, tên service và version
+        dict: Service status, service name and version
     """
     return {
         "status": HEALTH_STATUS,

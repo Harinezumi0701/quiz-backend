@@ -13,11 +13,11 @@ router = APIRouter()
     "/register",
     response_model=TokenResponse,
     status_code=HTTP_STATUS_CREATED,
-    summary="Đăng ký người dùng mới",
-    description="Tạo tài khoản mới và trả về access token",
+    summary="Register new user",
+    description="Create a new account and return access token",
     responses={
         201: {
-            "description": "Đăng ký thành công",
+            "description": "Registration successful",
             "content": {
                 "application/json": {
                     "example": {
@@ -28,7 +28,7 @@ router = APIRouter()
             }
         },
         400: {
-            "description": "Email đã được đăng ký",
+            "description": "Email already registered",
             "content": {
                 "application/json": {
                     "example": {"detail": "Email already registered"}
@@ -39,13 +39,13 @@ router = APIRouter()
 )
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
     """
-    Đăng ký người dùng mới.
+    Register a new user.
 
-    - **user_email**: Email của người dùng (phải là email hợp lệ)
-    - **account_name**: Tên hiển thị của tài khoản
-    - **user_password**: Mật khẩu (tối thiểu 6 ký tự)
+    - **user_email**: User email (must be a valid email)
+    - **account_name**: Account display name
+    - **user_password**: Password (minimum 6 characters)
 
-    Sau khi đăng ký thành công, bạn sẽ nhận được access token để sử dụng cho các API khác.
+    After successful registration, you will receive an access token to use for other APIs.
     """
     return auth_service.register_user(db, request)
 
@@ -53,11 +53,11 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
 @router.post(
     "/login",
     response_model=TokenResponse,
-    summary="Đăng nhập",
-    description="Xác thực người dùng và trả về access token",
+    summary="Login",
+    description="Authenticate user and return access token",
     responses={
         200: {
-            "description": "Đăng nhập thành công",
+            "description": "Login successful",
             "content": {
                 "application/json": {
                     "example": {
@@ -68,7 +68,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
             }
         },
         401: {
-            "description": "Email hoặc mật khẩu không đúng",
+            "description": "Incorrect email or password",
             "content": {
                 "application/json": {
                     "example": {"detail": "Incorrect email or password"}
@@ -79,11 +79,11 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
 )
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     """
-    Đăng nhập với email và mật khẩu.
+    Login with email and password.
 
-    - **user_email**: Email đã đăng ký
-    - **user_password**: Mật khẩu của tài khoản
+    - **user_email**: Registered email
+    - **user_password**: Account password
 
-    Trả về access token nếu thông tin đăng nhập đúng.
+    Returns access token if login credentials are correct.
     """
     return auth_service.login_user(db, request)

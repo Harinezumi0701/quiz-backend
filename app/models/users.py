@@ -14,4 +14,5 @@ class User(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
     deleted_at = Column(TIMESTAMP, nullable=True)
     
-    responses = relationship("Response", back_populates="user")
+    submissions = relationship("Submission", back_populates="user")
+    submission_history = relationship("SubmissionHistory", back_populates="user")

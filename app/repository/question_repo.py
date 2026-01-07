@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.questions import Question
-from app.models.answers import Answer
+from app.models.answer_options import AnswerOption
 
 
 def get_all_categories(db: Session):
@@ -59,10 +59,10 @@ def get_questions_by_category(db: Session, category: str):
 
     result = []
     for question in questions:
-        # Get all answers for this question
-        answers = db.query(Answer).filter(
-            Answer.question_id == question.id,
-            Answer.deleted_at.is_(None)
+        # Get all answer options for this question
+        answers = db.query(AnswerOption).filter(
+            AnswerOption.question_id == question.id,
+            AnswerOption.deleted_at.is_(None)
         ).all()
 
         result.append({
@@ -102,10 +102,10 @@ def get_questions_by_category_and_set(db: Session, category: str, question_set: 
 
     result = []
     for question in questions:
-        # Get all answers for this question
-        answers = db.query(Answer).filter(
-            Answer.question_id == question.id,
-            Answer.deleted_at.is_(None)
+        # Get all answer options for this question
+        answers = db.query(AnswerOption).filter(
+            AnswerOption.question_id == question.id,
+            AnswerOption.deleted_at.is_(None)
         ).all()
 
         result.append({

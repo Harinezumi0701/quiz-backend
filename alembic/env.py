@@ -7,8 +7,9 @@ from alembic import context
 from app.db.base import Base
 from app.models.users import User
 from app.models.questions import Question
-from app.models.answers import Answer
-from app.models.responses import Response
+from app.models.submissions import Submission
+from app.models.answer_options import AnswerOption
+from app.models.submission_history import SubmissionHistory
 from dotenv import load_dotenv
 load_dotenv()
 

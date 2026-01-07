@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
-class Answer(Base):
+class AnswerOption(Base):
     __tablename__ = "answers"
 
     id = Column(Integer, primary_key=True, index=True)

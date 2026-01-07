@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, response
+from app.api.v1 import user, auth, question, submission
 from app.constants import (
     APP_TITLE,
     APP_VERSION,
@@ -16,7 +16,7 @@ from app.constants import (
     AUTH_PREFIX,
     USERS_PREFIX,
     QUESTIONS_PREFIX,
-    RESPONSES_PREFIX,
+    SUBMISSIONS_PREFIX,
     HEALTH_CHECK_PATH,
     ROOT_PATH,
 )
@@ -28,7 +28,7 @@ Quiz system backend API with the following features:
 
 * **Authentication**: User registration and login
 * **Questions**: Question and category management
-* **Responses**: Process and store user responses
+* **Submissions**: Process and store user submissions
 * **Users**: User information management
 * **Dashboard**: Statistics and result reports
 
@@ -52,8 +52,8 @@ tags_metadata = [
         "description": "Question management. Get list of categories, question sets and questions by category/set.",
     },
     {
-        "name": "responses",
-        "description": "Process user responses. Submit responses and view dashboard statistics.",
+        "name": "submissions",
+        "description": "Process user submissions. Submit submissions and view dashboard statistics.",
     },
 ]
 
@@ -87,7 +87,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix=AUTH_PREFIX, tags=["auth"])
 app.include_router(user.router, prefix=USERS_PREFIX, tags=["users"])
 app.include_router(question.router, prefix=QUESTIONS_PREFIX, tags=["questions"])
-app.include_router(response.router, prefix=RESPONSES_PREFIX, tags=["responses"])
+app.include_router(submission.router, prefix=SUBMISSIONS_PREFIX, tags=["submissions"])
 
 
 def custom_openapi():

@@ -15,5 +15,5 @@ class Question(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
     deleted_at = Column(TIMESTAMP, nullable=True)
 
-    # A question can have multiple answers
-    answers = relationship("Answer", back_populates="question")
+    # A question can have multiple answer options
+    options = relationship("AnswerOption", back_populates="question")

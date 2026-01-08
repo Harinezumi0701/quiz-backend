@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, TIMESTAMP, ForeignKey, text
+from sqlalchemy import Column, String, Text, TIMESTAMP, ForeignKey, Boolean, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -13,6 +13,7 @@ class Question(Base):
     image_url = Column(Text, nullable=True)
     category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id"), nullable=True, index=True)
     question_set_id = Column(UUID(as_uuid=True), ForeignKey("question_sets.id"), nullable=True, index=True)
+    is_multiple_choice = Column(Boolean, nullable=False, default=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
     deleted_at = Column(TIMESTAMP, nullable=True)

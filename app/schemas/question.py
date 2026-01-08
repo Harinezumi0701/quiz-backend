@@ -23,6 +23,8 @@ class AnswerOut(BaseModel):
     content: str = Field(..., description="Answer content", example="Option A")
     is_correct: bool = Field(..., description="Whether this is the correct answer", example=True)
     explanation: str | None = Field(None, description="Explanation for the answer", example="This is the correct answer because...")
+    created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
+    updated_at: int | None = Field(None, description="Updated at Unix timestamp", example=1704067200)
 
     class Config:
         from_attributes = True
@@ -35,6 +37,7 @@ class QuestionWithAnswers(BaseModel):
     image_url: str | None = Field(None, description="Image URL (if available)", example="https://example.com/image.png")
     category: str | None = Field(None, description="Question category", example="DVA-C02")
     question_set: str | None = Field(None, description="Question set", example="DVA-C02_Day_1")
+    is_multiple_choice: bool = Field(False, description="Whether this question has multiple correct answers", example=False)
     created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
     updated_at: int | None = Field(None, description="Updated at Unix timestamp", example=1704067200)
     answers: List[AnswerOut] = Field(..., description="List of answers")
@@ -82,4 +85,14 @@ class QuestionSetDetailListResponse(SuccessResponse[List[QuestionSetDetailOut]])
 
 class QuestionSetDetailResponse(SuccessResponse[QuestionSetDetailOut]):
     """Response schema for single question set"""
+    pass
+
+
+class AnswerListResponse(SuccessResponse[List[AnswerOut]]):
+    """Response schema for list of answers"""
+    pass
+
+
+class AnswerResponse(SuccessResponse[AnswerOut]):
+    """Response schema for single answer"""
     pass

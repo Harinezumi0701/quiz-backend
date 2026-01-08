@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.repository import submission_repo
 from app.schemas.submission import SubmissionCreate
-from app.models.submissions import Submission
 from app.utils.datetime_utils import datetime_to_timestamp
 
 

@@ -1,5 +1,4 @@
 # app/utils/exceptions.py
-from typing import Optional, Union
 from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from app.utils.response import error_response

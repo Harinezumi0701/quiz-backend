@@ -1,5 +1,5 @@
 # app/utils/response.py
-from typing import Any, Optional, Union
+from typing import Optional, Union
 from fastapi import status
 from fastapi.responses import JSONResponse
 from app.schemas.http_response import SuccessResponse, ErrorResponse, ErrorDetail

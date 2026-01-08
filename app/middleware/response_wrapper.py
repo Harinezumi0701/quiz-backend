@@ -1,7 +1,7 @@
 # app/middleware/response_wrapper.py
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response, JSONResponse, StreamingResponse
+from starlette.responses import Response, JSONResponse
 from fastapi.responses import JSONResponse as FastAPIJSONResponse
 from app.utils.response import success_response
 from typing import Callable

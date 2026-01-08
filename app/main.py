@@ -1,8 +1,7 @@
 # app/main.py
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import JSONResponse
 from app.api.v1 import user, auth, question, submission
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response

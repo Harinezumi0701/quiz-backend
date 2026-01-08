@@ -41,3 +41,5 @@ htmlcov/
 # Build artifacts
 *.egg
 *.whl
+
+data*

@@ -62,3 +62,18 @@ def get_all_questions(
 def get_question_by_id(db: Session, question_id: str):
     """Get a specific question by ID."""
     return question_repo.get_question_by_id(db, question_id)
+
+
+def get_questions_by_category_and_set_id(
+    db: Session,
+    category_id: str,
+    question_set_id: str,
+    search_key: str = None,
+    search_value: str = None,
+    page: int = 1,
+    page_size: int = 10,
+):
+    """Get all questions for a specific category and question set with optional filtering and pagination."""
+    return question_repo.get_questions_by_category_and_set_id(
+        db, category_id, question_set_id, search_key, search_value, page, page_size
+    )

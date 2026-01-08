@@ -4,16 +4,36 @@ from typing import List
 from app.repository import submission_repo
 from app.schemas.submission import SubmissionCreate
 from app.models.submissions import Submission
+from app.utils.datetime_utils import datetime_to_timestamp
 
 
-def submit_submission(db: Session, user_id: int, submission_data: SubmissionCreate) -> Submission:
+def submit_submission(db: Session, user_id: int, submission_data: SubmissionCreate) -> dict:
     """Submit a single quiz submission."""
-    return submission_repo.create_submission(db, user_id, submission_data)
+    submission = submission_repo.create_submission(db, user_id, submission_data)
+    return {
+        "id": submission.id,
+        "user_id": submission.user_id,
+        "question_id": submission.question_id,
+        "selected_option_id": submission.selected_option_id,
+        "is_correct": submission.is_correct,
+        "answered_at": datetime_to_timestamp(submission.answered_at),
+    }
 
 
-def submit_submissions_bulk(db: Session, user_id: int, submissions: List[SubmissionCreate]) -> List[Submission]:
+def submit_submissions_bulk(db: Session, user_id: int, submissions: List[SubmissionCreate]) -> List[dict]:
     """Submit multiple quiz submissions at once."""
-    return submission_repo.create_submissions_bulk(db, user_id, submissions)
+    db_submissions = submission_repo.create_submissions_bulk(db, user_id, submissions)
+    return [
+        {
+            "id": submission.id,
+            "user_id": submission.user_id,
+            "question_id": submission.question_id,
+            "selected_option_id": submission.selected_option_id,
+            "is_correct": submission.is_correct,
+            "answered_at": datetime_to_timestamp(submission.answered_at),
+        }
+        for submission in db_submissions
+    ]
 
 
 def get_user_dashboard_data(db: Session, user_id: int):

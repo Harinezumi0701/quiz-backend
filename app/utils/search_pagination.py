@@ -42,16 +42,22 @@ class TextSearchStrategy(SearchStrategy):
 
 
 class DateSearchStrategy(SearchStrategy):
-    """Strategy for date search."""
+    """Strategy for date search. Supports both Unix timestamp (int) and date string formats."""
     
     def apply(self, query: Query, column: Any, search_value: str, date_format: Optional[str] = None, **kwargs) -> Query:
         """Apply date search filter."""
         try:
-            if date_format:
-                search_date = datetime.strptime(search_value, date_format)
-            else:
-                # Try ISO format
-                search_date = datetime.fromisoformat(search_value.replace("Z", "+00:00"))
+            # Try to parse as Unix timestamp first (int as string)
+            try:
+                timestamp = int(search_value)
+                search_date = datetime.fromtimestamp(timestamp)
+            except (ValueError, OSError, OverflowError):
+                # Not a timestamp, try parsing as date string
+                if date_format:
+                    search_date = datetime.strptime(search_value, date_format)
+                else:
+                    # Try ISO format
+                    search_date = datetime.fromisoformat(search_value.replace("Z", "+00:00"))
             
             return query.filter(func.date(column) == search_date.date())
         except (ValueError, AttributeError):

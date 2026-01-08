@@ -6,6 +6,7 @@ from app.models.questions import Question
 from app.models.answer_options import AnswerOption
 from app.models.categories import Category
 from app.utils.search_pagination import paginate_query
+from app.utils.datetime_utils import datetime_to_timestamp
 
 
 def get_all_categories(db: Session):
@@ -261,7 +262,7 @@ def get_all_questions(
                 "image_url": question.image_url,
                 "category": question.category_obj.name if question.category_obj else None,
                 "question_set": question.question_set,
-                "created_at": question.created_at,
+                "created_at": datetime_to_timestamp(question.created_at),
                 "answers": [
                     {
                         "id": answer.id,
@@ -304,8 +305,8 @@ def get_question_by_id(db: Session, question_id: str):
         "image_url": question.image_url,
         "category": question.category_obj.name if question.category_obj else None,
         "question_set": question.question_set,
-        "created_at": question.created_at,
-        "updated_at": question.updated_at,
+        "created_at": datetime_to_timestamp(question.created_at),
+        "updated_at": datetime_to_timestamp(question.updated_at),
         "answers": [
             {
                 "id": answer.id,

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from app.models.categories import Category
 from app.models.questions import Question
+from app.utils.datetime_utils import datetime_to_timestamp
 
 
 def get_all_categories_with_search(
@@ -30,8 +31,8 @@ def get_all_categories_with_search(
             'id': category.id,
             'name': category.name,
             'question_count': count,
-            'created_at': category.created_at,
-            'updated_at': category.updated_at
+            'created_at': datetime_to_timestamp(category.created_at),
+            'updated_at': datetime_to_timestamp(category.updated_at)
         })
     
     return result
@@ -56,6 +57,6 @@ def get_category_by_id(db: Session, category_id: str):
         'id': category.id,
         'name': category.name,
         'question_count': count,
-        'created_at': category.created_at,
-        'updated_at': category.updated_at
+        'created_at': datetime_to_timestamp(category.created_at),
+        'updated_at': datetime_to_timestamp(category.updated_at)
     }

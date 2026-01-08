@@ -1,7 +1,6 @@
 # app/schemas/submission.py
 from pydantic import BaseModel, Field
 from typing import List
-from datetime import datetime
 from uuid import UUID
 from app.schemas.http_response import SuccessResponse
 
@@ -52,7 +51,7 @@ class SubmissionOut(BaseModel):
     question_id: int = Field(..., description="Question ID", example=1)
     selected_option_id: int = Field(..., description="Selected answer option ID", example=3)
     is_correct: bool = Field(..., description="Whether the submission is correct", example=True)
-    answered_at: datetime | None = Field(None, description="Submission timestamp", example="2024-01-01T12:00:00")
+    answered_at: int | None = Field(None, description="Submission Unix timestamp", example=1704067200)
 
     class Config:
         from_attributes = True
@@ -63,7 +62,7 @@ class SubmissionOut(BaseModel):
                 "question_id": 1,
                 "selected_option_id": 3,
                 "is_correct": True,
-                "answered_at": "2024-01-01T12:00:00"
+                "answered_at": 1704067200
             }
         }
 
@@ -78,7 +77,7 @@ class CategoryStatistics(BaseModel):
     wrong_answers: int = Field(..., description="Number of wrong answers", example=10)
     wrong_submissions: int = Field(..., description="Number of wrong submissions", example=10)
     accuracy: float = Field(..., description="Accuracy rate", example=0.8)
-    last_attempt: str | None = Field(None, description="Last attempt", example="2024-01-01")
+    last_attempt: int | None = Field(None, description="Last attempt Unix timestamp", example=1704067200)
 
 
 class RecentActivity(BaseModel):
@@ -87,7 +86,7 @@ class RecentActivity(BaseModel):
     category: str = Field(..., description="Question category", example="DVA-C02")
     question_preview: str = Field(..., description="Question content preview", example="What is AWS Lambda?")
     is_correct: bool = Field(..., description="Whether the submission is correct", example=True)
-    answered_at: str | None = Field(None, description="Submission timestamp", example="2024-01-01T12:00:00")
+    answered_at: int | None = Field(None, description="Submission Unix timestamp", example=1704067200)
 
 
 class OverallStatistics(BaseModel):

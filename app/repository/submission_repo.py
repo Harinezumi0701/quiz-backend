@@ -7,6 +7,7 @@ from app.models.questions import Question
 from app.models.users import User
 from app.models.submission_history import SubmissionHistory
 from app.schemas.submission import SubmissionCreate
+from app.utils.datetime_utils import datetime_to_timestamp
 
 
 def create_submission(db: Session, user_id: int, submission_data: SubmissionCreate) -> Submission:
@@ -87,7 +88,7 @@ def get_user_statistics(db: Session, user_id: int):
             'wrong_answers': stat[1] - (stat[2] or 0),  # Keep for backward compatibility
             'wrong_submissions': stat[1] - (stat[2] or 0),
             'accuracy': round((stat[2] or 0) / stat[1] * 100, 1) if stat[1] > 0 else 0,
-            'last_attempt': stat[3].isoformat() if stat[3] else None
+            'last_attempt': datetime_to_timestamp(stat[3])
         }
         for stat in stats
     ]
@@ -116,7 +117,7 @@ def get_user_recent_activity(db: Session, user_id: int, limit: int = 10):
             'category': activity[1],
             'question_preview': activity[2][:100] + '...' if len(activity[2]) > 100 else activity[2],
             'is_correct': activity[3],
-            'answered_at': activity[4].isoformat() if activity[4] else None
+            'answered_at': datetime_to_timestamp(activity[4])
         }
         for activity in activities
     ]

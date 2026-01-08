@@ -64,8 +64,8 @@ class QuestionWithAnswers(BaseModel):
     image_url: str | None = Field(None, description="Image URL (if available)", example="https://example.com/image.png")
     category: str | None = Field(None, description="Question category", example="DVA-C02")
     question_set: str | None = Field(None, description="Question set", example="DVA-C02_Day_1")
-    created_at: str | None = Field(None, description="Created at timestamp")
-    updated_at: str | None = Field(None, description="Updated at timestamp")
+    created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
+    updated_at: int | None = Field(None, description="Updated at Unix timestamp", example=1704067200)
     answers: List[AnswerOut] = Field(..., description="List of answers")
 
     class Config:
@@ -88,8 +88,8 @@ class CategoryDetailOut(BaseModel):
     id: UUID = Field(..., description="Category ID", example="550e8400-e29b-41d4-a716-446655440000")
     name: str = Field(..., description="Category name", example="DVA-C02")
     question_count: int = Field(..., description="Number of questions in category", example=150)
-    created_at: str | None = Field(None, description="Created at timestamp")
-    updated_at: str | None = Field(None, description="Updated at timestamp")
+    created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
+    updated_at: int | None = Field(None, description="Updated at Unix timestamp", example=1704067200)
 
     class Config:
         from_attributes = True

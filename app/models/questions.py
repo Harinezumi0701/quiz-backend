@@ -12,7 +12,7 @@ class Question(Base):
     content = Column(Text, nullable=False)
     image_url = Column(Text, nullable=True)
     category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id"), nullable=True, index=True)
-    question_set_id = Column(UUID(as_uuid=True), ForeignKey("question_sets.id"), nullable=True, index=True)
+    test_id = Column(UUID(as_uuid=True), ForeignKey("tests.id"), nullable=True, index=True)
     is_multiple_choice = Column(Boolean, nullable=False, default=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
@@ -20,7 +20,7 @@ class Question(Base):
 
     # Relationships
     category_obj = relationship("Category", back_populates="questions")
-    question_set_obj = relationship("QuestionSet", back_populates="questions")
+    test_obj = relationship("Test", back_populates="questions")
     options = relationship("AnswerOption", back_populates="question")
 
     @property
@@ -29,6 +29,6 @@ class Question(Base):
         return self.category_obj.name if self.category_obj else None
 
     @property
-    def question_set(self):
-        """Backward compatibility: return question set name as string"""
-        return self.question_set_obj.name if self.question_set_obj else None
+    def test(self):
+        """Return test name as string"""
+        return self.test_obj.name if self.test_obj else None

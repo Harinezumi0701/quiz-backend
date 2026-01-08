@@ -16,4 +16,4 @@ class Category(Base):
 
     # Relationships
     questions = relationship("Question", back_populates="category_obj")
-    question_sets = relationship("QuestionSet", back_populates="category")
+    tests = relationship("Test", back_populates="category")

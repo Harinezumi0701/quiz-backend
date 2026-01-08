@@ -28,7 +28,7 @@ router = APIRouter()
     }
 )
 def get_all_questions(
-    key: Optional[str] = Query(None, description="Search key: content, created_at, or question_set"),
+    key: Optional[str] = Query(None, description="Search key: content, created_at, or test"),
     value: Optional[str] = Query(None, description="Search value"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
@@ -37,7 +37,7 @@ def get_all_questions(
     """
     Get all questions with optional filtering and pagination.
     
-    - **key**: Field to search (content, created_at, question_set)
+    - **key**: Field to search (content, created_at, test)
     - **value**: Value to search for
     - **page**: Page number (default: 1)
     - **page_size**: Number of items per page (default: 10, max: 100)

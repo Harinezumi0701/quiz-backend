@@ -5,8 +5,8 @@ from typing import Optional
 from app.schemas.question import (
     CategoryDetailListResponse,
     CategoryDetailResponse,
-    QuestionSetDetailListResponse,
-    QuestionSetDetailResponse,
+    TestDetailListResponse,
+    TestDetailResponse,
     QuestionListResponse,
 )
 from app.schemas.http_response import ErrorResponse
@@ -88,13 +88,13 @@ def get_category_by_id(
 
 
 @router.get(
-    "/{category_id}/question-sets",
-    response_model=QuestionSetDetailListResponse,
-    summary="Get question sets by category",
-    description="Get all question sets of a specific category with optional name search and pagination",
+    "/{category_id}/tests",
+    response_model=TestDetailListResponse,
+    summary="Get tests by category",
+    description="Get all tests of a specific category with optional name search and pagination",
     responses={
         200: {
-            "description": "List of question sets",
+            "description": "List of tests",
         },
         404: {
             "description": "Category not found",
@@ -102,30 +102,30 @@ def get_category_by_id(
         },
     },
 )
-def get_question_sets_by_category(
+def get_tests_by_category(
     category_id: str = Path(
         ..., description="Category ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
     key: Optional[str] = Query(None, description="Search key: name"),
     value: Optional[str] = Query(
-        None, description="Search value for question set name"
+        None, description="Search value for test name"
     ),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
     db: Session = Depends(get_db),
 ):
     """
-    Get all question sets of a specific category with optional filtering and pagination.
+    Get all tests of a specific category with optional filtering and pagination.
 
     - **category_id**: UUID of the category
     - **key**: Search key (only "name" is supported)
-    - **value**: Value to search for in question set name
+    - **value**: Value to search for in test name
     - **page**: Page number (default: 1)
     - **page_size**: Number of items per page (default: 10, max: 100)
 
     This endpoint does not require authentication.
     """
-    question_sets, total = category_service.get_question_sets_by_category_id(
+    tests, total = category_service.get_tests_by_category_id(
         db,
         category_id,
         search_key=key,
@@ -145,78 +145,78 @@ def get_question_sets_by_category(
 
     meta = get_pagination_meta(total, page, page_size)
 
-    return QuestionSetDetailListResponse(data=question_sets, meta=meta)
+    return TestDetailListResponse(data=tests, meta=meta)
 
 
 @router.get(
-    "/{category_id}/question-sets/{question_set_id}",
-    response_model=QuestionSetDetailResponse,
-    summary="Get question set by ID",
-    description="Get a specific question set by category ID and question set ID",
+    "/{category_id}/tests/{test_id}",
+    response_model=TestDetailResponse,
+    summary="Get test by ID",
+    description="Get a specific test by category ID and test ID",
     responses={
         200: {
-            "description": "Question set details",
+            "description": "Test details",
         },
         404: {
-            "description": "Category or question set not found",
+            "description": "Category or test not found",
             "model": ErrorResponse,
         },
     },
 )
-def get_question_set_by_id(
+def get_test_by_id(
     category_id: str = Path(
         ..., description="Category ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
-    question_set_id: str = Path(
+    test_id: str = Path(
         ...,
-        description="Question set ID",
+        description="Test ID",
         example="550e8400-e29b-41d4-a716-446655440000",
     ),
     db: Session = Depends(get_db),
 ):
     """
-    Get a specific question set by category ID and question set ID.
+    Get a specific test by category ID and test ID.
 
     - **category_id**: UUID of the category
-    - **question_set_id**: UUID of the question set
+    - **test_id**: UUID of the test
 
     This endpoint does not require authentication.
     """
-    question_set = category_service.get_question_set_by_id(
-        db, category_id, question_set_id
+    test = category_service.get_test_by_id(
+        db, category_id, test_id
     )
 
-    if not question_set:
+    if not test:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Question set with ID {question_set_id} not found in category {category_id}",
+            detail=f"Test with ID {test_id} not found in category {category_id}",
         )
 
-    return QuestionSetDetailResponse(data=question_set, meta={})
+    return TestDetailResponse(data=test, meta={})
 
 
 @router.get(
-    "/{category_id}/question-sets/{question_set_id}/questions",
+    "/{category_id}/tests/{test_id}/questions",
     response_model=QuestionListResponse,
-    summary="Get questions by question set",
-    description="Get all questions of a specific question set with optional filtering and pagination",
+    summary="Get questions by test",
+    description="Get all questions of a specific test with optional filtering and pagination",
     responses={
         200: {
             "description": "List of questions with answers",
         },
         404: {
-            "description": "Category, question set, or questions not found",
+            "description": "Category, test, or questions not found",
             "model": ErrorResponse,
         },
     },
 )
-def get_questions_by_question_set(
+def get_questions_by_test(
     category_id: str = Path(
         ..., description="Category ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
-    question_set_id: str = Path(
+    test_id: str = Path(
         ...,
-        description="Question set ID",
+        description="Test ID",
         example="550e8400-e29b-41d4-a716-446655440000",
     ),
     key: Optional[str] = Query(
@@ -228,10 +228,10 @@ def get_questions_by_question_set(
     db: Session = Depends(get_db),
 ):
     """
-    Get all questions of a specific question set with optional filtering and pagination.
+    Get all questions of a specific test with optional filtering and pagination.
 
     - **category_id**: UUID of the category
-    - **question_set_id**: UUID of the question set
+    - **test_id**: UUID of the test
     - **key**: Search key (content or created_at)
     - **value**: Value to search for
     - **page**: Page number (default: 1)
@@ -239,25 +239,25 @@ def get_questions_by_question_set(
 
     This endpoint does not require authentication.
     """
-    questions, total = question_service.get_questions_by_category_and_set_id(
+    questions, total = question_service.get_questions_by_category_and_test_id(
         db,
         category_id,
-        question_set_id,
+        test_id,
         search_key=key,
         search_value=value,
         page=page,
         page_size=page_size,
     )
 
-    # If no results and first page, verify category and question set exist
+    # If no results and first page, verify category and test exist
     if total == 0 and page == 1:
-        question_set = category_service.get_question_set_by_id(
-            db, category_id, question_set_id
+        test = category_service.get_test_by_id(
+            db, category_id, test_id
         )
-        if not question_set:
+        if not test:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Question set with ID {question_set_id} not found in category {category_id}",
+                detail=f"Test with ID {test_id} not found in category {category_id}",
             )
 
     meta = get_pagination_meta(total, page, page_size)

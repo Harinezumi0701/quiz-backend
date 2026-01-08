@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, submission, category, question_set, answer
+from app.api.v1 import user, auth, question, submission, category, test, answer
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response
 from app.constants import (
@@ -19,7 +19,7 @@ from app.constants import (
     USERS_PREFIX,
     QUESTIONS_PREFIX,
     CATEGORIES_PREFIX,
-    QUESTION_SETS_PREFIX,
+    TESTS_PREFIX,
     ANSWERS_PREFIX,
     SUBMISSIONS_PREFIX,
     HEALTH_CHECK_PATH,
@@ -54,15 +54,15 @@ tags_metadata = [
     },
     {
         "name": "questions",
-        "description": "Question management. Get list of categories, question sets and questions by category/set.",
+        "description": "Question management. Get list of categories, tests and questions by category/test.",
     },
     {
         "name": "categories",
         "description": "Category management. Get list of categories and manage category-related resources.",
     },
     {
-        "name": "question-sets",
-        "description": "Question set management. Get all question sets with search and pagination.",
+        "name": "tests",
+        "description": "Test management. Get all tests with search and pagination.",
     },
     {
         "name": "answers",
@@ -114,7 +114,7 @@ app.include_router(auth.router, prefix=AUTH_PREFIX, tags=["auth"])
 app.include_router(user.router, prefix=USERS_PREFIX, tags=["users"])
 app.include_router(question.router, prefix=QUESTIONS_PREFIX, tags=["questions"])
 app.include_router(category.router, prefix=CATEGORIES_PREFIX, tags=["categories"])
-app.include_router(question_set.router, prefix=QUESTION_SETS_PREFIX, tags=["question-sets"])
+app.include_router(test.router, prefix=TESTS_PREFIX, tags=["tests"])
 app.include_router(answer.router, prefix=ANSWERS_PREFIX, tags=["answers"])
 app.include_router(submission.router, prefix=SUBMISSIONS_PREFIX, tags=["submissions"])
 

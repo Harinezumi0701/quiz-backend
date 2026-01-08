@@ -11,5 +11,5 @@ ERROR_USER_NOT_FOUND = "User not found"
 ERROR_INVALID_REFRESH_TOKEN = "Invalid refresh token"
 ERROR_REFRESH_TOKEN_EXPIRED = "Refresh token expired"
 ERROR_QUESTIONS_NOT_FOUND_CATEGORY = "No questions found for category: {category}"
-ERROR_QUESTIONS_NOT_FOUND_CATEGORY_SET = "No questions found for category: {category}, set: {question_set}"
+ERROR_QUESTIONS_NOT_FOUND_CATEGORY_TEST = "No questions found for category: {category}, test: {test}"
 

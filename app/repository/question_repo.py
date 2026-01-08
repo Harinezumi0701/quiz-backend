@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 from app.models.questions import Question
 from app.models.answer_options import AnswerOption
 from app.models.categories import Category
-from app.models.question_sets import QuestionSet
+from app.models.tests import Test
 from app.utils.search_pagination import paginate_query
 from app.utils.datetime_utils import datetime_to_timestamp
 
@@ -23,7 +23,7 @@ def get_questions_by_category(db: Session, category: str):
 
     questions = (
         db.query(Question)
-        .options(joinedload(Question.category_obj), joinedload(Question.question_set_obj))
+        .options(joinedload(Question.category_obj), joinedload(Question.test_obj))
         .filter(Question.category_id == category.id, Question.deleted_at.is_(None))
         .all()
     )
@@ -46,7 +46,7 @@ def get_questions_by_category(db: Session, category: str):
                 "content": question.content,
                 "image_url": question.image_url,
                 "category": question.category_obj.name if question.category_obj else None,
-                "question_set": question.question_set,
+                "test": question.test,
                 "is_multiple_choice": question.is_multiple_choice,
                 "answers": [
                     {
@@ -75,7 +75,7 @@ def get_all_questions(
 
     Args:
         db: Database session
-        search_key: Field to search (content, created_at, question_set)
+        search_key: Field to search (content, created_at, test)
         search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
@@ -83,10 +83,10 @@ def get_all_questions(
     Returns:
         Tuple of (questions list, total count)
     """
-    # Always join with QuestionSet (left outer join) to enable question_set search
+    # Always join with Test (left outer join) to enable test search
     query = (
         db.query(Question)
-        .outerjoin(QuestionSet, Question.question_set_id == QuestionSet.id)
+        .outerjoin(Test, Question.test_id == Test.id)
         .filter(Question.deleted_at.is_(None))
     )
 
@@ -98,8 +98,8 @@ def get_all_questions(
             "case_sensitive": False,
         },
         "created_at": {"column": Question.created_at, "type": "date"},
-        "question_set": {
-            "column": QuestionSet.name,
+        "test": {
+            "column": Test.name,
             "type": "text",
             "case_sensitive": False,
         },
@@ -118,7 +118,7 @@ def get_all_questions(
     # Apply eager loading and execute query
     questions = paginated_query.options(
         joinedload(Question.category_obj),
-        joinedload(Question.question_set_obj)
+        joinedload(Question.test_obj)
     ).all()
 
     result = []
@@ -139,7 +139,7 @@ def get_all_questions(
                 "content": question.content,
                 "image_url": question.image_url,
                 "category": question.category_obj.name if question.category_obj else None,
-                "question_set": question.question_set,
+                "test": question.test,
                 "created_at": datetime_to_timestamp(question.created_at),
                 "answers": [
                     {
@@ -156,22 +156,22 @@ def get_all_questions(
     return result, total
 
 
-def get_questions_by_category_and_set_id(
+def get_questions_by_category_and_test_id(
     db: Session,
     category_id: str,
-    question_set_id: str,
+    test_id: str,
     search_key: Optional[str] = None,
     search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
 ) -> Tuple[list, int]:
     """
-    Get all questions for a specific category and question set with optional filtering and pagination.
+    Get all questions for a specific category and test with optional filtering and pagination.
 
     Args:
         db: Database session
         category_id: Category UUID
-        question_set_id: Question set UUID
+        test_id: Test UUID
         search_key: Field to search (content, created_at)
         search_value: Value to search for
         page: Page number (1-indexed)
@@ -189,14 +189,14 @@ def get_questions_by_category_and_set_id(
     if not category:
         return [], 0
 
-    # Verify question set exists and belongs to category
-    question_set = db.query(QuestionSet).filter(
-        QuestionSet.id == question_set_id,
-        QuestionSet.category_id == category_id,
-        QuestionSet.deleted_at.is_(None)
+    # Verify test exists and belongs to category
+    test = db.query(Test).filter(
+        Test.id == test_id,
+        Test.category_id == category_id,
+        Test.deleted_at.is_(None)
     ).first()
 
-    if not question_set:
+    if not test:
         return [], 0
 
     # Base query
@@ -204,7 +204,7 @@ def get_questions_by_category_and_set_id(
         db.query(Question)
         .filter(
             Question.category_id == category_id,
-            Question.question_set_id == question_set_id,
+            Question.test_id == test_id,
             Question.deleted_at.is_(None)
         )
     )
@@ -232,7 +232,7 @@ def get_questions_by_category_and_set_id(
     # Apply eager loading and execute query
     questions = paginated_query.options(
         joinedload(Question.category_obj),
-        joinedload(Question.question_set_obj)
+        joinedload(Question.test_obj)
     ).all()
 
     result = []
@@ -253,7 +253,7 @@ def get_questions_by_category_and_set_id(
                 "content": question.content,
                 "image_url": question.image_url,
                 "category": question.category_obj.name if question.category_obj else None,
-                "question_set": question.question_set,
+                "test": question.test,
                 "is_multiple_choice": question.is_multiple_choice,
                 "created_at": datetime_to_timestamp(question.created_at),
                 "answers": [
@@ -269,6 +269,178 @@ def get_questions_by_category_and_set_id(
         )
 
     return result, total
+
+
+def get_questions_by_test_id(
+    db: Session,
+    test_id: str,
+    search_key: Optional[str] = None,
+    search_value: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 10,
+) -> Tuple[list, int]:
+    """
+    Get all questions for a specific test with optional filtering and pagination.
+
+    Args:
+        db: Database session
+        test_id: Test UUID
+        search_key: Field to search (content, created_at)
+        search_value: Value to search for
+        page: Page number (1-indexed)
+        page_size: Number of items per page
+
+    Returns:
+        Tuple of (questions list, total count)
+    """
+    # Verify test exists
+    test = db.query(Test).filter(
+        Test.id == test_id,
+        Test.deleted_at.is_(None)
+    ).first()
+
+    if not test:
+        return [], 0
+
+    # Base query
+    query = (
+        db.query(Question)
+        .filter(
+            Question.test_id == test_id,
+            Question.deleted_at.is_(None)
+        )
+    )
+
+    # Define search configuration
+    search_config = {
+        "content": {
+            "column": Question.content,
+            "type": "text",
+            "case_sensitive": False,
+        },
+        "created_at": {"column": Question.created_at, "type": "date"},
+    }
+
+    # Apply search filter and pagination
+    paginated_query, total = paginate_query(
+        query,
+        search_key=search_key,
+        search_value=search_value,
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
+
+    # Apply eager loading and execute query
+    questions = paginated_query.options(
+        joinedload(Question.category_obj),
+        joinedload(Question.test_obj)
+    ).all()
+
+    result = []
+    for question in questions:
+        # Get all answer options for this question
+        answers = (
+            db.query(AnswerOption)
+            .filter(
+                AnswerOption.question_id == question.id,
+                AnswerOption.deleted_at.is_(None),
+            )
+            .all()
+        )
+
+        result.append(
+            {
+                "id": question.id,
+                "content": question.content,
+                "image_url": question.image_url,
+                "category": question.category_obj.name if question.category_obj else None,
+                "test": question.test,
+                "is_multiple_choice": question.is_multiple_choice,
+                "created_at": datetime_to_timestamp(question.created_at),
+                "answers": [
+                    {
+                        "id": answer.id,
+                        "content": answer.content,
+                        "is_correct": answer.is_correct,
+                        "explanation": answer.explanation,
+                    }
+                    for answer in answers
+                ],
+            }
+        )
+
+    return result, total
+
+
+def get_question_by_test_and_id(
+    db: Session,
+    test_id: str,
+    question_id: str,
+):
+    """
+    Get a specific question by test_id and question_id with answers.
+
+    Args:
+        db: Database session
+        test_id: Test UUID
+        question_id: Question UUID
+
+    Returns:
+        Question dict or None if not found
+    """
+    # Verify test exists
+    test = db.query(Test).filter(
+        Test.id == test_id,
+        Test.deleted_at.is_(None)
+    ).first()
+
+    if not test:
+        return None
+
+    # Get question and verify it belongs to test
+    question = (
+        db.query(Question)
+        .options(joinedload(Question.category_obj), joinedload(Question.test_obj))
+        .filter(
+            Question.id == question_id,
+            Question.test_id == test_id,
+            Question.deleted_at.is_(None)
+        )
+        .first()
+    )
+
+    if not question:
+        return None
+
+    # Get all answer options for this question
+    answers = (
+        db.query(AnswerOption)
+        .filter(
+            AnswerOption.question_id == question.id, AnswerOption.deleted_at.is_(None)
+        )
+        .all()
+    )
+
+    return {
+        "id": question.id,
+        "content": question.content,
+        "image_url": question.image_url,
+        "category": question.category_obj.name if question.category_obj else None,
+        "test": question.test,
+        "is_multiple_choice": question.is_multiple_choice,
+        "created_at": datetime_to_timestamp(question.created_at),
+        "updated_at": datetime_to_timestamp(question.updated_at),
+        "answers": [
+            {
+                "id": answer.id,
+                "content": answer.content,
+                "is_correct": answer.is_correct,
+                "explanation": answer.explanation,
+            }
+            for answer in answers
+        ],
+    }
 
 
 def get_question_by_id(db: Session, question_id: str):
@@ -297,7 +469,7 @@ def get_question_by_id(db: Session, question_id: str):
         "content": question.content,
         "image_url": question.image_url,
         "category": question.category_obj.name if question.category_obj else None,
-        "question_set": question.question_set,
+        "test": question.test,
         "is_multiple_choice": question.is_multiple_choice,
         "created_at": datetime_to_timestamp(question.created_at),
         "updated_at": datetime_to_timestamp(question.updated_at),

@@ -14,7 +14,7 @@ def get_category_by_id(db: Session, category_id: str):
     return category_repo.get_category_by_id(db, category_id)
 
 
-def get_question_sets_by_category_id(
+def get_tests_by_category_id(
     db: Session,
     category_id: str,
     search_key: str = None,
@@ -22,30 +22,30 @@ def get_question_sets_by_category_id(
     page: int = 1,
     page_size: int = 10,
 ) -> Tuple[list, int]:
-    """Get all question sets for a specific category with optional filtering and pagination."""
-    return category_repo.get_question_sets_by_category_id(
+    """Get all tests for a specific category with optional filtering and pagination."""
+    return category_repo.get_tests_by_category_id(
         db, category_id, search_key, search_value, page, page_size
     )
 
 
-def get_question_set_by_id(db: Session, category_id: str, question_set_id: str):
-    """Get a specific question set by category_id and question_set_id."""
-    return category_repo.get_question_set_by_id(db, category_id, question_set_id)
+def get_test_by_id(db: Session, category_id: str, test_id: str):
+    """Get a specific test by category_id and test_id."""
+    return category_repo.get_test_by_id(db, category_id, test_id)
 
 
-def get_all_question_sets(
+def get_all_tests(
     db: Session,
     search_key: str = None,
     search_value: str = None,
     page: int = 1,
     page_size: int = 10,
 ) -> Tuple[list, int]:
-    """Get all question sets with optional filtering and pagination."""
-    return category_repo.get_all_question_sets(
+    """Get all tests with optional filtering and pagination."""
+    return category_repo.get_all_tests(
         db, search_key, search_value, page, page_size
     )
 
 
-def get_question_set_by_id_only(db: Session, question_set_id: str):
-    """Get a specific question set by question_set_id only."""
-    return category_repo.get_question_set_by_id_only(db, question_set_id)
+def get_test_by_id_only(db: Session, test_id: str):
+    """Get a specific test by test_id only."""
+    return category_repo.get_test_by_id_only(db, test_id)

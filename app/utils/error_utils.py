@@ -33,7 +33,7 @@ ERROR_MESSAGE_TO_CODE = {
     "No questions found for category": QUESTIONS_NOT_FOUND,
     "No questions found for category:": QUESTIONS_NOT_FOUND,
     "No questions found for category: {category}": QUESTIONS_NOT_FOUND,
-    "No questions found for category: {category}, set: {question_set}": QUESTIONS_NOT_FOUND,
+    "No questions found for category: {category}, test: {test}": QUESTIONS_NOT_FOUND,
     
     # HTTP status code fallbacks
     "400": HTTP_400,

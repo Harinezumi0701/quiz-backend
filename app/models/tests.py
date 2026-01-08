@@ -8,8 +8,8 @@ from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 
-class QuestionSet(Base):
-    __tablename__ = "question_sets"
+class Test(Base):
+    __tablename__ = "tests"
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, server_default=text("uuidv7()"))
     name = Column(String(100), nullable=False)
@@ -19,5 +19,5 @@ class QuestionSet(Base):
     deleted_at = Column(TIMESTAMP, nullable=True)
 
     # Relationships
-    category = relationship("Category", back_populates="question_sets")
-    questions = relationship("Question", back_populates="question_set_obj")
+    category = relationship("Category", back_populates="tests")
+    questions = relationship("Question", back_populates="test_obj")

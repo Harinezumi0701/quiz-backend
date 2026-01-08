@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, Tuple
 from app.models.categories import Category
 from app.models.questions import Question
-from app.models.question_sets import QuestionSet
+from app.models.tests import Test
 from app.utils.datetime_utils import datetime_to_timestamp
 from app.utils.search_pagination import paginate_query
 
@@ -64,7 +64,7 @@ def get_category_by_id(db: Session, category_id: str):
     }
 
 
-def get_question_sets_by_category_id(
+def get_tests_by_category_id(
     db: Session,
     category_id: str,
     search_key: Optional[str] = None,
@@ -73,7 +73,7 @@ def get_question_sets_by_category_id(
     page_size: int = 10,
 ) -> Tuple[list, int]:
     """
-    Get all question sets for a specific category with optional filtering and pagination.
+    Get all tests for a specific category with optional filtering and pagination.
 
     Args:
         db: Database session
@@ -84,7 +84,7 @@ def get_question_sets_by_category_id(
         page_size: Number of items per page
 
     Returns:
-        Tuple of (question sets list, total count)
+        Tuple of (tests list, total count)
     """
     # Verify category exists
     category = db.query(Category).filter(
@@ -96,15 +96,15 @@ def get_question_sets_by_category_id(
         return [], 0
 
     # Base query
-    query = db.query(QuestionSet).filter(
-        QuestionSet.category_id == category_id,
-        QuestionSet.deleted_at.is_(None)
+    query = db.query(Test).filter(
+        Test.category_id == category_id,
+        Test.deleted_at.is_(None)
     )
 
     # Define search configuration
     search_config = {
         "name": {
-            "column": QuestionSet.name,
+            "column": Test.name,
             "type": "text",
             "case_sensitive": False,
         },
@@ -121,29 +121,29 @@ def get_question_sets_by_category_id(
     )
 
     # Execute query
-    question_sets = paginated_query.all()
+    tests = paginated_query.all()
 
     result = []
-    for qs in question_sets:
-        # Count questions in this set
+    for test in tests:
+        # Count questions in this test
         question_count = db.query(Question).filter(
-            Question.question_set_id == qs.id,
+            Question.test_id == test.id,
             Question.deleted_at.is_(None)
         ).count()
 
         result.append({
-            'id': qs.id,
-            'name': qs.name,
-            'category_id': qs.category_id,
+            'id': test.id,
+            'name': test.name,
+            'category_id': test.category_id,
             'question_count': question_count,
-            'created_at': datetime_to_timestamp(qs.created_at),
-            'updated_at': datetime_to_timestamp(qs.updated_at)
+            'created_at': datetime_to_timestamp(test.created_at),
+            'updated_at': datetime_to_timestamp(test.updated_at)
         })
 
     return result, total
 
 
-def get_all_question_sets(
+def get_all_tests(
     db: Session,
     search_key: Optional[str] = None,
     search_value: Optional[str] = None,
@@ -151,7 +151,7 @@ def get_all_question_sets(
     page_size: int = 10,
 ) -> Tuple[list, int]:
     """
-    Get all question sets with optional filtering and pagination.
+    Get all tests with optional filtering and pagination.
 
     Args:
         db: Database session
@@ -161,17 +161,17 @@ def get_all_question_sets(
         page_size: Number of items per page
 
     Returns:
-        Tuple of (question sets list, total count)
+        Tuple of (tests list, total count)
     """
     # Base query
-    query = db.query(QuestionSet).filter(
-        QuestionSet.deleted_at.is_(None)
+    query = db.query(Test).filter(
+        Test.deleted_at.is_(None)
     )
 
     # Define search configuration
     search_config = {
         "name": {
-            "column": QuestionSet.name,
+            "column": Test.name,
             "type": "text",
             "case_sensitive": False,
         },
@@ -188,43 +188,43 @@ def get_all_question_sets(
     )
 
     # Execute query
-    question_sets = paginated_query.all()
+    tests = paginated_query.all()
 
     result = []
-    for qs in question_sets:
-        # Count questions in this set
+    for test in tests:
+        # Count questions in this test
         question_count = db.query(Question).filter(
-            Question.question_set_id == qs.id,
+            Question.test_id == test.id,
             Question.deleted_at.is_(None)
         ).count()
 
         result.append({
-            'id': qs.id,
-            'name': qs.name,
-            'category_id': qs.category_id,
+            'id': test.id,
+            'name': test.name,
+            'category_id': test.category_id,
             'question_count': question_count,
-            'created_at': datetime_to_timestamp(qs.created_at),
-            'updated_at': datetime_to_timestamp(qs.updated_at)
+            'created_at': datetime_to_timestamp(test.created_at),
+            'updated_at': datetime_to_timestamp(test.updated_at)
         })
 
     return result, total
 
 
-def get_question_set_by_id(
+def get_test_by_id(
     db: Session,
     category_id: str,
-    question_set_id: str,
+    test_id: str,
 ):
     """
-    Get a specific question set by category_id and question_set_id.
+    Get a specific test by category_id and test_id.
 
     Args:
         db: Database session
         category_id: Category UUID
-        question_set_id: Question set UUID
+        test_id: Test UUID
 
     Returns:
-        Question set dict or None if not found
+        Test dict or None if not found
     """
     # Verify category exists
     category = db.query(Category).filter(
@@ -235,66 +235,66 @@ def get_question_set_by_id(
     if not category:
         return None
 
-    # Get question set
-    question_set = db.query(QuestionSet).filter(
-        QuestionSet.id == question_set_id,
-        QuestionSet.category_id == category_id,
-        QuestionSet.deleted_at.is_(None)
+    # Get test
+    test = db.query(Test).filter(
+        Test.id == test_id,
+        Test.category_id == category_id,
+        Test.deleted_at.is_(None)
     ).first()
 
-    if not question_set:
+    if not test:
         return None
 
-    # Count questions in this set
+    # Count questions in this test
     question_count = db.query(Question).filter(
-        Question.question_set_id == question_set.id,
+        Question.test_id == test.id,
         Question.deleted_at.is_(None)
     ).count()
 
     return {
-        'id': question_set.id,
-        'name': question_set.name,
-        'category_id': question_set.category_id,
+        'id': test.id,
+        'name': test.name,
+        'category_id': test.category_id,
         'question_count': question_count,
-        'created_at': datetime_to_timestamp(question_set.created_at),
-        'updated_at': datetime_to_timestamp(question_set.updated_at)
+        'created_at': datetime_to_timestamp(test.created_at),
+        'updated_at': datetime_to_timestamp(test.updated_at)
     }
 
 
-def get_question_set_by_id_only(
+def get_test_by_id_only(
     db: Session,
-    question_set_id: str,
+    test_id: str,
 ):
     """
-    Get a specific question set by question_set_id only.
+    Get a specific test by test_id only.
 
     Args:
         db: Database session
-        question_set_id: Question set UUID
+        test_id: Test UUID
 
     Returns:
-        Question set dict or None if not found
+        Test dict or None if not found
     """
-    # Get question set
-    question_set = db.query(QuestionSet).filter(
-        QuestionSet.id == question_set_id,
-        QuestionSet.deleted_at.is_(None)
+    # Get test
+    test = db.query(Test).filter(
+        Test.id == test_id,
+        Test.deleted_at.is_(None)
     ).first()
 
-    if not question_set:
+    if not test:
         return None
 
-    # Count questions in this set
+    # Count questions in this test
     question_count = db.query(Question).filter(
-        Question.question_set_id == question_set.id,
+        Question.test_id == test.id,
         Question.deleted_at.is_(None)
     ).count()
 
     return {
-        'id': question_set.id,
-        'name': question_set.name,
-        'category_id': question_set.category_id,
+        'id': test.id,
+        'name': test.name,
+        'category_id': test.category_id,
         'question_count': question_count,
-        'created_at': datetime_to_timestamp(question_set.created_at),
-        'updated_at': datetime_to_timestamp(question_set.updated_at)
+        'created_at': datetime_to_timestamp(test.created_at),
+        'updated_at': datetime_to_timestamp(test.updated_at)
     }

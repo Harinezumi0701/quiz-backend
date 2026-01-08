@@ -86,7 +86,7 @@ app.add_middleware(
     allow_headers=CORS_ALLOW_HEADERS,
 )
 
-# Response wrapper middleware để tự động wrap success responses
+# Response wrapper middleware to automatically wrap success responses
 from app.middleware.response_wrapper import ResponseWrapperMiddleware
 app.add_middleware(ResponseWrapperMiddleware)
 

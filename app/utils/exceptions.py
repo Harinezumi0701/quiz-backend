@@ -16,29 +16,29 @@ logger = logging.getLogger(__name__)
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """
-    Handler cho HTTPException để format response theo chuẩn.
+    Handler for HTTPException to format response according to standard.
 
     Args:
         request: FastAPI request object
         exc: HTTPException instance
 
     Returns:
-        JSONResponse với cấu trúc error chuẩn
+        JSONResponse with standard error structure
     """
     trace_id = str(uuid.uuid4())
     
-    # Lấy error code từ detail hoặc từ status code
+    # Get error code from detail or from status code
     if isinstance(exc.detail, dict) and "code" in exc.detail:
         error_code = exc.detail["code"]
         error_message = exc.detail.get("message", str(exc.detail))
         error_details = exc.detail.get("details")
     elif isinstance(exc.detail, str):
-        # Nếu detail là string, sử dụng centralized error code mapping
+        # If detail is string, use centralized error code mapping
         error_message = exc.detail
         error_code = get_error_code_from_message(error_message, exc.status_code)
         error_details = None
     else:
-        # Tự động tạo error code từ status code
+        # Automatically create error code from status code
         error_code = get_error_code_from_status_code(exc.status_code)
         error_message = str(exc.detail) if exc.detail else "An error occurred"
         error_details = None
@@ -59,14 +59,14 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """
-    Handler cho các exception không được xử lý.
+    Handler for unhandled exceptions.
 
     Args:
         request: FastAPI request object
         exc: Exception instance
 
     Returns:
-        JSONResponse với cấu trúc error chuẩn
+        JSONResponse with standard error structure
     """
     trace_id = str(uuid.uuid4())
     

@@ -8,14 +8,14 @@ from app.schemas.http_response import SuccessResponse
 class SubmissionCreate(BaseModel):
     """Schema for creating a submission"""
     question_id: UUID = Field(..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440000")
-    selected_option_id: UUID = Field(..., description="Selected answer option ID", example="550e8400-e29b-41d4-a716-446655440001")
+    answer_id: UUID = Field(..., description="Selected answer option ID", example="550e8400-e29b-41d4-a716-446655440001")
     is_correct: bool = Field(..., description="Whether the submission is correct", example=True)
 
     class Config:
         json_schema_extra = {
             "example": {
                 "question_id": "550e8400-e29b-41d4-a716-446655440000",
-                "selected_option_id": "550e8400-e29b-41d4-a716-446655440001",
+                "answer_id": "550e8400-e29b-41d4-a716-446655440001",
                 "is_correct": True
             }
         }
@@ -31,12 +31,12 @@ class SubmissionBulkCreate(BaseModel):
                 "submissions": [
                     {
                         "question_id": "550e8400-e29b-41d4-a716-446655440000",
-                        "selected_option_id": "550e8400-e29b-41d4-a716-446655440001",
+                        "answer_id": "550e8400-e29b-41d4-a716-446655440001",
                         "is_correct": True
                     },
                     {
                         "question_id": "550e8400-e29b-41d4-a716-446655440002",
-                        "selected_option_id": "550e8400-e29b-41d4-a716-446655440003",
+                        "answer_id": "550e8400-e29b-41d4-a716-446655440003",
                         "is_correct": False
                     }
                 ]
@@ -49,7 +49,7 @@ class SubmissionOut(BaseModel):
     id: UUID = Field(..., description="Submission ID", example="550e8400-e29b-41d4-a716-446655440000")
     user_id: UUID = Field(..., description="User ID", example="550e8400-e29b-41d4-a716-446655440001")
     question_id: UUID = Field(..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440002")
-    selected_option_id: UUID = Field(..., description="Selected answer option ID", example="550e8400-e29b-41d4-a716-446655440003")
+    answer_id: UUID = Field(..., description="Selected answer option ID", example="550e8400-e29b-41d4-a716-446655440003")
     is_correct: bool = Field(..., description="Whether the submission is correct", example=True)
     answered_at: int | None = Field(None, description="Submission Unix timestamp", example=1704067200)
 
@@ -60,7 +60,7 @@ class SubmissionOut(BaseModel):
                 "id": "550e8400-e29b-41d4-a716-446655440000",
                 "user_id": "550e8400-e29b-41d4-a716-446655440001",
                 "question_id": "550e8400-e29b-41d4-a716-446655440002",
-                "selected_option_id": "550e8400-e29b-41d4-a716-446655440003",
+                "answer_id": "550e8400-e29b-41d4-a716-446655440003",
                 "is_correct": True,
                 "answered_at": 1704067200
             }

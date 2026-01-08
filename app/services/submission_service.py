@@ -20,11 +20,11 @@ def submit_submission(db: Session, user_id: UUID, submission_data: SubmissionCre
     
     # Check if answer exists for the question
     if not question_repo.answer_exists_for_question(
-        db, submission_data.question_id, submission_data.selected_option_id
+        db, submission_data.question_id, submission_data.answer_id
     ):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Answer with ID {submission_data.selected_option_id} not found for question {submission_data.question_id}"
+            detail=f"Answer with ID {submission_data.answer_id} not found for question {submission_data.question_id}"
         )
     
     submission = submission_repo.create_submission(db, user_id, submission_data)
@@ -32,7 +32,7 @@ def submit_submission(db: Session, user_id: UUID, submission_data: SubmissionCre
         "id": submission.id,
         "user_id": submission.user_id,
         "question_id": submission.question_id,
-        "selected_option_id": submission.selected_option_id,
+        "answer_id": submission.answer_id,
         "is_correct": submission.is_correct,
         "answered_at": datetime_to_timestamp(submission.answered_at),
     }
@@ -51,11 +51,11 @@ def submit_submissions_bulk(db: Session, user_id: UUID, submissions: List[Submis
         
         # Check if answer exists for the question
         if not question_repo.answer_exists_for_question(
-            db, submission.question_id, submission.selected_option_id
+            db, submission.question_id, submission.answer_id
         ):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Answer with ID {submission.selected_option_id} not found for question {submission.question_id}"
+                detail=f"Answer with ID {submission.answer_id} not found for question {submission.question_id}"
             )
     
     db_submissions = submission_repo.create_submissions_bulk(db, user_id, submissions)
@@ -64,7 +64,7 @@ def submit_submissions_bulk(db: Session, user_id: UUID, submissions: List[Submis
             "id": submission.id,
             "user_id": submission.user_id,
             "question_id": submission.question_id,
-            "selected_option_id": submission.selected_option_id,
+            "answer_id": submission.answer_id,
             "is_correct": submission.is_correct,
             "answered_at": datetime_to_timestamp(submission.answered_at),
         }

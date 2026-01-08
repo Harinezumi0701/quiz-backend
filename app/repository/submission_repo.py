@@ -23,7 +23,7 @@ def create_submission(
     db_submission = Submission(
         user_id=user_id,
         question_id=submission_data.question_id,
-        selected_option_id=submission_data.selected_option_id,
+        answer_id=submission_data.answer_id,
         is_correct=submission_data.is_correct,
         submission_history_id=submission_history.id
     )
@@ -48,7 +48,7 @@ def create_submissions_bulk(
         Submission(
             user_id=user_id,
             question_id=s.question_id,
-            selected_option_id=s.selected_option_id,
+            answer_id=s.answer_id,
             is_correct=s.is_correct,
             submission_history_id=submission_history.id
         )

@@ -244,7 +244,7 @@ def submit_test_submissions(
     
     Each submission in the list includes:
     - question_id: Question ID
-    - selected_option_id: Selected answer option ID
+    - answer_id: Selected answer option ID
     - is_correct: Whether the submission is correct
     
     Requires authentication token in header: `Authorization: Bearer <token>`

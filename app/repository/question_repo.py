@@ -86,7 +86,7 @@ def get_questions_by_category(db: Session, category: str):
 
     questions = (
         db.query(Question)
-        .options(joinedload(Question.category))
+        .options(joinedload(Question.category_obj))
         .filter(Question.category_id == category.id, Question.deleted_at.is_(None))
         .all()
     )
@@ -108,7 +108,7 @@ def get_questions_by_category(db: Session, category: str):
                 "id": question.id,
                 "content": question.content,
                 "image_url": question.image_url,
-                "category": question.category.name if question.category else None,
+                "category": question.category_obj.name if question.category_obj else None,
                 "answers": [
                     {
                         "id": answer.id,
@@ -139,7 +139,7 @@ def get_questions_by_category_and_set(db: Session, category: str, question_set: 
     if question_set == "Default":
         questions = (
             db.query(Question)
-            .options(joinedload(Question.category))
+            .options(joinedload(Question.category_obj))
             .filter(
                 Question.category_id == category.id,
                 Question.question_set.is_(None),
@@ -150,7 +150,7 @@ def get_questions_by_category_and_set(db: Session, category: str, question_set: 
     else:
         questions = (
             db.query(Question)
-            .options(joinedload(Question.category))
+            .options(joinedload(Question.category_obj))
             .filter(
                 Question.category_id == category.id,
                 Question.question_set == question_set,
@@ -176,7 +176,7 @@ def get_questions_by_category_and_set(db: Session, category: str, question_set: 
                 "id": question.id,
                 "content": question.content,
                 "image_url": question.image_url,
-                "category": question.category.name if question.category else None,
+                "category": question.category_obj.name if question.category_obj else None,
                 "answers": [
                     {
                         "id": answer.id,
@@ -240,7 +240,7 @@ def get_all_questions(
     )
 
     # Apply eager loading and execute query
-    questions = paginated_query.options(joinedload(Question.category)).all()
+    questions = paginated_query.options(joinedload(Question.category_obj)).all()
 
     result = []
     for question in questions:
@@ -259,7 +259,7 @@ def get_all_questions(
                 "id": question.id,
                 "content": question.content,
                 "image_url": question.image_url,
-                "category": question.category.name if question.category else None,
+                "category": question.category_obj.name if question.category_obj else None,
                 "question_set": question.question_set,
                 "created_at": question.created_at,
                 "answers": [
@@ -281,7 +281,7 @@ def get_question_by_id(db: Session, question_id: str):
     """Get a specific question by ID with answers."""
     question = (
         db.query(Question)
-        .options(joinedload(Question.category))
+        .options(joinedload(Question.category_obj))
         .filter(Question.id == question_id, Question.deleted_at.is_(None))
         .first()
     )
@@ -302,7 +302,7 @@ def get_question_by_id(db: Session, question_id: str):
         "id": question.id,
         "content": question.content,
         "image_url": question.image_url,
-        "category": question.category.name if question.category else None,
+        "category": question.category_obj.name if question.category_obj else None,
         "question_set": question.question_set,
         "created_at": question.created_at,
         "updated_at": question.updated_at,

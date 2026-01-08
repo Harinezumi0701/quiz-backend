@@ -10,6 +10,7 @@ from app.models.questions import Question
 from app.models.submissions import Submission
 from app.models.answer_options import AnswerOption
 from app.models.submission_history import SubmissionHistory
+from app.models.refresh_tokens import RefreshToken
 from dotenv import load_dotenv
 load_dotenv()
 

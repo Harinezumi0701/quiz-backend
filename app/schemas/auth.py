@@ -36,12 +36,14 @@ class LoginRequest(BaseModel):
 class TokenData(BaseModel):
     """Token data schema"""
     access_token: str = Field(..., description="JWT access token", example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+    refresh_token: str = Field(..., description="Refresh token", example="dGhpc2lzYXJlZnJlc2h0b2tlbg")
     token_type: str = Field(default="bearer", description="Token type", example="bearer")
 
     class Config:
         json_schema_extra = {
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiZXhwIjoxNjE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                "refresh_token": "dGhpc2lzYXJlZnJlc2h0b2tlbg",
                 "token_type": "bearer"
             }
         }
@@ -55,3 +57,29 @@ class TokenResponse(SuccessResponse[TokenData]):
 class TokenDataInternal(BaseModel):
     """Token data schema for internal use"""
     user_email: str | None = Field(None, description="Email from token")
+
+
+class RefreshTokenRequest(BaseModel):
+    """Request schema for refresh token"""
+    refresh_token: str = Field(..., description="Refresh token", example="dGhpc2lzYXJlZnJlc2h0b2tlbg")
+    generate_new_refresh_token: bool = Field(default=False, description="Generate new refresh token", example=False)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "refresh_token": "dGhpc2lzYXJlZnJlc2h0b2tlbg",
+                "generate_new_refresh_token": False
+            }
+        }
+
+
+class RevokeTokenRequest(BaseModel):
+    """Request schema for revoke token"""
+    refresh_token: str = Field(..., description="Refresh token to revoke", example="dGhpc2lzYXJlZnJlc2h0b2tlbg")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "refresh_token": "dGhpc2lzYXJlZnJlc2h0b2tlbg"
+            }
+        }

@@ -1,6 +1,6 @@
 # app/utils/security.py
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -11,6 +11,7 @@ from app.constants import (
     JWT_SUBJECT_KEY,
     DEFAULT_SECRET_KEY,
     DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES,
+    DEFAULT_REFRESH_TOKEN_EXPIRE_DAYS,
 )
 
 load_dotenv()
@@ -22,6 +23,7 @@ pwd_context = CryptContext(schemes=[PASSWORD_SCHEME], deprecated="auto")
 SECRET_KEY = os.getenv("SECRET_KEY", DEFAULT_SECRET_KEY)
 ALGORITHM = os.getenv("ALGORITHM", JWT_ALGORITHM)
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", str(DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES)))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", str(DEFAULT_REFRESH_TOKEN_EXPIRE_DAYS)))
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -38,9 +40,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     """Create a JWT access token."""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -57,3 +59,14 @@ def decode_access_token(token: str) -> Optional[str]:
         return user_email
     except JWTError:
         return None
+
+
+def create_refresh_token() -> str:
+    """Create a random refresh token string."""
+    import secrets
+    return secrets.token_urlsafe(32)
+
+
+def get_refresh_token_expires_delta() -> timedelta:
+    """Get the expiration time delta for refresh tokens."""
+    return timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)

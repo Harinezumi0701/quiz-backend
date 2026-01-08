@@ -18,10 +18,10 @@ class Question(Base):
     deleted_at = Column(TIMESTAMP, nullable=True)
 
     # Relationships
-    category = relationship("Category", back_populates="questions")
+    category_obj = relationship("Category", back_populates="questions")
     options = relationship("AnswerOption", back_populates="question")
 
     @property
     def category(self):
         """Backward compatibility: return category name as string"""
-        return self.category.name if self.category else None
+        return self.category_obj.name if self.category_obj else None

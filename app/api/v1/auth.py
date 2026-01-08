@@ -1,7 +1,7 @@
 # app/api/v1/auth.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, TokenData
+from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, TokenData, RefreshTokenRequest, RevokeTokenRequest
 from app.schemas.http_response import ErrorResponse
 from app.services import auth_service
 from app.db.session import get_db
@@ -34,7 +34,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     - **account_name**: Account display name
     - **user_password**: Password (minimum 6 characters)
 
-    After successful registration, you will receive an access token to use for other APIs.
+    After successful registration, you will receive an access token and refresh token to use for other APIs.
     """
     token_data = auth_service.register_user(db, request)
     return TokenResponse(data=token_data, meta={})
@@ -62,7 +62,62 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     - **user_email**: Registered email
     - **user_password**: Account password
 
-    Returns access token if login credentials are correct.
+    Returns access token and refresh token if login credentials are correct.
     """
     token_data = auth_service.login_user(db, request)
     return TokenResponse(data=token_data, meta={})
+
+
+@router.post(
+    "/token/refresh",
+    response_model=TokenResponse,
+    summary="Refresh access token",
+    description="Refresh access token using refresh token. Optionally generate new refresh token",
+    responses={
+        200: {
+            "description": "Token refreshed successfully",
+        },
+        401: {
+            "description": "Invalid or expired refresh token",
+            "model": ErrorResponse,
+        }
+    }
+)
+def refresh(request: RefreshTokenRequest, db: Session = Depends(get_db)):
+    """
+    Refresh access token using refresh token.
+
+    - **refresh_token**: Valid refresh token
+    - **generate_new_refresh_token**: (Optional) If true, generate a new refresh token and invalidate the old one
+
+    Returns new access token. If generate_new_refresh_token is true, returns new refresh token as well.
+    """
+    token_data = auth_service.refresh_access_token(db, request)
+    return TokenResponse(data=token_data, meta={})
+
+
+@router.post(
+    "/token/revoke",
+    status_code=status.HTTP_200_OK,
+    summary="Revoke refresh token",
+    description="Revoke a refresh token to invalidate it",
+    responses={
+        200: {
+            "description": "Token revoked successfully",
+        },
+        401: {
+            "description": "Invalid refresh token",
+            "model": ErrorResponse,
+        }
+    }
+)
+def revoke(request: RevokeTokenRequest, db: Session = Depends(get_db)):
+    """
+    Revoke a refresh token.
+
+    - **refresh_token**: Refresh token to revoke
+
+    Invalidates the refresh token so it can no longer be used to refresh access tokens.
+    """
+    auth_service.revoke_token(db, request)
+    return {"message": "Token revoked successfully"}

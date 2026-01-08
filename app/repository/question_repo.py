@@ -382,6 +382,7 @@ def get_answers_by_question_id(
     for answer in answers:
         result.append({
             'id': answer.id,
+            'question_id': answer.question_id,
             'content': answer.content,
             'is_correct': answer.is_correct,
             'explanation': answer.explanation,
@@ -429,6 +430,116 @@ def get_answer_by_id(
 
     return {
         'id': answer.id,
+        'question_id': answer.question_id,
+        'content': answer.content,
+        'is_correct': answer.is_correct,
+        'explanation': answer.explanation,
+        'created_at': datetime_to_timestamp(answer.created_at),
+        'updated_at': datetime_to_timestamp(answer.updated_at)
+    }
+
+
+def get_all_answers(
+    db: Session,
+    search_key: Optional[str] = None,
+    search_value: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 10,
+) -> Tuple[list, int]:
+    """
+    Get all answers with optional filtering and pagination.
+
+    Args:
+        db: Database session
+        search_key: Field to search (content, is_correct, question_id)
+        search_value: Value to search for
+        page: Page number (1-indexed)
+        page_size: Number of items per page
+
+    Returns:
+        Tuple of (answers list, total count)
+    """
+    # Base query
+    query = db.query(AnswerOption).filter(
+        AnswerOption.deleted_at.is_(None)
+    )
+
+    # Handle boolean search for is_correct separately
+    if search_key == "is_correct" and search_value:
+        # Convert string to boolean
+        is_correct_value = search_value.lower() in ("true", "1", "yes", "t")
+        query = query.filter(AnswerOption.is_correct == is_correct_value)
+    elif search_key == "question_id" and search_value:
+        # Handle UUID search for question_id
+        try:
+            query = query.filter(AnswerOption.question_id == search_value)
+        except (ValueError, TypeError):
+            # Invalid UUID format, return empty result
+            return [], 0
+    else:
+        # Define search configuration for other fields
+        search_config = {
+            "content": {
+                "column": AnswerOption.content,
+                "type": "text",
+                "case_sensitive": False,
+            },
+        }
+
+        # Apply search filter
+        if search_config and search_key in search_config:
+            from app.utils.search_pagination import SearchFilter
+            search_filter = SearchFilter(search_config)
+            query = search_filter.apply(query, search_key, search_value)
+
+    # Apply pagination
+    from app.utils.search_pagination import PaginationHandler
+    paginated_query, total = PaginationHandler.apply(query, page, page_size)
+
+    # Execute query
+    answers = paginated_query.all()
+
+    result = []
+    for answer in answers:
+        result.append({
+            'id': answer.id,
+            'question_id': answer.question_id,
+            'content': answer.content,
+            'is_correct': answer.is_correct,
+            'explanation': answer.explanation,
+            'created_at': datetime_to_timestamp(answer.created_at),
+            'updated_at': datetime_to_timestamp(answer.updated_at)
+        })
+
+    return result, total
+
+
+def get_answer_by_id_only(
+    db: Session,
+    answer_id: str,
+):
+    """
+    Get a specific answer by answer_id only.
+
+    Args:
+        db: Database session
+        answer_id: Answer UUID
+
+    Returns:
+        Answer dict or None if not found
+    """
+    # Get answer
+    answer = db.query(AnswerOption).filter(
+        AnswerOption.id == answer_id,
+        AnswerOption.deleted_at.is_(None)
+    ).first()
+
+    if not answer:
+        return None
+
+    return {
+        'id': answer.id,
+        'question_id': answer.question_id,
         'content': answer.content,
         'is_correct': answer.is_correct,
         'explanation': answer.explanation,

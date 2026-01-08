@@ -20,6 +20,7 @@ class QuestionSetDetailOut(BaseModel):
 class AnswerOut(BaseModel):
     """Schema for answer"""
     id: UUID = Field(..., description="Answer ID", example="550e8400-e29b-41d4-a716-446655440000")
+    question_id: UUID | None = Field(None, description="Question ID", example="550e8400-e29b-41d4-a716-446655440000")
     content: str = Field(..., description="Answer content", example="Option A")
     is_correct: bool = Field(..., description="Whether this is the correct answer", example=True)
     explanation: str | None = Field(None, description="Explanation for the answer", example="This is the correct answer because...")

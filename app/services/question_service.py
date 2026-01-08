@@ -51,3 +51,21 @@ def get_answers_by_question_id(
 def get_answer_by_id(db: Session, question_id: str, answer_id: str):
     """Get a specific answer by question_id and answer_id."""
     return question_repo.get_answer_by_id(db, question_id, answer_id)
+
+
+def get_all_answers(
+    db: Session,
+    search_key: str = None,
+    search_value: str = None,
+    page: int = 1,
+    page_size: int = 10,
+):
+    """Get all answers with optional filtering and pagination."""
+    return question_repo.get_all_answers(
+        db, search_key, search_value, page, page_size
+    )
+
+
+def get_answer_by_id_only(db: Session, answer_id: str):
+    """Get a specific answer by answer_id only."""
+    return question_repo.get_answer_by_id_only(db, answer_id)

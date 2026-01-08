@@ -2,20 +2,21 @@
 from pydantic import BaseModel, Field
 from typing import List
 from datetime import datetime
+from uuid import UUID
 from app.schemas.http_response import SuccessResponse
 
 
 class SubmissionCreate(BaseModel):
     """Schema for creating a submission"""
-    question_id: int = Field(..., description="Question ID", example=1)
-    selected_option_id: int = Field(..., description="Selected answer option ID", example=3)
+    question_id: UUID = Field(..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440000")
+    selected_option_id: UUID = Field(..., description="Selected answer option ID", example="550e8400-e29b-41d4-a716-446655440001")
     is_correct: bool = Field(..., description="Whether the submission is correct", example=True)
 
     class Config:
         json_schema_extra = {
             "example": {
-                "question_id": 1,
-                "selected_option_id": 3,
+                "question_id": "550e8400-e29b-41d4-a716-446655440000",
+                "selected_option_id": "550e8400-e29b-41d4-a716-446655440001",
                 "is_correct": True
             }
         }
@@ -30,13 +31,13 @@ class SubmissionBulkCreate(BaseModel):
             "example": {
                 "submissions": [
                     {
-                        "question_id": 1,
-                        "selected_option_id": 3,
+                        "question_id": "550e8400-e29b-41d4-a716-446655440000",
+                        "selected_option_id": "550e8400-e29b-41d4-a716-446655440001",
                         "is_correct": True
                     },
                     {
-                        "question_id": 2,
-                        "selected_option_id": 5,
+                        "question_id": "550e8400-e29b-41d4-a716-446655440002",
+                        "selected_option_id": "550e8400-e29b-41d4-a716-446655440003",
                         "is_correct": False
                     }
                 ]
@@ -82,7 +83,7 @@ class CategoryStatistics(BaseModel):
 
 class RecentActivity(BaseModel):
     """Schema for recent activity"""
-    id: int = Field(..., description="Submission ID", example=1)
+    id: UUID = Field(..., description="Submission ID", example="550e8400-e29b-41d4-a716-446655440000")
     category: str = Field(..., description="Question category", example="DVA-C02")
     question_preview: str = Field(..., description="Question content preview", example="What is AWS Lambda?")
     is_correct: bool = Field(..., description="Whether the submission is correct", example=True)

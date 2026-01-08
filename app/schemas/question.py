@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
+from uuid import UUID
 from app.schemas.http_response import SuccessResponse
 
 
@@ -47,7 +48,7 @@ class CategoryWithSetsOut(BaseModel):
 
 class AnswerOut(BaseModel):
     """Schema for answer"""
-    id: int = Field(..., description="Answer ID", example=1)
+    id: UUID = Field(..., description="Answer ID", example="550e8400-e29b-41d4-a716-446655440000")
     content: str = Field(..., description="Answer content", example="Option A")
     is_correct: bool = Field(..., description="Whether this is the correct answer", example=True)
     explanation: str | None = Field(None, description="Explanation for the answer", example="This is the correct answer because...")
@@ -58,7 +59,7 @@ class AnswerOut(BaseModel):
 
 class QuestionWithAnswers(BaseModel):
     """Schema for question with answers"""
-    id: int = Field(..., description="Question ID", example=1)
+    id: UUID = Field(..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440000")
     content: str = Field(..., description="Question content", example="What is AWS Lambda?")
     image_url: str | None = Field(None, description="Image URL (if available)", example="https://example.com/image.png")
     category: str | None = Field(None, description="Question category", example="DVA-C02")
@@ -70,7 +71,7 @@ class QuestionWithAnswers(BaseModel):
 
 class QuestionOut(BaseModel):
     """Schema for question (without answers)"""
-    id: int = Field(..., description="Question ID", example=1)
+    id: UUID = Field(..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440000")
     content: str = Field(..., description="Question content", example="What is AWS Lambda?")
     image_url: str | None = Field(None, description="Image URL (if available)")
     category: str | None = Field(None, description="Question category", example="DVA-C02")

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, Text, Boolean, ForeignKey, TIMESTAMP
+from sqlalchemy import Column, Text, Boolean, ForeignKey, TIMESTAMP, text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.base import Base
@@ -6,8 +7,8 @@ from app.db.base import Base
 class AnswerOption(Base):
     __tablename__ = "answers"
 
-    id = Column(Integer, primary_key=True, index=True)
-    question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, server_default=text("uuidv7()"))
+    question_id = Column(UUID(as_uuid=True), ForeignKey("questions.id", ondelete="CASCADE"), nullable=False)
     content = Column(Text, nullable=True)
     image_url = Column(Text, nullable=True)
     is_correct = Column(Boolean, nullable=False, default=False)

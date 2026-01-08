@@ -1,13 +1,32 @@
 # app/services/submission_service.py
 from sqlalchemy.orm import Session
 from typing import List
-from app.repository import submission_repo
+from uuid import UUID
+from fastapi import HTTPException, status
+from app.repository import submission_repo, question_repo
 from app.schemas.submission import SubmissionCreate
 from app.utils.datetime_utils import datetime_to_timestamp
 
 
-def submit_submission(db: Session, user_id: int, submission_data: SubmissionCreate) -> dict:
+def submit_submission(db: Session, user_id: UUID, submission_data: SubmissionCreate) -> dict:
     """Submit a single quiz submission."""
+    # Validate submission before creating
+    # Check if question exists
+    if not question_repo.question_exists(db, submission_data.question_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Question with ID {submission_data.question_id} not found"
+        )
+    
+    # Check if answer exists for the question
+    if not question_repo.answer_exists_for_question(
+        db, submission_data.question_id, submission_data.selected_option_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Answer with ID {submission_data.selected_option_id} not found for question {submission_data.question_id}"
+        )
+    
     submission = submission_repo.create_submission(db, user_id, submission_data)
     return {
         "id": submission.id,
@@ -19,8 +38,26 @@ def submit_submission(db: Session, user_id: int, submission_data: SubmissionCrea
     }
 
 
-def submit_submissions_bulk(db: Session, user_id: int, submissions: List[SubmissionCreate]) -> List[dict]:
+def submit_submissions_bulk(db: Session, user_id: UUID, submissions: List[SubmissionCreate]) -> List[dict]:
     """Submit multiple quiz submissions at once."""
+    # Validate all submissions before creating
+    for submission in submissions:
+        # Check if question exists
+        if not question_repo.question_exists(db, submission.question_id):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Question with ID {submission.question_id} not found"
+            )
+        
+        # Check if answer exists for the question
+        if not question_repo.answer_exists_for_question(
+            db, submission.question_id, submission.selected_option_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Answer with ID {submission.selected_option_id} not found for question {submission.question_id}"
+            )
+    
     db_submissions = submission_repo.create_submissions_bulk(db, user_id, submissions)
     return [
         {
@@ -35,7 +72,7 @@ def submit_submissions_bulk(db: Session, user_id: int, submissions: List[Submiss
     ]
 
 
-def get_user_dashboard_data(db: Session, user_id: int):
+def get_user_dashboard_data(db: Session, user_id: UUID):
     """Get comprehensive dashboard data for user."""
     statistics = submission_repo.get_user_statistics(db, user_id)
     recent_activity = submission_repo.get_user_recent_activity(db, user_id, limit=10)

@@ -1,4 +1,5 @@
 # app/repository/question_repo.py
+from uuid import UUID
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from typing import Optional, Tuple
@@ -718,3 +719,41 @@ def get_answer_by_id_only(
         'created_at': datetime_to_timestamp(answer.created_at),
         'updated_at': datetime_to_timestamp(answer.updated_at)
     }
+
+
+def question_exists(db: Session, question_id: UUID) -> bool:
+    """
+    Check if a question exists and is not deleted.
+
+    Args:
+        db: Database session
+        question_id: Question UUID
+
+    Returns:
+        True if question exists, False otherwise
+    """
+    question = db.query(Question).filter(
+        Question.id == question_id,
+        Question.deleted_at.is_(None)
+    ).first()
+    return question is not None
+
+
+def answer_exists_for_question(db: Session, question_id: UUID, answer_id: UUID) -> bool:
+    """
+    Check if an answer exists for a specific question and is not deleted.
+
+    Args:
+        db: Database session
+        question_id: Question UUID
+        answer_id: Answer UUID
+
+    Returns:
+        True if answer exists for the question, False otherwise
+    """
+    answer = db.query(AnswerOption).filter(
+        AnswerOption.id == answer_id,
+        AnswerOption.question_id == question_id,
+        AnswerOption.deleted_at.is_(None)
+    ).first()
+    return answer is not None

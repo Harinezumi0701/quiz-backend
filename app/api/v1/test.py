@@ -1,5 +1,5 @@
 # app/api/v1/test.py
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.schemas.question import (
@@ -8,10 +8,13 @@ from app.schemas.question import (
     QuestionListResponse,
     QuestionResponse,
 )
+from app.schemas.submission import SubmissionBulkCreate, SubmissionListResponse
 from app.schemas.http_response import ErrorResponse
-from app.services import category_service, question_service
+from app.services import category_service, question_service, submission_service
 from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
+from app.api.dependencies.auth import get_current_user
+from app.models.users import User
 
 router = APIRouter()
 
@@ -202,3 +205,57 @@ def get_question_by_test(
         )
 
     return QuestionResponse(data=question, meta={})
+
+
+@router.post(
+    "/{test_id}/submit",
+    response_model=SubmissionListResponse,
+    summary="Submit multiple submissions for a test",
+    description="Submit multiple submissions for a test in one request (requires authentication)",
+    responses={
+        200: {
+            "description": "List of saved submissions",
+        },
+        401: {
+            "description": "Unauthorized access",
+            "model": ErrorResponse,
+        },
+        404: {
+            "description": "Test not found or question not found or answer not found",
+            "model": ErrorResponse,
+        },
+    }
+)
+def submit_test_submissions(
+    test_id: str = Path(
+        ...,
+        description="Test ID",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    bulk_data: SubmissionBulkCreate = Body(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Submit multiple submissions for a test at once.
+    
+    - **test_id**: Test ID
+    - **submissions**: List of submissions (minimum 1 submission)
+    
+    Each submission in the list includes:
+    - question_id: Question ID
+    - selected_option_id: Selected answer option ID
+    - is_correct: Whether the submission is correct
+    
+    Requires authentication token in header: `Authorization: Bearer <token>`
+    """
+    # Verify test exists
+    test = category_service.get_test_by_id_only(db, test_id)
+    if not test:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Test with ID {test_id} not found",
+        )
+    
+    submissions = submission_service.submit_submissions_bulk(db, current_user.id, bulk_data.submissions)
+    return SubmissionListResponse(data=submissions, meta={})

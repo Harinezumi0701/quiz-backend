@@ -34,7 +34,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     - **account_name**: Account display name
     - **user_password**: Password (minimum 6 characters)
 
-    After successful registration, you will receive an access token and refresh token to use for other APIs.
+    After successful registration, you will receive an access token to use for other APIs.
     """
     token_data = auth_service.register_user(db, request)
     return TokenResponse(data=token_data, meta={})
@@ -61,8 +61,9 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
 
     - **user_email**: Registered email
     - **user_password**: Account password
+    - **remember_me**: (Optional) If true, returns refresh token for persistent sessions
 
-    Returns access token and refresh token if login credentials are correct.
+    Returns access token. Refresh token is only returned if remember_me is true.
     """
     token_data = auth_service.login_user(db, request)
     return TokenResponse(data=token_data, meta={})
@@ -72,7 +73,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     "/token/refresh",
     response_model=TokenResponse,
     summary="Refresh access token",
-    description="Refresh access token using refresh token. Optionally generate new refresh token",
+    description="Refresh access token using refresh token",
     responses={
         200: {
             "description": "Token refreshed successfully",
@@ -88,9 +89,8 @@ def refresh(request: RefreshTokenRequest, db: Session = Depends(get_db)):
     Refresh access token using refresh token.
 
     - **refresh_token**: Valid refresh token
-    - **generate_new_refresh_token**: (Optional) If true, generate a new refresh token and invalidate the old one
 
-    Returns new access token. If generate_new_refresh_token is true, returns new refresh token as well.
+    Returns new access token and new refresh token. Old refresh token is invalidated.
     """
     token_data = auth_service.refresh_access_token(db, request)
     return TokenResponse(data=token_data, meta={})

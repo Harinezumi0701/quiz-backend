@@ -22,7 +22,7 @@ from fastapi import HTTPException, status
 
 
 def register_user(db: Session, request: RegisterRequest) -> TokenData:
-    """Register a new user and return access token and refresh token."""
+    """Register a new user and return access token (no refresh token)."""
     # Check if email already exists
     if auth_repo.email_exists(db, request.user_email):
         raise HTTPException(
@@ -44,25 +44,15 @@ def register_user(db: Session, request: RegisterRequest) -> TokenData:
     # Generate access token
     access_token = create_access_token(data={JWT_SUBJECT_KEY: user.user_email})
 
-    # Generate and save refresh token
-    refresh_token_str = create_refresh_token()
-    expires_at = datetime.now(timezone.utc) + get_refresh_token_expires_delta()
-    auth_repo.create_refresh_token(
-        db=db,
-        user_id=user.id,
-        token=refresh_token_str,
-        expires_at=expires_at
-    )
-
     return TokenData(
         access_token=access_token,
-        refresh_token=refresh_token_str,
+        refresh_token=None,
         token_type="bearer"
     )
 
 
 def login_user(db: Session, request: LoginRequest) -> TokenData:
-    """Authenticate a user and return access token and refresh token."""
+    """Authenticate a user and return access token. Refresh token only if remember_me is True."""
     # Get user by email
     user = auth_repo.get_user_by_email(db, request.user_email)
 
@@ -76,15 +66,17 @@ def login_user(db: Session, request: LoginRequest) -> TokenData:
     # Generate access token
     access_token = create_access_token(data={JWT_SUBJECT_KEY: user.user_email})
 
-    # Generate and save refresh token
-    refresh_token_str = create_refresh_token()
-    expires_at = datetime.now(timezone.utc) + get_refresh_token_expires_delta()
-    auth_repo.create_refresh_token(
-        db=db,
-        user_id=user.id,
-        token=refresh_token_str,
-        expires_at=expires_at
-    )
+    # Generate and save refresh token only if remember_me is True
+    refresh_token_str = None
+    if request.remember_me:
+        refresh_token_str = create_refresh_token()
+        expires_at = datetime.now(timezone.utc) + get_refresh_token_expires_delta()
+        auth_repo.create_refresh_token(
+            db=db,
+            user_id=user.id,
+            token=refresh_token_str,
+            expires_at=expires_at
+        )
 
     return TokenData(
         access_token=access_token,
@@ -99,7 +91,7 @@ def get_user_by_email(db: Session, email: str):
 
 
 def refresh_access_token(db: Session, request: RefreshTokenRequest) -> TokenData:
-    """Refresh access token using refresh token. Optionally generate new refresh token."""
+    """Refresh access token using refresh token. Old refresh token is deleted and new one is generated."""
     # Get refresh token from database
     refresh_token = auth_repo.get_refresh_token_by_token(db, request.refresh_token)
 
@@ -130,33 +122,24 @@ def refresh_access_token(db: Session, request: RefreshTokenRequest) -> TokenData
     # Generate new access token
     access_token = create_access_token(data={JWT_SUBJECT_KEY: user.user_email})
 
-    # Generate new refresh token if requested
-    if request.generate_new_refresh_token:
-        # Delete old refresh token
-        auth_repo.delete_refresh_token(db, request.refresh_token)
-        
-        # Create new refresh token
-        new_refresh_token_str = create_refresh_token()
-        expires_at = datetime.now(timezone.utc) + get_refresh_token_expires_delta()
-        auth_repo.create_refresh_token(
-            db=db,
-            user_id=user.id,
-            token=new_refresh_token_str,
-            expires_at=expires_at
-        )
-        
-        return TokenData(
-            access_token=access_token,
-            refresh_token=new_refresh_token_str,
-            token_type="bearer"
-        )
-    else:
-        # Return new access token (keep same refresh token)
-        return TokenData(
-            access_token=access_token,
-            refresh_token=request.refresh_token,
-            token_type="bearer"
-        )
+    # Delete old refresh token
+    auth_repo.delete_refresh_token(db, request.refresh_token)
+
+    # Generate and save new refresh token
+    new_refresh_token_str = create_refresh_token()
+    expires_at = datetime.now(timezone.utc) + get_refresh_token_expires_delta()
+    auth_repo.create_refresh_token(
+        db=db,
+        user_id=user.id,
+        token=new_refresh_token_str,
+        expires_at=expires_at
+    )
+
+    return TokenData(
+        access_token=access_token,
+        refresh_token=new_refresh_token_str,
+        token_type="bearer"
+    )
 
 
 def revoke_token(db: Session, request: RevokeTokenRequest) -> None:

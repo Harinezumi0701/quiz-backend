@@ -43,24 +43,18 @@ def create_refresh_token(db: Session, user_id: str, token: str, expires_at: date
 
 def get_refresh_token_by_token(db: Session, token: str) -> RefreshToken | None:
     """Get a refresh token by token string."""
-    return db.query(RefreshToken).filter(
-        RefreshToken.token == token,
-        RefreshToken.deleted_at.is_(None)
-    ).first()
+    return db.query(RefreshToken).filter(RefreshToken.token == token).first()
 
 
 def delete_refresh_token(db: Session, token: str) -> None:
-    """Delete (soft delete) a refresh token."""
+    """Delete (hard delete) a refresh token."""
     refresh_token = get_refresh_token_by_token(db, token)
     if refresh_token:
-        refresh_token.deleted_at = datetime.now(timezone.utc)
+        db.delete(refresh_token)
         db.commit()
 
 
 def delete_user_refresh_tokens(db: Session, user_id: str) -> None:
-    """Delete all refresh tokens for a user (soft delete)."""
-    db.query(RefreshToken).filter(
-        RefreshToken.user_id == user_id,
-        RefreshToken.deleted_at.is_(None)
-    ).update({"deleted_at": datetime.now(timezone.utc)})
+    """Delete all refresh tokens for a user (hard delete)."""
+    db.query(RefreshToken).filter(RefreshToken.user_id == user_id).delete()
     db.commit()

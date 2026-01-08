@@ -23,12 +23,14 @@ class LoginRequest(BaseModel):
     """Request schema for login"""
     user_email: EmailStr = Field(..., description="User email", example="user@example.com")
     user_password: str = Field(..., description="Password", example="password123")
+    remember_me: bool = Field(default=False, description="Remember me option", example=False)
 
     class Config:
         json_schema_extra = {
             "example": {
                 "user_email": "user@example.com",
-                "user_password": "password123"
+                "user_password": "password123",
+                "remember_me": False
             }
         }
 
@@ -36,7 +38,7 @@ class LoginRequest(BaseModel):
 class TokenData(BaseModel):
     """Token data schema"""
     access_token: str = Field(..., description="JWT access token", example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-    refresh_token: str = Field(..., description="Refresh token", example="dGhpc2lzYXJlZnJlc2h0b2tlbg")
+    refresh_token: str | None = Field(None, description="Refresh token", example="dGhpc2lzYXJlZnJlc2h0b2tlbg")
     token_type: str = Field(default="bearer", description="Token type", example="bearer")
 
     class Config:
@@ -62,13 +64,11 @@ class TokenDataInternal(BaseModel):
 class RefreshTokenRequest(BaseModel):
     """Request schema for refresh token"""
     refresh_token: str = Field(..., description="Refresh token", example="dGhpc2lzYXJlZnJlc2h0b2tlbg")
-    generate_new_refresh_token: bool = Field(default=False, description="Generate new refresh token", example=False)
 
     class Config:
         json_schema_extra = {
             "example": {
-                "refresh_token": "dGhpc2lzYXJlZnJlc2h0b2tlbg",
-                "generate_new_refresh_token": False
+                "refresh_token": "dGhpc2lzYXJlZnJlc2h0b2tlbg"
             }
         }
 

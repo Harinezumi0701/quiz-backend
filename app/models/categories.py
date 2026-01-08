@@ -15,4 +15,4 @@ class Category(Base):
     deleted_at = Column(TIMESTAMP, nullable=True)
 
     # Relationship with questions
-    questions = relationship("Question", back_populates="category_obj")
+    questions = relationship("Question", back_populates="category")

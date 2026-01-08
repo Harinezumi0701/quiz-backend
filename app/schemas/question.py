@@ -63,6 +63,9 @@ class QuestionWithAnswers(BaseModel):
     content: str = Field(..., description="Question content", example="What is AWS Lambda?")
     image_url: str | None = Field(None, description="Image URL (if available)", example="https://example.com/image.png")
     category: str | None = Field(None, description="Question category", example="DVA-C02")
+    question_set: str | None = Field(None, description="Question set", example="DVA-C02_Day_1")
+    created_at: str | None = Field(None, description="Created at timestamp")
+    updated_at: str | None = Field(None, description="Updated at timestamp")
     answers: List[AnswerOut] = Field(..., description="List of answers")
 
     class Config:
@@ -80,8 +83,30 @@ class QuestionOut(BaseModel):
         from_attributes = True
 
 
+class CategoryDetailOut(BaseModel):
+    """Schema for category with ID"""
+    id: UUID = Field(..., description="Category ID", example="550e8400-e29b-41d4-a716-446655440000")
+    name: str = Field(..., description="Category name", example="DVA-C02")
+    question_count: int = Field(..., description="Number of questions in category", example=150)
+    created_at: str | None = Field(None, description="Created at timestamp")
+    updated_at: str | None = Field(None, description="Updated at timestamp")
+
+    class Config:
+        from_attributes = True
+
+
 class CategoryListResponse(SuccessResponse[List[CategoryOut]]):
     """Response schema for list of categories"""
+    pass
+
+
+class CategoryDetailResponse(SuccessResponse[CategoryDetailOut]):
+    """Response schema for single category"""
+    pass
+
+
+class CategoryDetailListResponse(SuccessResponse[List[CategoryDetailOut]]):
+    """Response schema for list of categories with details"""
     pass
 
 
@@ -92,4 +117,9 @@ class CategoryWithSetsListResponse(SuccessResponse[List[CategoryWithSetsOut]]):
 
 class QuestionListResponse(SuccessResponse[List[QuestionWithAnswers]]):
     """Response schema for list of questions with answers"""
+    pass
+
+
+class QuestionResponse(SuccessResponse[QuestionWithAnswers]):
+    """Response schema for single question"""
     pass

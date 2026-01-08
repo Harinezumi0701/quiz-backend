@@ -43,3 +43,4 @@ htmlcov/
 *.whl
 
 data*
+instructions.md

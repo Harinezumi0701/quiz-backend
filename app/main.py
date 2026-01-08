@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, submission
+from app.api.v1 import user, auth, question, submission, category
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response
 from app.constants import (
@@ -18,6 +18,7 @@ from app.constants import (
     AUTH_PREFIX,
     USERS_PREFIX,
     QUESTIONS_PREFIX,
+    CATEGORIES_PREFIX,
     SUBMISSIONS_PREFIX,
     HEALTH_CHECK_PATH,
     ROOT_PATH,
@@ -98,6 +99,7 @@ app.add_exception_handler(Exception, general_exception_handler)
 app.include_router(auth.router, prefix=AUTH_PREFIX, tags=["auth"])
 app.include_router(user.router, prefix=USERS_PREFIX, tags=["users"])
 app.include_router(question.router, prefix=QUESTIONS_PREFIX, tags=["questions"])
+app.include_router(category.router, prefix=CATEGORIES_PREFIX, tags=["categories"])
 app.include_router(submission.router, prefix=SUBMISSIONS_PREFIX, tags=["submissions"])
 
 

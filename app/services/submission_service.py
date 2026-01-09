@@ -75,6 +75,7 @@ def submit_submissions_bulk(db: Session, user_id: UUID, submissions: List[Submis
 def get_user_dashboard_data(db: Session, user_id: UUID):
     """Get comprehensive dashboard data for user."""
     statistics = submission_repo.get_user_statistics(db, user_id)
+    statistics_by_test = submission_repo.get_user_statistics_by_test(db, user_id)
     recent_activity = submission_repo.get_user_recent_activity(db, user_id, limit=10)
 
     # Calculate overall statistics
@@ -90,6 +91,7 @@ def get_user_dashboard_data(db: Session, user_id: UUID):
             'overall_accuracy': round(total_correct / total_submitted * 100, 1) if total_submitted > 0 else 0
         },
         'by_category': statistics,
+        'by_test': statistics_by_test,
         'recent_activity': recent_activity
     }
 

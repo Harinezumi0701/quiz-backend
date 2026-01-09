@@ -20,7 +20,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     response_model=TestDetailListResponse,
     summary="Get all tests",
     description="Get all tests with optional name search and pagination",

@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, submission, category, test, answer, me
+from app.api.v1 import user, auth, question, category, test, answer, me
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response
 from app.constants import (
@@ -22,7 +22,6 @@ from app.constants import (
     CATEGORIES_PREFIX,
     TESTS_PREFIX,
     ANSWERS_PREFIX,
-    SUBMISSIONS_PREFIX,
     HEALTH_CHECK_PATH,
     ROOT_PATH,
 )
@@ -34,7 +33,6 @@ Quiz system backend API with the following features:
 
 * **Authentication**: User registration and login
 * **Questions**: Question and category management
-* **Submissions**: Process and store user submissions
 * **Users**: User information management
 * **Dashboard**: Statistics and result reports
 
@@ -90,6 +88,7 @@ app = FastAPI(
     openapi_url="/docs/openapi.json",  # Ensure OpenAPI endpoint is enabled
     docs_url="/docs",  # Swagger UI
     redoc_url="/redoc",  # ReDoc
+    redirect_slashes=False,  # Disable automatic trailing slash redirects
 )
 
 # CORS configuration for frontend
@@ -120,7 +119,6 @@ app.include_router(question.router, prefix=QUESTIONS_PREFIX, tags=["questions"])
 app.include_router(category.router, prefix=CATEGORIES_PREFIX, tags=["categories"])
 app.include_router(test.router, prefix=TESTS_PREFIX, tags=["tests"])
 app.include_router(answer.router, prefix=ANSWERS_PREFIX, tags=["answers"])
-app.include_router(submission.router, prefix=SUBMISSIONS_PREFIX, tags=["submissions"])
 
 
 def custom_openapi():

@@ -13,4 +13,6 @@ if __name__ == "__main__":
         reload=True,  # Enable auto-reload on code changes
         log_level="debug",  # Detailed logging
         reload_dirs=["app"],  # Watch app directory for changes
+        proxy_headers=True,
+        forwarded_allow_ips="*",
     )

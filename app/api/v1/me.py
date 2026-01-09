@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     response_model=UserResponse,
     summary="Get current user information",
     description="Get information of the currently logged in user (requires authentication)",

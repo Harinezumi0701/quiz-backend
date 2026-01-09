@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     response_model=AnswerListResponse,
     summary="Get all answers",
     description="Get all answers with optional filtering and pagination",

@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     response_model=CategoryDetailListResponse,
     summary="Get all categories",
     description="Get list of all categories with optional name search",

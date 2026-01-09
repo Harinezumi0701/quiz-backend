@@ -9,4 +9,5 @@ SERVICE_NAME = "quiz-api"
 HEALTH_STATUS = "healthy"
 WELCOME_MESSAGE = "Welcome to My FastAPI Project"
 UNCATEGORIZED_CATEGORY_NAME = "Uncategorized"
+UNCATEGORIZED_TEST_NAME_NAME = "Uncategorized Test"
 

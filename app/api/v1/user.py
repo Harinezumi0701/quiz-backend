@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     response_model=UserListResponse,
     summary="Get all users",
     description="Get list of all users in the system (public endpoint)",

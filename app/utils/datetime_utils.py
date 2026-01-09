@@ -1,6 +1,30 @@
 # app/utils/datetime_utils.py
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
+
+
+def normalize_to_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    """
+    Normalize datetime to UTC timezone-aware datetime.
+    
+    If datetime is timezone-naive, assumes it's in UTC and adds UTC timezone.
+    If datetime is timezone-aware, converts it to UTC.
+    
+    Args:
+        dt: datetime object or None
+        
+    Returns:
+        UTC timezone-aware datetime, or None if dt is None
+    """
+    if dt is None:
+        return None
+    
+    # If already timezone-aware, convert to UTC
+    if dt.tzinfo is not None:
+        return dt.astimezone(timezone.utc)
+    
+    # If timezone-naive, assume UTC and add timezone
+    return dt.replace(tzinfo=timezone.utc)
 
 
 def datetime_to_timestamp(dt: Optional[datetime]) -> Optional[int]:

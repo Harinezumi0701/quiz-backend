@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, submission, category, test, answer
+from app.api.v1 import user, auth, question, submission, category, test, answer, me
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response
 from app.constants import (
@@ -17,6 +17,7 @@ from app.constants import (
     CORS_ALLOW_HEADERS,
     AUTH_PREFIX,
     USERS_PREFIX,
+    ME_PREFIX,
     QUESTIONS_PREFIX,
     CATEGORIES_PREFIX,
     TESTS_PREFIX,
@@ -50,7 +51,11 @@ tags_metadata = [
     },
     {
         "name": "users",
-        "description": "User information management. Get list of users or current user information.",
+        "description": "User information management. Get list of users or user information by ID.",
+    },
+    {
+        "name": "me",
+        "description": "Current user endpoints. Get current user information and dashboard statistics.",
     },
     {
         "name": "questions",
@@ -67,10 +72,6 @@ tags_metadata = [
     {
         "name": "answers",
         "description": "Answer management. Get all answers with search and pagination.",
-    },
-    {
-        "name": "submissions",
-        "description": "Process user submissions. Submit submissions and view dashboard statistics.",
     },
 ]
 
@@ -102,16 +103,19 @@ app.add_middleware(
 
 # Response wrapper middleware to automatically wrap success responses
 from app.middleware.response_wrapper import ResponseWrapperMiddleware
+
 app.add_middleware(ResponseWrapperMiddleware)
 
 # Register exception handlers
 from fastapi import HTTPException
+
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
 
 # Register routers from api/v1 folder
 app.include_router(auth.router, prefix=AUTH_PREFIX, tags=["auth"])
 app.include_router(user.router, prefix=USERS_PREFIX, tags=["users"])
+app.include_router(me.router, prefix=ME_PREFIX, tags=["me"])
 app.include_router(question.router, prefix=QUESTIONS_PREFIX, tags=["questions"])
 app.include_router(category.router, prefix=CATEGORIES_PREFIX, tags=["categories"])
 app.include_router(test.router, prefix=TESTS_PREFIX, tags=["tests"])
@@ -147,6 +151,7 @@ def custom_openapi():
     except Exception as e:
         # Fallback: create basic schema if error occurs
         import logging
+
         logging.error(f"Error generating OpenAPI schema: {e}")
         fallback_schema = {
             "openapi": "3.1.0",
@@ -164,6 +169,7 @@ def custom_openapi():
 # Assign custom_openapi after all routes are registered
 app.openapi = custom_openapi
 
+
 @app.get(
     ROOT_PATH,
     summary="Root endpoint",
@@ -174,26 +180,20 @@ app.openapi = custom_openapi
             "description": "Welcome message",
             "content": {
                 "application/json": {
-                    "example": {
-                        "data": {"message": WELCOME_MESSAGE},
-                        "meta": {}
-                    }
+                    "example": {"data": {"message": WELCOME_MESSAGE}, "meta": {}}
                 }
-            }
+            },
         }
-    }
+    },
 )
 def root():
     """
     Root endpoint of the API.
-    
+
     Returns:
         dict: Welcome message
     """
-    return success_response(
-        data={"message": WELCOME_MESSAGE},
-        meta={}
-    )
+    return success_response(data={"message": WELCOME_MESSAGE}, meta={})
 
 
 @app.get(
@@ -210,27 +210,23 @@ def root():
                         "data": {
                             "status": HEALTH_STATUS,
                             "service": SERVICE_NAME,
-                            "version": APP_VERSION
+                            "version": APP_VERSION,
                         },
-                        "meta": {}
+                        "meta": {},
                     }
                 }
-            }
+            },
         }
-    }
+    },
 )
 def health_check():
     """
     Health check endpoint to verify if the service is running.
-    
+
     Returns:
         dict: Service status, service name and version
     """
     return success_response(
-        data={
-            "status": HEALTH_STATUS,
-            "service": SERVICE_NAME,
-            "version": APP_VERSION
-        },
-        meta={}
+        data={"status": HEALTH_STATUS, "service": SERVICE_NAME, "version": APP_VERSION},
+        meta={},
     )

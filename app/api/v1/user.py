@@ -5,8 +5,6 @@ from app.schemas.user import UserOut, UserListResponse, UserResponse
 from app.schemas.http_response import ErrorResponse
 from app.services import user_service
 from app.db.session import get_db
-from app.api.dependencies.auth import get_current_user
-from app.models.users import User
 from app.constants import ERROR_USER_NOT_FOUND
 
 router = APIRouter()
@@ -31,30 +29,6 @@ def read_users(db: Session = Depends(get_db)):
     """
     users = user_service.list_users(db)
     return UserListResponse(data=users, meta={})
-
-
-@router.get(
-    "/me",
-    response_model=UserResponse,
-    summary="Get current user information",
-    description="Get information of the currently logged in user (requires authentication)",
-    responses={
-        200: {
-            "description": "User information",
-        },
-        401: {
-            "description": "Unauthorized access",
-            "model": ErrorResponse,
-        }
-    }
-)
-def read_current_user(current_user: User = Depends(get_current_user)):
-    """
-    Get current user information.
-    
-    Requires authentication token in header: `Authorization: Bearer <token>`
-    """
-    return UserResponse(data=current_user, meta={})
 
 
 @router.get(

@@ -5,10 +5,12 @@ from typing import List
 from uuid import UUID
 from app.models.submissions import Submission
 from app.models.questions import Question
+from app.models.categories import Category
 from app.models.users import User
 from app.models.submission_history import SubmissionHistory
 from app.schemas.submission import SubmissionCreate
 from app.utils.datetime_utils import datetime_to_timestamp
+from app.constants import UNCATEGORIZED_CATEGORY_NAME
 
 
 def create_submission(
@@ -63,26 +65,32 @@ def create_submissions_bulk(
 
 def get_user_statistics(db: Session, user_id: UUID):
     """Get user's quiz statistics grouped by category."""
-    from sqlalchemy import Integer, case
+    from sqlalchemy import Integer, case, func as sql_func
 
     stats = (
         db.query(
-            Question.category,
+            sql_func.coalesce(Category.name, UNCATEGORIZED_CATEGORY_NAME).label("category_name"),
             func.count(Submission.id).label("total_submitted"),
             func.sum(case((Submission.is_correct == True, 1), else_=0)).label(
                 "correct_submissions"
             ),
             func.max(Submission.answered_at).label("last_attempt"),
         )
-        .join(Submission, Submission.question_id == Question.id)
-        .filter(Submission.user_id == user_id, Question.deleted_at.is_(None))
-        .group_by(Question.category)
+        .select_from(Submission)
+        .join(Question, Submission.question_id == Question.id)
+        .outerjoin(Category, Question.category_id == Category.id)
+        .filter(
+            Submission.user_id == user_id,
+            Question.deleted_at.is_(None),
+            (Category.deleted_at.is_(None) | (Category.id.is_(None)))
+        )
+        .group_by(sql_func.coalesce(Category.name, UNCATEGORIZED_CATEGORY_NAME))
         .all()
     )
 
     return [
         {
-            "category": stat[0],
+            "category": stat[0] or UNCATEGORIZED_CATEGORY_NAME,
             "total_answered": stat[1],  # Keep for backward compatibility
             "total_submitted": stat[1],
             "correct_answers": stat[2] or 0,  # Keep for backward compatibility
@@ -102,13 +110,18 @@ def get_user_recent_activity(db: Session, user_id: UUID, limit: int = 10):
     activities = (
         db.query(
             Submission.id,
-            Question.category,
+            Category.name.label("category_name"),
             Question.content,
             Submission.is_correct,
             Submission.answered_at,
         )
         .join(Question, Submission.question_id == Question.id)
-        .filter(Submission.user_id == user_id, Question.deleted_at.is_(None))
+        .outerjoin(Category, Question.category_id == Category.id)
+        .filter(
+            Submission.user_id == user_id,
+            Question.deleted_at.is_(None),
+            (Category.deleted_at.is_(None) | (Category.id.is_(None)))
+        )
         .order_by(Submission.answered_at.desc())
         .limit(limit)
         .all()
@@ -117,7 +130,7 @@ def get_user_recent_activity(db: Session, user_id: UUID, limit: int = 10):
     return [
         {
             "id": activity[0],
-            "category": activity[1],
+            "category": activity[1] or UNCATEGORIZED_CATEGORY_NAME,
             "question_preview": (
                 activity[2][:100] + "..." if len(activity[2]) > 100 else activity[2]
             ),

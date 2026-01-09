@@ -6,14 +6,14 @@ from app.schemas.http_response import SuccessResponse
 class RegisterRequest(BaseModel):
     """Request schema for new user registration"""
     user_email: EmailStr = Field(..., description="User email", example="user@example.com")
-    account_name: str = Field(..., min_length=1, max_length=100, description="Account name", example="John Doe")
+    full_name: str = Field(..., min_length=1, max_length=100, description="Full name", example="John Doe")
     user_password: str = Field(..., min_length=6, description="Password (minimum 6 characters)", example="password123")
 
     class Config:
         json_schema_extra = {
             "example": {
                 "user_email": "user@example.com",
-                "account_name": "John Doe",
+                "full_name": "John Doe",
                 "user_password": "password123"
             }
         }

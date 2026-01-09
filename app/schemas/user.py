@@ -1,23 +1,38 @@
 # app/schemas/user.py
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 from uuid import UUID
+from datetime import date
 from app.schemas.http_response import SuccessResponse
 
 
 class UserOut(BaseModel):
     """Schema for user information"""
     id: UUID = Field(..., description="User ID", example="550e8400-e29b-41d4-a716-446655440000")
-    account_name: str = Field(..., description="Account name", example="John Doe")
+    user_id: str = Field(..., description="User ID (editable unique identifier)", example="abc123")
     user_email: str = Field(..., description="User email", example="user@example.com")
+    full_name: str = Field(..., description="Full name", example="John Doe")
+    phone: Optional[str] = Field(None, description="Phone number", example="+84123456789")
+    birthday: Optional[date] = Field(None, description="Birthday", example="1990-01-01")
+    address: Optional[str] = Field(None, description="Address", example="123 Main St, City")
+    job_title: Optional[str] = Field(None, description="Job title", example="Software Engineer")
+    company: Optional[str] = Field(None, description="Company", example="Tech Corp")
+    join_date: Optional[date] = Field(None, description="Join date", example="2024-01-01")
 
     class Config:
         from_attributes = True
         json_schema_extra = {
             "example": {
                 "id": "550e8400-e29b-41d4-a716-446655440000",
-                "account_name": "John Doe",
-                "user_email": "user@example.com"
+                "user_id": "my_custom_user_id",
+                "user_email": "user@example.com",
+                "full_name": "John Doe",
+                "phone": "+84123456789",
+                "birthday": "1990-01-01",
+                "address": "123 Main St, City",
+                "job_title": "Software Engineer",
+                "company": "Tech Corp",
+                "join_date": "2024-01-01"
             }
         }
 
@@ -30,3 +45,29 @@ class UserListResponse(SuccessResponse[List[UserOut]]):
 class UserResponse(SuccessResponse[UserOut]):
     """Response schema for single user"""
     pass
+
+
+class UserUpdateRequest(BaseModel):
+    """Request schema for updating user information"""
+    user_id: Optional[str] = Field(None, min_length=1, max_length=125, description="User ID (editable unique identifier matching [A-Za-z\\._-], 1-125 characters)", example="abc123")
+    full_name: Optional[str] = Field(None, min_length=1, max_length=255, description="Full name", example="John Doe")
+    phone: Optional[str] = Field(None, max_length=20, description="Phone number", example="+84123456789")
+    birthday: Optional[date] = Field(None, description="Birthday", example="1990-01-01")
+    address: Optional[str] = Field(None, max_length=500, description="Address", example="123 Main St, City")
+    job_title: Optional[str] = Field(None, max_length=100, description="Job title", example="Software Engineer")
+    company: Optional[str] = Field(None, max_length=100, description="Company", example="Tech Corp")
+    join_date: Optional[date] = Field(None, description="Join date", example="2024-01-01")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "user_id": "my_custom_user_id",
+                "full_name": "John Doe",
+                "phone": "+84123456789",
+                "birthday": "1990-01-01",
+                "address": "123 Main St, City",
+                "job_title": "Software Engineer",
+                "company": "Tech Corp",
+                "join_date": "2024-01-01"
+            }
+        }

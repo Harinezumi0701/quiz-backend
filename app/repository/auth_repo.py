@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from app.models.users import User
 from app.models.refresh_tokens import RefreshToken
+from app.utils.user_id_generator import generate_unique_user_id
 
 
 def get_user_by_email(db: Session, email: str) -> User | None:
@@ -10,11 +11,13 @@ def get_user_by_email(db: Session, email: str) -> User | None:
     return db.query(User).filter(User.user_email == email).first()
 
 
-def create_user(db: Session, user_email: str, account_name: str, hashed_password: str) -> User:
+def create_user(db: Session, user_email: str, full_name: str, hashed_password: str) -> User:
     """Create a new user."""
+    user_id = generate_unique_user_id(db)
     user = User(
+        user_id=user_id,
         user_email=user_email,
-        account_name=account_name,
+        full_name=full_name,
         user_password=hashed_password
     )
     db.add(user)

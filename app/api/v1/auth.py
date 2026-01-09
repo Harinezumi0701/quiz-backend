@@ -31,7 +31,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     Register a new user.
 
     - **user_email**: User email (must be a valid email)
-    - **account_name**: Account display name
+    - **full_name**: Full name
     - **user_password**: Password (minimum 6 characters)
 
     After successful registration, you will receive an access token to use for other APIs.

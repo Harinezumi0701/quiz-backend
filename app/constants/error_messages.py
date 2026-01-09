@@ -14,3 +14,6 @@ ERROR_QUESTIONS_NOT_FOUND_CATEGORY = "No questions found for category: {category
 ERROR_QUESTIONS_NOT_FOUND_CATEGORY_TEST = (
     "No questions found for category: {category}, test: {test}"
 )
+ERROR_USER_ID_ALREADY_EXISTS = "User ID already exists"
+ERROR_INVALID_USER_ID_FORMAT = "User ID must match pattern [A-Za-z\\._-] and be between 1-125 characters"
+ERROR_INVALID_REFRESH_TOKEN = "Invalid refresh token"

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, TIMESTAMP, text
+from sqlalchemy import Column, String, TIMESTAMP, Date, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from app.db.base import Base
@@ -8,9 +8,16 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, server_default=text("uuidv7()"))
+    user_id = Column(String(125), unique=True, nullable=False, index=True)
     user_email = Column(String(255), unique=True, nullable=False)
-    account_name = Column(String(255), nullable=False)
+    full_name = Column(String(255), nullable=False)
     user_password = Column(String(255), nullable=False)
+    phone = Column(String(20), nullable=True)
+    birthday = Column(Date, nullable=True)
+    address = Column(String(500), nullable=True)
+    job_title = Column(String(100), nullable=True)
+    company = Column(String(100), nullable=True)
+    join_date = Column(Date, nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
     deleted_at = Column(TIMESTAMP, nullable=True)

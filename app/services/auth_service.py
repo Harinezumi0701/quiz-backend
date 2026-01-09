@@ -44,7 +44,7 @@ def register_user(db: Session, request: RegisterRequest) -> TokenData:
     user = auth_repo.create_user(
         db=db,
         user_email=request.user_email,
-        account_name=request.account_name,
+        full_name=request.full_name,
         hashed_password=hashed_password,
     )
 

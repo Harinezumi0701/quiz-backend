@@ -31,25 +31,25 @@ from fastapi import HTTPException, status
 def register_user(db: Session, request: RegisterRequest) -> TokenData:
     """Register a new user and return access token (no refresh token)."""
     # Check if email already exists
-    if auth_repo.email_exists(db, request.user_email):
+    if auth_repo.email_exists(db, request.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=ERROR_EMAIL_ALREADY_REGISTERED,
         )
 
     # Hash the password
-    hashed_password = get_password_hash(request.user_password)
+    hashed_password = get_password_hash(request.password)
 
     # Create the user
     user = auth_repo.create_user(
         db=db,
-        user_email=request.user_email,
+        email=request.email,
         full_name=request.full_name,
         hashed_password=hashed_password,
     )
 
     # Generate access token
-    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.user_email})
+    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.email})
 
     return TokenData(access_token=access_token, refresh_token=None, token_type="bearer")
 
@@ -57,17 +57,17 @@ def register_user(db: Session, request: RegisterRequest) -> TokenData:
 def login_user(db: Session, request: LoginRequest) -> TokenData:
     """Authenticate a user and return access token. Refresh token only if remember_me is True."""
     # Get user by email
-    user = auth_repo.get_user_by_email(db, request.user_email)
+    user = auth_repo.get_user_by_email(db, request.email)
 
     # Check if user exists and password is correct
-    if not user or not verify_password(request.user_password, user.user_password):
+    if not user or not verify_password(request.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ERROR_INCORRECT_EMAIL_OR_PASSWORD,
         )
 
     # Generate access token
-    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.user_email})
+    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.email})
 
     # Generate and save refresh token only if remember_me is True
     refresh_token_str = None
@@ -116,7 +116,7 @@ def refresh_access_token(db: Session, request: RefreshTokenRequest) -> TokenData
         )
 
     # Generate new access token
-    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.user_email})
+    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.email})
 
     # Delete old refresh token
     auth_repo.delete_refresh_token(db, request.refresh_token)

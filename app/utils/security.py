@@ -53,10 +53,10 @@ def decode_access_token(token: str) -> Optional[str]:
     """Decode and verify a JWT token, returning the user email."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_email: str = payload.get(JWT_SUBJECT_KEY)
-        if user_email is None:
+        email: str = payload.get(JWT_SUBJECT_KEY)
+        if email is None:
             return None
-        return user_email
+        return email
     except JWTError:
         return None
 

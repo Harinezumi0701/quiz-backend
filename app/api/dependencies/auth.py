@@ -31,8 +31,8 @@ def get_current_user(
     token = credentials.credentials
 
     # Decode the token
-    user_email = decode_access_token(token)
-    if user_email is None:
+    email = decode_access_token(token)
+    if email is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ERROR_COULD_NOT_VALIDATE_CREDENTIALS,
@@ -40,7 +40,7 @@ def get_current_user(
         )
 
     # Get the user from database
-    user = auth_service.get_user_by_email(db, user_email)
+    user = auth_service.get_user_by_email(db, email)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

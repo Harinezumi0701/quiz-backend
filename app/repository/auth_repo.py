@@ -8,17 +8,17 @@ from app.utils.user_id_generator import generate_unique_user_id
 
 def get_user_by_email(db: Session, email: str) -> User | None:
     """Get a user by email address."""
-    return db.query(User).filter(User.user_email == email).first()
+    return db.query(User).filter(User.email == email).first()
 
 
-def create_user(db: Session, user_email: str, full_name: str, hashed_password: str) -> User:
+def create_user(db: Session, email: str, full_name: str, hashed_password: str) -> User:
     """Create a new user."""
     user_id = generate_unique_user_id(db)
     user = User(
         user_id=user_id,
-        user_email=user_email,
+        email=email,
         full_name=full_name,
-        user_password=hashed_password
+        password=hashed_password
     )
     db.add(user)
     db.commit()
@@ -28,7 +28,7 @@ def create_user(db: Session, user_email: str, full_name: str, hashed_password: s
 
 def email_exists(db: Session, email: str) -> bool:
     """Check if an email already exists."""
-    return db.query(User).filter(User.user_email == email).first() is not None
+    return db.query(User).filter(User.email == email).first() is not None
 
 
 def create_refresh_token(db: Session, user_id: str, token: str, expires_at: datetime) -> RefreshToken:

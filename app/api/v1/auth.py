@@ -30,9 +30,9 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     """
     Register a new user.
 
-    - **user_email**: User email (must be a valid email)
+    - **email**: User email (must be a valid email)
     - **full_name**: Full name
-    - **user_password**: Password (minimum 6 characters)
+    - **password**: Password (minimum 6 characters)
 
     After successful registration, you will receive an access token to use for other APIs.
     """
@@ -59,8 +59,8 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     """
     Login with email and password.
 
-    - **user_email**: Registered email
-    - **user_password**: Account password
+    - **email**: Registered email
+    - **password**: Account password
     - **remember_me**: (Optional) If true, returns refresh token for persistent sessions
 
     Returns access token. Refresh token is only returned if remember_me is true.

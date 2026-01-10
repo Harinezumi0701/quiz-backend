@@ -1,7 +1,7 @@
 # app/api/v1/me.py
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from app.schemas.user import UserResponse, UserUpdateRequest
+from app.schemas.user import UserResponse, UserUpdateRequest, ChangePasswordRequest
 from app.schemas.submission import DashboardResponse
 from app.schemas.http_response import ErrorResponse
 from app.services import submission_service, user_service
@@ -109,3 +109,44 @@ def get_dashboard(
     """
     dashboard_data = submission_service.get_user_dashboard_data(db, current_user.id)
     return DashboardResponse(data=dashboard_data, meta={})
+
+
+@router.post(
+    "/password",
+    status_code=status.HTTP_200_OK,
+    summary="Change user password",
+    description="Change password for the currently logged in user (requires authentication)",
+    responses={
+        200: {
+            "description": "Password changed successfully",
+        },
+        400: {
+            "description": "Incorrect old password or new password same as old",
+            "model": ErrorResponse,
+        },
+        401: {
+            "description": "Unauthorized access",
+            "model": ErrorResponse,
+        }
+    }
+)
+def change_password(
+    password_data: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Change user password.
+    
+    - **old_password**: Current password
+    - **new_password**: New password (minimum 6 characters)
+    
+    Requires authentication token in header: `Authorization: Bearer <token>`
+    """
+    user_service.change_password(
+        db=db,
+        user_id=current_user.id,
+        old_password=password_data.old_password,
+        new_password=password_data.new_password
+    )
+    return {"message": "Password changed successfully"}

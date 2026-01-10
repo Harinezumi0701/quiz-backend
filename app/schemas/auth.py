@@ -5,31 +5,31 @@ from app.schemas.http_response import SuccessResponse
 
 class RegisterRequest(BaseModel):
     """Request schema for new user registration"""
-    user_email: EmailStr = Field(..., description="User email", example="user@example.com")
+    email: EmailStr = Field(..., description="User email", example="user@example.com")
     full_name: str = Field(..., min_length=1, max_length=100, description="Full name", example="John Doe")
-    user_password: str = Field(..., min_length=6, description="Password (minimum 6 characters)", example="password123")
+    password: str = Field(..., min_length=6, description="Password (minimum 6 characters)", example="password123")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "user_email": "user@example.com",
+                "email": "user@example.com",
                 "full_name": "John Doe",
-                "user_password": "password123"
+                "password": "password123"
             }
         }
 
 
 class LoginRequest(BaseModel):
     """Request schema for login"""
-    user_email: EmailStr = Field(..., description="User email", example="user@example.com")
-    user_password: str = Field(..., description="Password", example="password123")
+    email: EmailStr = Field(..., description="User email", example="user@example.com")
+    password: str = Field(..., description="Password", example="password123")
     remember_me: bool = Field(default=False, description="Remember me option", example=False)
 
     class Config:
         json_schema_extra = {
             "example": {
-                "user_email": "user@example.com",
-                "user_password": "password123",
+                "email": "user@example.com",
+                "password": "password123",
                 "remember_me": False
             }
         }
@@ -58,7 +58,7 @@ class TokenResponse(SuccessResponse[TokenData]):
 
 class TokenDataInternal(BaseModel):
     """Token data schema for internal use"""
-    user_email: str | None = Field(None, description="Email from token")
+    email: str | None = Field(None, description="Email from token")
 
 
 class RefreshTokenRequest(BaseModel):

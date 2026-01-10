@@ -10,7 +10,7 @@ class UserOut(BaseModel):
     """Schema for user information"""
     id: UUID = Field(..., description="User ID", example="550e8400-e29b-41d4-a716-446655440000")
     user_id: str = Field(..., description="User ID (editable unique identifier)", example="abc123")
-    user_email: str = Field(..., description="User email", example="user@example.com")
+    email: str = Field(..., description="User email", example="user@example.com")
     full_name: str = Field(..., description="Full name", example="John Doe")
     phone: Optional[str] = Field(None, description="Phone number", example="+84123456789")
     birthday: Optional[date] = Field(None, description="Birthday", example="1990-01-01")
@@ -25,7 +25,7 @@ class UserOut(BaseModel):
             "example": {
                 "id": "550e8400-e29b-41d4-a716-446655440000",
                 "user_id": "my_custom_user_id",
-                "user_email": "user@example.com",
+                "email": "user@example.com",
                 "full_name": "John Doe",
                 "phone": "+84123456789",
                 "birthday": "1990-01-01",
@@ -69,5 +69,19 @@ class UserUpdateRequest(BaseModel):
                 "job_title": "Software Engineer",
                 "company": "Tech Corp",
                 "join_date": "2024-01-01"
+            }
+        }
+
+
+class ChangePasswordRequest(BaseModel):
+    """Request schema for changing user password"""
+    old_password: str = Field(..., min_length=1, description="Current password", example="oldpassword123")
+    new_password: str = Field(..., min_length=6, description="New password (minimum 6 characters)", example="newpassword123")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "old_password": "oldpassword123",
+                "new_password": "newpassword123"
             }
         }

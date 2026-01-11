@@ -20,9 +20,23 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    pass
+    # Check if role column exists before adding
+    connection = op.get_bind()
+    inspector = sa.inspect(connection)
+    columns = [col['name'] for col in inspector.get_columns('users')]
+
+    if 'role' not in columns:
+        # Add role column with default value 'user'
+        op.add_column('users', sa.Column('role', sa.String(length=50), nullable=False, server_default='user'))
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    pass
+    # Check if role column exists before dropping
+    connection = op.get_bind()
+    inspector = sa.inspect(connection)
+    columns = [col['name'] for col in inspector.get_columns('users')]
+
+    if 'role' in columns:
+        # Remove role column
+        op.drop_column('users', 'role')

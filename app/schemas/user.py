@@ -12,6 +12,7 @@ class UserOut(BaseModel):
     user_id: str = Field(..., description="User ID (editable unique identifier)", example="abc123")
     email: str = Field(..., description="User email", example="user@example.com")
     full_name: str = Field(..., description="Full name", example="John Doe")
+    role: str = Field(..., description="User role", example="user")
     phone: Optional[str] = Field(None, description="Phone number", example="+84123456789")
     birthday: Optional[date] = Field(None, description="Birthday", example="1990-01-01")
     address: Optional[str] = Field(None, description="Address", example="123 Main St, City")
@@ -27,6 +28,7 @@ class UserOut(BaseModel):
                 "user_id": "my_custom_user_id",
                 "email": "user@example.com",
                 "full_name": "John Doe",
+                "role": "user",
                 "phone": "+84123456789",
                 "birthday": "1990-01-01",
                 "address": "123 Main St, City",

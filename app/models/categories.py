@@ -17,3 +17,11 @@ class Category(Base):
     # Relationships
     questions = relationship("Question", back_populates="category_obj")
     tests = relationship("Test", back_populates="category")
+
+    @property
+    def category(self):
+        return self._category
+
+    @category.setter
+    def category(self, value):
+        self._category = value

@@ -2,6 +2,7 @@
 from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import Optional, Tuple, Dict, Any
+from datetime import date
 from app.models.users import User
 from app.utils.search_pagination import (
     paginate_query,
@@ -84,6 +85,46 @@ def user_id_exists(db: Session, user_id: str, exclude_user_id: UUID = None) -> b
     return query.first() is not None
 
 
+def create_user(
+    db: Session,
+    email: str,
+    full_name: str,
+    hashed_password: str,
+    user_id: str = None,
+    role_id: UUID = None,
+    phone: str = None,
+    birthday: date = None,
+    address: str = None,
+    job_title: str = None,
+    company: str = None,
+    join_date: date = None,
+) -> User:
+    """Create a new user."""
+    from app.utils.user_id_generator import generate_unique_user_id
+
+    # Generate user_id if not provided
+    if not user_id:
+        user_id = generate_unique_user_id(db)
+
+    user = User(
+        user_id=user_id,
+        email=email,
+        full_name=full_name,
+        password=hashed_password,
+        role_id=role_id,
+        phone=phone,
+        birthday=birthday,
+        address=address,
+        job_title=job_title,
+        company=company,
+        join_date=join_date,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
 def update_user(db: Session, user: User, **kwargs):
     """Update user fields."""
     for key, value in kwargs.items():
@@ -92,3 +133,26 @@ def update_user(db: Session, user: User, **kwargs):
     db.commit()
     db.refresh(user)
     return user
+
+
+def delete_user(db: Session, user_id: UUID) -> bool:
+    """
+    Soft delete a user.
+
+    Args:
+        db: Database session
+        user_id: User UUID
+
+    Returns:
+        bool: True if deleted, False if not found
+    """
+    from datetime import datetime, timezone
+
+    user = db.query(User).filter(User.id == user_id, User.deleted_at.is_(None)).first()
+
+    if not user:
+        return False
+
+    user.deleted_at = datetime.now(timezone.utc)
+    db.commit()
+    return True

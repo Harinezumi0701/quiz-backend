@@ -1,5 +1,5 @@
 # app/schemas/user.py
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional
 from uuid import UUID
 from datetime import date
@@ -80,6 +80,64 @@ class UserResponse(SuccessResponse[UserOut]):
     pass
 
 
+class UserCreateRequest(BaseModel):
+    """Request schema for creating a new user"""
+
+    email: EmailStr = Field(..., description="User email", example="user@example.com")
+    full_name: str = Field(
+        ..., min_length=1, max_length=255, description="Full name", example="John Doe"
+    )
+    password: str = Field(
+        ...,
+        min_length=6,
+        description="Password (minimum 6 characters)",
+        example="password123",
+    )
+    user_id: Optional[str] = Field(
+        None,
+        min_length=1,
+        max_length=125,
+        description="User ID (editable unique identifier matching [A-Za-z\\._-], 1-125 characters). If not provided, will be auto-generated.",
+        example="abc123",
+    )
+    role_id: Optional[UUID] = Field(
+        None, description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
+    )
+    phone: Optional[str] = Field(
+        None, max_length=20, description="Phone number", example="+84123456789"
+    )
+    birthday: Optional[date] = Field(None, description="Birthday", example="1990-01-01")
+    address: Optional[str] = Field(
+        None, max_length=500, description="Address", example="123 Main St, City"
+    )
+    job_title: Optional[str] = Field(
+        None, max_length=100, description="Job title", example="Software Engineer"
+    )
+    company: Optional[str] = Field(
+        None, max_length=100, description="Company", example="Tech Corp"
+    )
+    join_date: Optional[date] = Field(
+        None, description="Join date", example="2024-01-01"
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "user@example.com",
+                "full_name": "John Doe",
+                "password": "password123",
+                "user_id": "abc123",
+                "role_id": "550e8400-e29b-41d4-a716-446655440000",
+                "phone": "+84123456789",
+                "birthday": "1990-01-01",
+                "address": "123 Main St, City",
+                "job_title": "Software Engineer",
+                "company": "Tech Corp",
+                "join_date": "2024-01-01",
+            }
+        }
+
+
 class UserUpdateRequest(BaseModel):
     """Request schema for updating user information"""
 
@@ -108,6 +166,9 @@ class UserUpdateRequest(BaseModel):
     )
     join_date: Optional[date] = Field(
         None, description="Join date", example="2024-01-01"
+    )
+    role_id: Optional[UUID] = Field(
+        None, description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
     )
 
     class Config:

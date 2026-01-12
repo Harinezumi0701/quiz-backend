@@ -8,6 +8,90 @@ from sqlalchemy.orm import Query
 from sqlalchemy import func, or_
 from typing import Optional, Tuple, Dict, Any, List
 from datetime import datetime
+import unicodedata
+import re
+
+
+def remove_vietnamese_accents(text: str) -> str:
+    """
+    Remove Vietnamese accents from text for accent-insensitive search.
+    
+    Args:
+        text: Input text with Vietnamese accents
+        
+    Returns:
+        Text without Vietnamese accents
+        
+    Example:
+        remove_vietnamese_accents("Nguyễn") -> "Nguyen"
+        remove_vietnamese_accents("Việt Nam") -> "Viet Nam"
+    """
+    if not text:
+        return text
+    
+    # Normalize to NFD (decomposed form) to separate base characters and combining marks
+    nfd_text = unicodedata.normalize("NFD", text)
+    
+    # Remove combining marks (accents)
+    no_accents = "".join(
+        char for char in nfd_text if unicodedata.category(char) != "Mn"
+    )
+    
+    # Normalize back to NFC (composed form) for consistency
+    return unicodedata.normalize("NFC", no_accents)
+
+
+def create_accent_insensitive_pattern(search_value: str) -> str:
+    """
+    Create a regex pattern that matches text with or without Vietnamese accents.
+    
+    Args:
+        search_value: Search value (may or may not have accents)
+        
+    Returns:
+        Regex pattern string for accent-insensitive matching
+    """
+    if not search_value:
+        return search_value
+    
+    # Remove accents from search value
+    normalized_search = remove_vietnamese_accents(search_value)
+    
+    # Escape special regex characters
+    escaped = re.escape(normalized_search)
+    
+    # Create pattern that matches with or without accents
+    # This is a simplified approach - for full support, we'd need to map
+    # each character to its accented variants
+    pattern = escaped
+    
+    # Replace common Vietnamese characters with their variants
+    replacements = {
+        'a': '[aàáạảãâầấậẩẫăằắặẳẵ]',
+        'A': '[AÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴ]',
+        'e': '[eèéẹẻẽêềếệểễ]',
+        'E': '[EÈÉẸẺẼÊỀẾỆỂỄ]',
+        'i': '[iìíịỉĩ]',
+        'I': '[IÌÍỊỈĨ]',
+        'o': '[oòóọỏõôồốộổỗơờớợởỡ]',
+        'O': '[OÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠ]',
+        'u': '[uùúụủũưừứựửữ]',
+        'U': '[UÙÚỤỦŨƯỪỨỰỬỮ]',
+        'y': '[yỳýỵỷỹ]',
+        'Y': '[YỲÝỴỶỸ]',
+        'd': '[dđ]',
+        'D': '[DĐ]',
+    }
+    
+    # Build pattern with character variants
+    result = []
+    for char in pattern:
+        if char in replacements:
+            result.append(replacements[char])
+        else:
+            result.append(char)
+    
+    return ''.join(result)
 
 
 class SearchStrategy(ABC):
@@ -31,7 +115,7 @@ class SearchStrategy(ABC):
 
 
 class TextSearchStrategy(SearchStrategy):
-    """Strategy for text search (case-sensitive or case-insensitive)."""
+    """Strategy for text search (case-sensitive or case-insensitive, with Vietnamese accent-insensitive support)."""
 
     def apply(
         self,
@@ -39,13 +123,36 @@ class TextSearchStrategy(SearchStrategy):
         column: Any,
         search_value: str,
         case_sensitive: bool = False,
+        accent_insensitive: bool = True,
         **kwargs,
     ) -> Query:
-        """Apply text search filter."""
-        if case_sensitive:
-            return query.filter(column.like(f"%{search_value}%"))
+        """Apply text search filter with optional Vietnamese accent-insensitive support."""
+        if accent_insensitive:
+            # Normalize search value (remove accents)
+            normalized_search = remove_vietnamese_accents(search_value)
+            normalized_search_lower = normalized_search.lower()
+            
+            # Use PostgreSQL's translate function to normalize Vietnamese accents in column
+            # Map all Vietnamese accented characters to their base forms
+            vietnamese_chars = 'àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ'
+            base_chars = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiioooooooooooooooouuuuuuuuuuuyyyyyyd'
+            
+            # Normalize the column: convert to lowercase and replace accented chars
+            normalized_column = func.lower(
+                func.translate(
+                    func.lower(column),
+                    vietnamese_chars + vietnamese_chars.upper(),
+                    base_chars + base_chars.upper()
+                )
+            )
+            
+            return query.filter(normalized_column.like(f"%{normalized_search_lower}%"))
         else:
-            return query.filter(column.ilike(f"%{search_value}%"))
+            # Standard search without accent normalization
+            if case_sensitive:
+                return query.filter(column.like(f"%{search_value}%"))
+            else:
+                return query.filter(column.ilike(f"%{search_value}%"))
 
 
 class DateSearchStrategy(SearchStrategy):
@@ -159,10 +266,30 @@ class MultipleValueSearchStrategy(SearchStrategy):
                 conditions.append(column == value)
             elif base_strategy == "text":
                 case_sensitive = kwargs.get("case_sensitive", False)
-                if case_sensitive:
-                    conditions.append(column.like(f"%{value}%"))
+                accent_insensitive = kwargs.get("accent_insensitive", True)
+                
+                if accent_insensitive:
+                    # Normalize search value (remove accents)
+                    normalized_value = remove_vietnamese_accents(value)
+                    normalized_value_lower = normalized_value.lower()
+                    
+                    # Use PostgreSQL's translate function to normalize Vietnamese accents
+                    vietnamese_chars = 'àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ'
+                    base_chars = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiioooooooooooooooouuuuuuuuuuuyyyyyyd'
+                    
+                    normalized_column = func.lower(
+                        func.translate(
+                            func.lower(column),
+                            vietnamese_chars + vietnamese_chars.upper(),
+                            base_chars + base_chars.upper()
+                        )
+                    )
+                    conditions.append(normalized_column.like(f"%{normalized_value_lower}%"))
                 else:
-                    conditions.append(column.ilike(f"%{value}%"))
+                    if case_sensitive:
+                        conditions.append(column.like(f"%{value}%"))
+                    else:
+                        conditions.append(column.ilike(f"%{value}%"))
             else:
                 # For other strategies, use exact match as fallback
                 conditions.append(column == value)

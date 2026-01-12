@@ -93,11 +93,9 @@ class ExactSearchStrategy(SearchStrategy):
         **kwargs,
     ) -> Query:
         """Apply exact match search filter."""
-        if case_sensitive:
-            return query.filter(column == search_value)
-        else:
-            # For case-insensitive exact match, use ilike with exact pattern
-            return query.filter(column.ilike(search_value))
+        # Always use == for exact match to support UUID and other non-text types
+        # If case-insensitive matching is needed, use "text" strategy instead
+        return query.filter(column == search_value)
 
 
 class NullSearchStrategy(SearchStrategy):
@@ -157,11 +155,8 @@ class MultipleValueSearchStrategy(SearchStrategy):
             # Create a temporary query to get the condition
             # We'll use the base strategy's logic but apply OR
             if base_strategy == "exact":
-                case_sensitive = kwargs.get("case_sensitive", False)
-                if case_sensitive:
-                    conditions.append(column == value)
-                else:
-                    conditions.append(column.ilike(value))
+                # For exact match, always use == (not ilike) to support UUID and other non-text types
+                conditions.append(column == value)
             elif base_strategy == "text":
                 case_sensitive = kwargs.get("case_sensitive", False)
                 if case_sensitive:
@@ -170,7 +165,7 @@ class MultipleValueSearchStrategy(SearchStrategy):
                     conditions.append(column.ilike(f"%{value}%"))
             else:
                 # For other strategies, use exact match as fallback
-                conditions.append(column.ilike(value))
+                conditions.append(column == value)
 
         if conditions:
             return query.filter(or_(*conditions))

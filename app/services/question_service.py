@@ -63,40 +63,35 @@ def get_question_by_test_and_id(
     )
 
 
-def get_answers_by_question_id(
+def create_question(
+    db: Session,
+    content: str,
+    image_url: Optional[str] = None,
+    category_id: Optional[str] = None,
+    test_id: Optional[str] = None,
+    is_multiple_choice: bool = False,
+):
+    """Create a new question."""
+    return question_repo.create_question(
+        db, content, image_url, category_id, test_id, is_multiple_choice
+    )
+
+
+def update_question(
     db: Session,
     question_id: str,
-    search_key: str = None,
-    search_value: str = None,
-    page: int = 1,
-    page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
+    content: Optional[str] = None,
+    image_url: Optional[str] = None,
+    category_id: Optional[str] = None,
+    test_id: Optional[str] = None,
+    is_multiple_choice: Optional[bool] = None,
 ):
-    """Get all answers for a specific question with optional filtering and pagination."""
-    return question_repo.get_answers_by_question_id(
-        db, question_id, search_key, search_value, page, page_size, request_params
+    """Update a question."""
+    return question_repo.update_question(
+        db, question_id, content, image_url, category_id, test_id, is_multiple_choice
     )
 
 
-def get_answer_by_id(db: Session, question_id: str, answer_id: str):
-    """Get a specific answer by question_id and answer_id."""
-    return question_repo.get_answer_by_id(db, question_id, answer_id)
-
-
-def get_all_answers(
-    db: Session,
-    search_key: str = None,
-    search_value: str = None,
-    page: int = 1,
-    page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-):
-    """Get all answers with optional filtering and pagination."""
-    return question_repo.get_all_answers(
-        db, search_key, search_value, page, page_size, request_params
-    )
-
-
-def get_answer_by_id_only(db: Session, answer_id: str):
-    """Get a specific answer by answer_id only."""
-    return question_repo.get_answer_by_id_only(db, answer_id)
+def delete_question(db: Session, question_id: str):
+    """Delete a question (soft delete)."""
+    return question_repo.delete_question(db, question_id)

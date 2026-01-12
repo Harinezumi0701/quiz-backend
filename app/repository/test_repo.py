@@ -96,6 +96,8 @@ def get_tests_by_category_id(
                 "id": test.id,
                 "name": test.name,
                 "category_id": test.category_id,
+                "description": test.description,
+                "time_limit": test.time_limit,
                 "question_count": question_count,
                 "created_at": datetime_to_timestamp(test.created_at),
                 "updated_at": datetime_to_timestamp(test.updated_at),
@@ -137,6 +139,10 @@ def get_all_tests(
             "type": "text",
             "case_sensitive": False,
         },
+        "category_id": {
+            "column": Test.category_id,
+            "type": "exact",
+        },
     }
 
     # Apply search filter and pagination
@@ -175,6 +181,8 @@ def get_all_tests(
                 "id": test.id,
                 "name": test.name,
                 "category_id": test.category_id,
+                "description": test.description,
+                "time_limit": test.time_limit,
                 "question_count": question_count,
                 "created_at": datetime_to_timestamp(test.created_at),
                 "updated_at": datetime_to_timestamp(test.updated_at),
@@ -235,6 +243,8 @@ def get_test_by_id(
         "id": test.id,
         "name": test.name,
         "category_id": test.category_id,
+        "description": test.description,
+        "time_limit": test.time_limit,
         "question_count": question_count,
         "created_at": datetime_to_timestamp(test.created_at),
         "updated_at": datetime_to_timestamp(test.updated_at),
@@ -272,13 +282,21 @@ def get_test_by_id_only(
         "id": test.id,
         "name": test.name,
         "category_id": test.category_id,
+        "description": test.description,
+        "time_limit": test.time_limit,
         "question_count": question_count,
         "created_at": datetime_to_timestamp(test.created_at),
         "updated_at": datetime_to_timestamp(test.updated_at),
     }
 
 
-def create_test(db: Session, name: str, category_id: str):
+def create_test(
+    db: Session,
+    name: str,
+    category_id: str,
+    description: str | None = None,
+    time_limit: int | None = None,
+):
     """
     Create a new test.
 
@@ -286,6 +304,8 @@ def create_test(db: Session, name: str, category_id: str):
         db: Database session
         name: Test name
         category_id: Category UUID
+        description: Test description (optional)
+        time_limit: Time limit in seconds (optional)
 
     Returns:
         Test dict or None if category not found
@@ -300,7 +320,12 @@ def create_test(db: Session, name: str, category_id: str):
     if not category:
         return None
 
-    test = Test(name=name, category_id=category_id)
+    test = Test(
+        name=name,
+        category_id=category_id,
+        description=description,
+        time_limit=time_limit,
+    )
     db.add(test)
     db.commit()
     db.refresh(test)
@@ -316,13 +341,21 @@ def create_test(db: Session, name: str, category_id: str):
         "id": test.id,
         "name": test.name,
         "category_id": test.category_id,
+        "description": test.description,
+        "time_limit": test.time_limit,
         "question_count": question_count,
         "created_at": datetime_to_timestamp(test.created_at),
         "updated_at": datetime_to_timestamp(test.updated_at),
     }
 
 
-def update_test(db: Session, test_id: str, name: str):
+def update_test(
+    db: Session,
+    test_id: str,
+    name: str,
+    description: str | None = None,
+    time_limit: int | None = None,
+):
     """
     Update a test.
 
@@ -330,20 +363,22 @@ def update_test(db: Session, test_id: str, name: str):
         db: Database session
         test_id: Test UUID
         name: New test name
+        description: Test description (optional)
+        time_limit: Time limit in seconds (optional)
 
     Returns:
         Test dict or None if not found
     """
-    test = (
-        db.query(Test)
-        .filter(Test.id == test_id, Test.deleted_at.is_(None))
-        .first()
-    )
+    test = db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
 
     if not test:
         return None
 
     test.name = name
+    if description is not None:
+        test.description = description
+    if time_limit is not None:
+        test.time_limit = time_limit
     db.commit()
     db.refresh(test)
 
@@ -358,6 +393,8 @@ def update_test(db: Session, test_id: str, name: str):
         "id": test.id,
         "name": test.name,
         "category_id": test.category_id,
+        "description": test.description,
+        "time_limit": test.time_limit,
         "question_count": question_count,
         "created_at": datetime_to_timestamp(test.created_at),
         "updated_at": datetime_to_timestamp(test.updated_at),
@@ -377,11 +414,7 @@ def delete_test(db: Session, test_id: str):
     """
     from datetime import datetime, timezone
 
-    test = (
-        db.query(Test)
-        .filter(Test.id == test_id, Test.deleted_at.is_(None))
-        .first()
-    )
+    test = db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
 
     if not test:
         return False

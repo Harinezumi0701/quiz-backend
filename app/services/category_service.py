@@ -77,14 +77,26 @@ def delete_category(db: Session, category_id: str):
     return category_repo.delete_category(db, category_id)
 
 
-def create_test(db: Session, name: str, category_id: str):
+def create_test(
+    db: Session,
+    name: str,
+    category_id: str,
+    description: str | None = None,
+    time_limit: int | None = None,
+):
     """Create a new test."""
-    return test_repo.create_test(db, name, category_id)
+    return test_repo.create_test(db, name, category_id, description, time_limit)
 
 
-def update_test(db: Session, test_id: str, name: str):
+def update_test(
+    db: Session,
+    test_id: str,
+    name: str,
+    description: str | None = None,
+    time_limit: int | None = None,
+):
     """Update a test."""
-    return test_repo.update_test(db, test_id, name)
+    return test_repo.update_test(db, test_id, name, description, time_limit)
 
 
 def delete_test(db: Session, test_id: str):

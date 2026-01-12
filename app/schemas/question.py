@@ -2,20 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List
 from uuid import UUID
 from app.schemas.http_response import SuccessResponse
-
-
-class AnswerOut(BaseModel):
-    """Schema for answer"""
-    id: UUID = Field(..., description="Answer ID", example="550e8400-e29b-41d4-a716-446655440000")
-    question_id: UUID | None = Field(None, description="Question ID", example="550e8400-e29b-41d4-a716-446655440000")
-    content: str = Field(..., description="Answer content", example="Option A")
-    is_correct: bool = Field(..., description="Whether this is the correct answer", example=True)
-    explanation: str | None = Field(None, description="Explanation for the answer", example="This is the correct answer because...")
-    created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
-    updated_at: int | None = Field(None, description="Updated at Unix timestamp", example=1704067200)
-
-    class Config:
-        from_attributes = True
+from app.schemas.answer import AnswerOut
 
 
 class QuestionWithAnswers(BaseModel):
@@ -44,11 +31,41 @@ class QuestionResponse(SuccessResponse[QuestionWithAnswers]):
     pass
 
 
-class AnswerListResponse(SuccessResponse[List[AnswerOut]]):
-    """Response schema for list of answers"""
-    pass
+class QuestionCreateRequest(BaseModel):
+    """Request schema for creating a question"""
+    content: str = Field(..., min_length=1, description="Question content", example="What is AWS Lambda?")
+    image_url: str | None = Field(None, description="Image URL (if available)", example="https://example.com/image.png")
+    category_id: UUID | None = Field(None, description="Category ID", example="550e8400-e29b-41d4-a716-446655440000")
+    test_id: UUID | None = Field(None, description="Test ID", example="550e8400-e29b-41d4-a716-446655440000")
+    is_multiple_choice: bool = Field(False, description="Whether this question has multiple correct answers", example=False)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "content": "What is AWS Lambda?",
+                "image_url": "https://example.com/image.png",
+                "category_id": "550e8400-e29b-41d4-a716-446655440000",
+                "test_id": "550e8400-e29b-41d4-a716-446655440000",
+                "is_multiple_choice": False
+            }
+        }
 
 
-class AnswerResponse(SuccessResponse[AnswerOut]):
-    """Response schema for single answer"""
-    pass
+class QuestionUpdateRequest(BaseModel):
+    """Request schema for updating a question"""
+    content: str | None = Field(None, min_length=1, description="Question content", example="What is AWS Lambda?")
+    image_url: str | None = Field(None, description="Image URL (if available)", example="https://example.com/image.png")
+    category_id: UUID | None = Field(None, description="Category ID", example="550e8400-e29b-41d4-a716-446655440000")
+    test_id: UUID | None = Field(None, description="Test ID", example="550e8400-e29b-41d4-a716-446655440000")
+    is_multiple_choice: bool | None = Field(None, description="Whether this question has multiple correct answers", example=False)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "content": "What is AWS Lambda?",
+                "image_url": "https://example.com/image.png",
+                "category_id": "550e8400-e29b-41d4-a716-446655440000",
+                "test_id": "550e8400-e29b-41d4-a716-446655440000",
+                "is_multiple_choice": False
+            }
+        }

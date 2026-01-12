@@ -1,68 +1,16 @@
 # app/repository/question_repo.py
 from uuid import UUID
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any
 from app.models.questions import Question
 from app.models.answer_options import AnswerOption
 from app.models.categories import Category
 from app.models.tests import Test
-from app.utils.search_pagination import paginate_query, paginate_query_with_multiple_filters
-from typing import Dict, Any
+from app.utils.search_pagination import (
+    paginate_query,
+    paginate_query_with_multiple_filters,
+)
 from app.utils.datetime_utils import datetime_to_timestamp
-
-
-def get_questions_by_category(db: Session, category: str):
-    """Get all questions with answers for a specific category."""
-    category = (
-        db.query(Category)
-        .filter(Category.name == category, Category.deleted_at.is_(None))
-        .first()
-    )
-
-    if not category:
-        return []
-
-    questions = (
-        db.query(Question)
-        .options(joinedload(Question.category_obj), joinedload(Question.test_obj))
-        .filter(Question.category_id == category.id, Question.deleted_at.is_(None))
-        .all()
-    )
-
-    result = []
-    for question in questions:
-        # Get all answer options for this question
-        answers = (
-            db.query(AnswerOption)
-            .filter(
-                AnswerOption.question_id == question.id,
-                AnswerOption.deleted_at.is_(None),
-            )
-            .all()
-        )
-
-        result.append(
-            {
-                "id": question.id,
-                "content": question.content,
-                "image_url": question.image_url,
-                "category": question.category_obj.name if question.category_obj else None,
-                "test": question.test,
-                "is_multiple_choice": question.is_multiple_choice,
-                "answers": [
-                    {
-                        "id": answer.id,
-                        "content": answer.content,
-                        "is_correct": answer.is_correct,
-                        "explanation": answer.explanation,
-                    }
-                    for answer in answers
-                ],
-            }
-        )
-
-    return result
 
 
 def get_all_questions(
@@ -130,8 +78,7 @@ def get_all_questions(
 
     # Apply eager loading and execute query
     questions = paginated_query.options(
-        joinedload(Question.category_obj),
-        joinedload(Question.test_obj)
+        joinedload(Question.category_obj), joinedload(Question.test_obj)
     ).all()
 
     result = []
@@ -151,7 +98,9 @@ def get_all_questions(
                 "id": question.id,
                 "content": question.content,
                 "image_url": question.image_url,
-                "category": question.category_obj.name if question.category_obj else None,
+                "category": (
+                    question.category_obj.name if question.category_obj else None
+                ),
                 "test": question.test,
                 "created_at": datetime_to_timestamp(question.created_at),
                 "answers": [
@@ -196,32 +145,34 @@ def get_questions_by_category_and_test_id(
         Tuple of (questions list, total count)
     """
     # Verify category exists
-    category = db.query(Category).filter(
-        Category.id == category_id,
-        Category.deleted_at.is_(None)
-    ).first()
+    category = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.deleted_at.is_(None))
+        .first()
+    )
 
     if not category:
         return [], 0
 
     # Verify test exists and belongs to category
-    test = db.query(Test).filter(
-        Test.id == test_id,
-        Test.category_id == category_id,
-        Test.deleted_at.is_(None)
-    ).first()
+    test = (
+        db.query(Test)
+        .filter(
+            Test.id == test_id,
+            Test.category_id == category_id,
+            Test.deleted_at.is_(None),
+        )
+        .first()
+    )
 
     if not test:
         return [], 0
 
     # Base query
-    query = (
-        db.query(Question)
-        .filter(
-            Question.category_id == category_id,
-            Question.test_id == test_id,
-            Question.deleted_at.is_(None)
-        )
+    query = db.query(Question).filter(
+        Question.category_id == category_id,
+        Question.test_id == test_id,
+        Question.deleted_at.is_(None),
     )
 
     # Define search configuration
@@ -255,8 +206,7 @@ def get_questions_by_category_and_test_id(
 
     # Apply eager loading and execute query
     questions = paginated_query.options(
-        joinedload(Question.category_obj),
-        joinedload(Question.test_obj)
+        joinedload(Question.category_obj), joinedload(Question.test_obj)
     ).all()
 
     result = []
@@ -276,7 +226,9 @@ def get_questions_by_category_and_test_id(
                 "id": question.id,
                 "content": question.content,
                 "image_url": question.image_url,
-                "category": question.category_obj.name if question.category_obj else None,
+                "category": (
+                    question.category_obj.name if question.category_obj else None
+                ),
                 "test": question.test,
                 "is_multiple_choice": question.is_multiple_choice,
                 "created_at": datetime_to_timestamp(question.created_at),
@@ -320,21 +272,14 @@ def get_questions_by_test_id(
         Tuple of (questions list, total count)
     """
     # Verify test exists
-    test = db.query(Test).filter(
-        Test.id == test_id,
-        Test.deleted_at.is_(None)
-    ).first()
+    test = db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
 
     if not test:
         return [], 0
 
     # Base query
-    query = (
-        db.query(Question)
-        .filter(
-            Question.test_id == test_id,
-            Question.deleted_at.is_(None)
-        )
+    query = db.query(Question).filter(
+        Question.test_id == test_id, Question.deleted_at.is_(None)
     )
 
     # Define search configuration
@@ -368,8 +313,7 @@ def get_questions_by_test_id(
 
     # Apply eager loading and execute query
     questions = paginated_query.options(
-        joinedload(Question.category_obj),
-        joinedload(Question.test_obj)
+        joinedload(Question.category_obj), joinedload(Question.test_obj)
     ).all()
 
     result = []
@@ -389,7 +333,9 @@ def get_questions_by_test_id(
                 "id": question.id,
                 "content": question.content,
                 "image_url": question.image_url,
-                "category": question.category_obj.name if question.category_obj else None,
+                "category": (
+                    question.category_obj.name if question.category_obj else None
+                ),
                 "test": question.test,
                 "is_multiple_choice": question.is_multiple_choice,
                 "created_at": datetime_to_timestamp(question.created_at),
@@ -425,10 +371,7 @@ def get_question_by_test_and_id(
         Question dict or None if not found
     """
     # Verify test exists
-    test = db.query(Test).filter(
-        Test.id == test_id,
-        Test.deleted_at.is_(None)
-    ).first()
+    test = db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
 
     if not test:
         return None
@@ -440,7 +383,7 @@ def get_question_by_test_and_id(
         .filter(
             Question.id == question_id,
             Question.test_id == test_id,
-            Question.deleted_at.is_(None)
+            Question.deleted_at.is_(None),
         )
         .first()
     )
@@ -518,298 +461,6 @@ def get_question_by_id(db: Session, question_id: str):
             for answer in answers
         ],
     }
-
-
-def get_answers_by_question_id(
-    db: Session,
-    question_id: str,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
-    page: int = 1,
-    page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
-    """
-    Get all answers for a specific question with optional filtering and pagination.
-
-    Args:
-        db: Database session
-        question_id: Question UUID
-        search_key: Field to search (content, is_correct)
-        search_value: Value to search for
-        page: Page number (1-indexed)
-        page_size: Number of items per page
-
-    Returns:
-        Tuple of (answers list, total count)
-    """
-    # Verify question exists
-    question = db.query(Question).filter(
-        Question.id == question_id,
-        Question.deleted_at.is_(None)
-    ).first()
-
-    if not question:
-        return [], 0
-
-    # Base query
-    query = db.query(AnswerOption).filter(
-        AnswerOption.question_id == question_id,
-        AnswerOption.deleted_at.is_(None)
-    )
-
-    # Define search configuration
-    search_config = {
-        "content": {
-            "column": AnswerOption.content,
-            "type": "text",
-            "case_sensitive": False,
-        },
-        "is_correct": {
-            "column": AnswerOption.is_correct,
-            "type": "exact",
-        },
-    }
-
-    # Apply search filter and pagination
-    if request_params:
-        # For multiple filters, handle is_correct specially
-        filters = []
-        if request_params:
-            from app.utils.search_pagination import parse_multiple_filters
-            filters = parse_multiple_filters(request_params)
-        
-        if filters:
-            from app.utils.search_pagination import SearchFilter
-            search_filter = SearchFilter(search_config)
-            for f_key, f_value in filters:
-                if f_key == "is_correct":
-                    # Convert string to boolean
-                    is_correct_value = f_value.lower() in ("true", "1", "yes", "t")
-                    query = query.filter(AnswerOption.is_correct == is_correct_value)
-                else:
-                    query = search_filter.apply(query, f_key, f_value)
-        
-        from app.utils.search_pagination import PaginationHandler
-        paginated_query, total = PaginationHandler.apply(query, page, page_size)
-    else:
-        # Handle boolean search for is_correct separately
-        if search_key == "is_correct" and search_value:
-            # Convert string to boolean
-            is_correct_value = search_value.lower() in ("true", "1", "yes", "t")
-            query = query.filter(AnswerOption.is_correct == is_correct_value)
-        else:
-            # Apply search filter
-            if search_config and search_key in search_config:
-                from app.utils.search_pagination import SearchFilter
-                search_filter = SearchFilter(search_config)
-                query = search_filter.apply(query, search_key, search_value)
-
-        # Apply pagination
-        from app.utils.search_pagination import PaginationHandler
-        paginated_query, total = PaginationHandler.apply(query, page, page_size)
-
-    # Execute query
-    answers = paginated_query.all()
-
-    result = []
-    for answer in answers:
-        result.append({
-            'id': answer.id,
-            'question_id': answer.question_id,
-            'content': answer.content,
-            'is_correct': answer.is_correct,
-            'explanation': answer.explanation,
-            'created_at': datetime_to_timestamp(answer.created_at),
-            'updated_at': datetime_to_timestamp(answer.updated_at)
-        })
-
-    return result, total
-
-
-def get_answer_by_id(
-    db: Session,
-    question_id: str,
-    answer_id: str,
-):
-    """
-    Get a specific answer by question_id and answer_id.
-
-    Args:
-        db: Database session
-        question_id: Question UUID
-        answer_id: Answer UUID
-
-    Returns:
-        Answer dict or None if not found
-    """
-    # Verify question exists
-    question = db.query(Question).filter(
-        Question.id == question_id,
-        Question.deleted_at.is_(None)
-    ).first()
-
-    if not question:
-        return None
-
-    # Get answer
-    answer = db.query(AnswerOption).filter(
-        AnswerOption.id == answer_id,
-        AnswerOption.question_id == question_id,
-        AnswerOption.deleted_at.is_(None)
-    ).first()
-
-    if not answer:
-        return None
-
-    return {
-        'id': answer.id,
-        'question_id': answer.question_id,
-        'content': answer.content,
-        'is_correct': answer.is_correct,
-        'explanation': answer.explanation,
-        'created_at': datetime_to_timestamp(answer.created_at),
-        'updated_at': datetime_to_timestamp(answer.updated_at)
-    }
-
-
-def get_all_answers(
-    db: Session,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
-    page: int = 1,
-    page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
-    """
-    Get all answers with optional filtering and pagination.
-
-    Args:
-        db: Database session
-        search_key: Field to search (content, is_correct, question_id)
-        search_value: Value to search for
-        page: Page number (1-indexed)
-        page_size: Number of items per page
-
-    Returns:
-        Tuple of (answers list, total count)
-    """
-    # Base query
-    query = db.query(AnswerOption).filter(
-        AnswerOption.deleted_at.is_(None)
-    )
-
-    # Define search configuration
-    search_config = {
-        "content": {
-            "column": AnswerOption.content,
-            "type": "text",
-            "case_sensitive": False,
-        },
-        "is_correct": {
-            "column": AnswerOption.is_correct,
-            "type": "exact",
-        },
-        "question_id": {
-            "column": AnswerOption.question_id,
-            "type": "exact",
-        },
-    }
-
-    # Apply search filter and pagination
-    if request_params:
-        # For multiple filters, handle special cases
-        from app.utils.search_pagination import parse_multiple_filters, SearchFilter
-        filters = parse_multiple_filters(request_params)
-        
-        if filters:
-            search_filter = SearchFilter(search_config)
-            for f_key, f_value in filters:
-                if f_key == "is_correct":
-                    # Convert string to boolean
-                    is_correct_value = f_value.lower() in ("true", "1", "yes", "t")
-                    query = query.filter(AnswerOption.is_correct == is_correct_value)
-                else:
-                    query = search_filter.apply(query, f_key, f_value)
-        
-        from app.utils.search_pagination import PaginationHandler
-        paginated_query, total = PaginationHandler.apply(query, page, page_size)
-    else:
-        # Handle boolean search for is_correct separately
-        if search_key == "is_correct" and search_value:
-            # Convert string to boolean
-            is_correct_value = search_value.lower() in ("true", "1", "yes", "t")
-            query = query.filter(AnswerOption.is_correct == is_correct_value)
-        elif search_key == "question_id" and search_value:
-            # Handle UUID search for question_id
-            try:
-                query = query.filter(AnswerOption.question_id == search_value)
-            except (ValueError, TypeError):
-                # Invalid UUID format, return empty result
-                return [], 0
-        else:
-            # Apply search filter
-            if search_config and search_key in search_config:
-                from app.utils.search_pagination import SearchFilter
-                search_filter = SearchFilter(search_config)
-                query = search_filter.apply(query, search_key, search_value)
-
-        # Apply pagination
-        from app.utils.search_pagination import PaginationHandler
-        paginated_query, total = PaginationHandler.apply(query, page, page_size)
-
-    # Execute query
-    answers = paginated_query.all()
-
-    result = []
-    for answer in answers:
-        result.append({
-            'id': answer.id,
-            'question_id': answer.question_id,
-            'content': answer.content,
-            'is_correct': answer.is_correct,
-            'explanation': answer.explanation,
-            'created_at': datetime_to_timestamp(answer.created_at),
-            'updated_at': datetime_to_timestamp(answer.updated_at)
-        })
-
-    return result, total
-
-
-def get_answer_by_id_only(
-    db: Session,
-    answer_id: str,
-):
-    """
-    Get a specific answer by answer_id only.
-
-    Args:
-        db: Database session
-        answer_id: Answer UUID
-
-    Returns:
-        Answer dict or None if not found
-    """
-    # Get answer
-    answer = db.query(AnswerOption).filter(
-        AnswerOption.id == answer_id,
-        AnswerOption.deleted_at.is_(None)
-    ).first()
-
-    if not answer:
-        return None
-
-    return {
-        'id': answer.id,
-        'question_id': answer.question_id,
-        'content': answer.content,
-        'is_correct': answer.is_correct,
-        'explanation': answer.explanation,
-        'created_at': datetime_to_timestamp(answer.created_at),
-        'updated_at': datetime_to_timestamp(answer.updated_at)
-    }
-
-
 def question_exists(db: Session, question_id: UUID) -> bool:
     """
     Check if a question exists and is not deleted.
@@ -821,28 +472,227 @@ def question_exists(db: Session, question_id: UUID) -> bool:
     Returns:
         True if question exists, False otherwise
     """
-    question = db.query(Question).filter(
-        Question.id == question_id,
-        Question.deleted_at.is_(None)
-    ).first()
+    question = (
+        db.query(Question)
+        .filter(Question.id == question_id, Question.deleted_at.is_(None))
+        .first()
+    )
     return question is not None
 
 
-def answer_exists_for_question(db: Session, question_id: UUID, answer_id: UUID) -> bool:
+def create_question(
+    db: Session,
+    content: str,
+    image_url: Optional[str] = None,
+    category_id: Optional[str] = None,
+    test_id: Optional[str] = None,
+    is_multiple_choice: bool = False,
+):
     """
-    Check if an answer exists for a specific question and is not deleted.
+    Create a new question.
+
+    Args:
+        db: Database session
+        content: Question content
+        image_url: Optional image URL
+        category_id: Optional category UUID
+        test_id: Optional test UUID
+        is_multiple_choice: Whether this question has multiple correct answers
+
+    Returns:
+        Question dict or None if category/test not found
+    """
+    # Verify category exists if provided
+    if category_id:
+        category = (
+            db.query(Category)
+            .filter(Category.id == category_id, Category.deleted_at.is_(None))
+            .first()
+        )
+        if not category:
+            return None
+
+    # Verify test exists if provided
+    if test_id:
+        test = (
+            db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
+        )
+        if not test:
+            return None
+
+    question = Question(
+        content=content,
+        image_url=image_url,
+        category_id=category_id,
+        test_id=test_id,
+        is_multiple_choice=is_multiple_choice,
+    )
+    db.add(question)
+    db.commit()
+    db.refresh(question)
+
+    # Load relationships
+    question = (
+        db.query(Question)
+        .options(joinedload(Question.category_obj))
+        .filter(Question.id == question.id)
+        .first()
+    )
+
+    # Get all answer options for this question
+    answers = (
+        db.query(AnswerOption)
+        .filter(
+            AnswerOption.question_id == question.id, AnswerOption.deleted_at.is_(None)
+        )
+        .all()
+    )
+
+    return {
+        "id": question.id,
+        "content": question.content,
+        "image_url": question.image_url,
+        "category": question.category_obj.name if question.category_obj else None,
+        "test": question.test,
+        "is_multiple_choice": question.is_multiple_choice,
+        "created_at": datetime_to_timestamp(question.created_at),
+        "updated_at": datetime_to_timestamp(question.updated_at),
+        "answers": [
+            {
+                "id": answer.id,
+                "content": answer.content,
+                "is_correct": answer.is_correct,
+                "explanation": answer.explanation,
+            }
+            for answer in answers
+        ],
+    }
+
+
+def update_question(
+    db: Session,
+    question_id: str,
+    content: Optional[str] = None,
+    image_url: Optional[str] = None,
+    category_id: Optional[str] = None,
+    test_id: Optional[str] = None,
+    is_multiple_choice: Optional[bool] = None,
+):
+    """
+    Update a question.
 
     Args:
         db: Database session
         question_id: Question UUID
-        answer_id: Answer UUID
+        content: Optional new question content
+        image_url: Optional new image URL
+        category_id: Optional new category UUID
+        test_id: Optional new test UUID
+        is_multiple_choice: Optional new is_multiple_choice value
 
     Returns:
-        True if answer exists for the question, False otherwise
+        Question dict or None if not found
     """
-    answer = db.query(AnswerOption).filter(
-        AnswerOption.id == answer_id,
-        AnswerOption.question_id == question_id,
-        AnswerOption.deleted_at.is_(None)
-    ).first()
-    return answer is not None
+    question = (
+        db.query(Question)
+        .filter(Question.id == question_id, Question.deleted_at.is_(None))
+        .first()
+    )
+
+    if not question:
+        return None
+
+    # Verify category exists if provided
+    if category_id is not None:
+        category = (
+            db.query(Category)
+            .filter(Category.id == category_id, Category.deleted_at.is_(None))
+            .first()
+        )
+        if not category:
+            return None
+        question.category_id = category_id
+
+    # Verify test exists if provided
+    if test_id is not None:
+        test = (
+            db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
+        )
+        if not test:
+            return None
+        question.test_id = test_id
+
+    # Update fields if provided
+    if content is not None:
+        question.content = content
+    if image_url is not None:
+        question.image_url = image_url
+    if is_multiple_choice is not None:
+        question.is_multiple_choice = is_multiple_choice
+
+    db.commit()
+    db.refresh(question)
+
+    # Load relationships
+    question = (
+        db.query(Question)
+        .options(joinedload(Question.category_obj))
+        .filter(Question.id == question.id)
+        .first()
+    )
+
+    # Get all answer options for this question
+    answers = (
+        db.query(AnswerOption)
+        .filter(
+            AnswerOption.question_id == question.id, AnswerOption.deleted_at.is_(None)
+        )
+        .all()
+    )
+
+    return {
+        "id": question.id,
+        "content": question.content,
+        "image_url": question.image_url,
+        "category": question.category_obj.name if question.category_obj else None,
+        "test": question.test,
+        "is_multiple_choice": question.is_multiple_choice,
+        "created_at": datetime_to_timestamp(question.created_at),
+        "updated_at": datetime_to_timestamp(question.updated_at),
+        "answers": [
+            {
+                "id": answer.id,
+                "content": answer.content,
+                "is_correct": answer.is_correct,
+                "explanation": answer.explanation,
+            }
+            for answer in answers
+        ],
+    }
+
+
+def delete_question(db: Session, question_id: str):
+    """
+    Soft delete a question.
+
+    Args:
+        db: Database session
+        question_id: Question UUID
+
+    Returns:
+        bool: True if deleted, False if not found
+    """
+    from datetime import datetime, timezone
+
+    question = (
+        db.query(Question)
+        .filter(Question.id == question_id, Question.deleted_at.is_(None))
+        .first()
+    )
+
+    if not question:
+        return False
+
+    question.deleted_at = datetime.now(timezone.utc)
+    db.commit()
+    return True

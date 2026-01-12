@@ -1,12 +1,20 @@
 # app/api/v1/answer.py
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.orm import Session
 from typing import Optional
-from app.schemas.question import AnswerListResponse, AnswerResponse
+from app.schemas.answer import (
+    AnswerListResponse,
+    AnswerResponse,
+    AnswerCreateRequest,
+    AnswerUpdateRequest,
+)
 from app.schemas.http_response import ErrorResponse
-from app.services import question_service
+from app.services import answer_service
 from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
+from app.api.dependencies.permissions import require_namespace_permission
+from app.models.users import User
+from app.constants.permissions import PERMISSION_NAMESPACE_ANSWERS
 
 router = APIRouter()
 
@@ -76,7 +84,7 @@ def get_all_answers(
     This endpoint does not require authentication.
     """
     request_params = dict(request.query_params)
-    answers, total = question_service.get_all_answers(
+    answers, total = answer_service.get_all_answers(
         db,
         search_key=key,
         search_value=value,
@@ -120,7 +128,7 @@ def get_answer_by_id(
 
     This endpoint does not require authentication.
     """
-    answer = question_service.get_answer_by_id_only(db, answer_id)
+    answer = answer_service.get_answer_by_id_only(db, answer_id)
 
     if not answer:
         raise HTTPException(
@@ -129,3 +137,163 @@ def get_answer_by_id(
         )
 
     return AnswerResponse(data=answer, meta={})
+
+
+@router.post(
+    "",
+    response_model=AnswerResponse,
+    summary="Create a new answer",
+    description="Create a new answer (requires permission)",
+    responses={
+        200: {
+            "description": "Answer created",
+        },
+        400: {
+            "description": "Question not found",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
+    },
+)
+def create_answer(
+    answer_data: AnswerCreateRequest = Body(...),
+    db: Session = Depends(get_db),
+    _user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_ANSWERS, "POST")
+    ),
+):
+    """
+    Create a new answer.
+
+    - **question_id**: Question ID (required)
+    - **content**: Optional answer content
+    - **image_url**: Optional image URL
+    - **is_correct**: Whether this is the correct answer (default: false)
+    - **explanation**: Optional explanation for the answer
+
+    Requires permission: answers::create
+    """
+    answer = answer_service.create_answer(
+        db,
+        str(answer_data.question_id),
+        answer_data.content,
+        answer_data.image_url,
+        answer_data.is_correct,
+        answer_data.explanation,
+    )
+    if not answer:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Question not found",
+        )
+
+    return AnswerResponse(data=answer, meta={})
+
+
+@router.put(
+    "/{answer_id}",
+    response_model=AnswerResponse,
+    summary="Update an answer",
+    description="Update an answer by ID (requires permission)",
+    responses={
+        200: {
+            "description": "Answer updated",
+        },
+        404: {
+            "description": "Answer not found",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
+    },
+)
+def update_answer(
+    answer_id: str = Path(
+        ...,
+        description="Answer ID",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    answer_data: AnswerUpdateRequest = Body(...),
+    db: Session = Depends(get_db),
+    _user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_ANSWERS, "PUT")
+    ),
+):
+    """
+    Update an answer by ID.
+
+    - **answer_id**: UUID of the answer
+    - **content**: Optional new answer content
+    - **image_url**: Optional new image URL
+    - **is_correct**: Optional new is_correct value
+    - **explanation**: Optional new explanation
+
+    Requires permission: answers::update
+    """
+    answer = answer_service.update_answer(
+        db,
+        answer_id,
+        answer_data.content,
+        answer_data.image_url,
+        answer_data.is_correct,
+        answer_data.explanation,
+    )
+    if not answer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Answer with ID {answer_id} not found",
+        )
+
+    return AnswerResponse(data=answer, meta={})
+
+
+@router.delete(
+    "/{answer_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Delete an answer",
+    description="Delete an answer by ID (soft delete, requires permission)",
+    responses={
+        200: {
+            "description": "Answer deleted successfully",
+        },
+        404: {
+            "description": "Answer not found",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
+    },
+)
+def delete_answer(
+    answer_id: str = Path(
+        ...,
+        description="Answer ID",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    db: Session = Depends(get_db),
+    _user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_ANSWERS, "DELETE")
+    ),
+):
+    """
+    Delete an answer by ID (soft delete).
+
+    - **answer_id**: UUID of the answer
+
+    Requires permission: answers::delete
+    """
+    deleted = answer_service.delete_answer(db, answer_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Answer with ID {answer_id} not found",
+        )
+
+    return {"message": "Answer deleted successfully"}

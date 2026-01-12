@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 from fastapi import HTTPException, status
-from app.repository import submission_repo, question_repo
+from app.repository import submission_repo, question_repo, answer_repo
 from app.schemas.submission import SubmissionCreate
 from app.utils.datetime_utils import datetime_to_timestamp
 
@@ -19,7 +19,7 @@ def submit_submission(db: Session, user_id: UUID, submission_data: SubmissionCre
         )
     
     # Check if answer exists for the question
-    if not question_repo.answer_exists_for_question(
+    if not answer_repo.answer_exists_for_question(
         db, submission_data.question_id, submission_data.answer_id
     ):
         raise HTTPException(
@@ -50,7 +50,7 @@ def submit_submissions_bulk(db: Session, user_id: UUID, submissions: List[Submis
             )
         
         # Check if answer exists for the question
-        if not question_repo.answer_exists_for_question(
+        if not answer_repo.answer_exists_for_question(
             db, submission.question_id, submission.answer_id
         ):
             raise HTTPException(

@@ -361,7 +361,13 @@ def create_test(
             detail=f"Test with name '{test_data.name}' already exists in this category",
         )
 
-    test = category_service.create_test(db, test_data.name, str(test_data.category_id))
+    test = category_service.create_test(
+        db, 
+        test_data.name, 
+        str(test_data.category_id),
+        test_data.description,
+        test_data.time_limit
+    )
     if not test:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -447,7 +453,13 @@ def update_test(
             detail=f"Test with name '{test_data.name}' already exists in this category",
         )
 
-    test = category_service.update_test(db, test_id, test_data.name)
+    test = category_service.update_test(
+        db, 
+        test_id, 
+        test_data.name,
+        test_data.description,
+        test_data.time_limit
+    )
     if not test:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

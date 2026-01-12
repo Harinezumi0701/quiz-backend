@@ -3,6 +3,11 @@ import fnmatch
 from sqlalchemy.orm import Session
 from app.models.users import User
 from app.repository import role_repo
+from app.constants.permissions import (
+    PERMISSION_NAMESPACE_CATEGORIES,
+    PERMISSION_ACTION_READ,
+    PERMISSION_WILDCARD_ALL,
+)
 
 
 def check_permission(db: Session, user: User, required_permission: str) -> bool:
@@ -118,7 +123,7 @@ def get_user_permissions(db: Session, user: User) -> list[str]:
         user: User object
 
     Returns:
-        list[str]: List of permission strings (e.g., ["category::read", "*::*"])
+        list[str]: List of permission strings (e.g., [f"{PERMISSION_NAMESPACE_CATEGORIES}::{PERMISSION_ACTION_READ}", PERMISSION_WILDCARD_ALL])
     """
     if not user.role_id:
         return []

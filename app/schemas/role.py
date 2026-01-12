@@ -4,6 +4,10 @@ from typing import List, Optional
 from uuid import UUID
 from datetime import datetime
 from app.schemas.http_response import SuccessResponse
+from app.constants.permissions import (
+    PERMISSION_NAMESPACE_CATEGORIES,
+    PERMISSION_ACTION_READ,
+)
 
 
 class PermissionOut(BaseModel):
@@ -13,7 +17,9 @@ class PermissionOut(BaseModel):
         ..., description="Permission ID", example="550e8400-e29b-41d4-a716-446655440000"
     )
     permission: str = Field(
-        ..., description="Permission string", example="category::read"
+        ...,
+        description="Permission string",
+        example=f"{PERMISSION_NAMESPACE_CATEGORIES}::{PERMISSION_ACTION_READ}",
     )
     created_at: datetime = Field(..., description="Created at timestamp")
 
@@ -29,7 +35,9 @@ class RoleOut(BaseModel):
     )
     name: str = Field(..., description="Role name", example="admin")
     description: Optional[str] = Field(
-        None, description="Role description", example="Administrator with full permissions"
+        None,
+        description="Role description",
+        example="Administrator with full permissions",
     )
     permissions: List[PermissionOut] = Field(
         default_factory=list, description="List of permissions for this role"

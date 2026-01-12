@@ -10,6 +10,7 @@ from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
 from app.api.dependencies.permissions import require_namespace_permission
 from app.models.users import User
+from app.constants.permissions import PERMISSION_NAMESPACE_ROLES
 
 router = APIRouter()
 
@@ -35,7 +36,9 @@ def get_all_roles(
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
     db: Session = Depends(get_db),
-    user: User = Depends(require_namespace_permission("role", "GET")),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_ROLES, "GET")
+    ),
 ):
     """
     Get all roles with optional filtering and pagination.
@@ -45,7 +48,7 @@ def get_all_roles(
     - **page**: Page number (default: 1)
     - **page_size**: Number of items per page (default: 10, max: 100)
 
-    Requires permission: role::read
+    Requires permission: roles::read
     """
     roles, total = role_service.get_all_roles_with_search(
         db, search_key=key, search_value=value, page=page, page_size=page_size
@@ -80,14 +83,16 @@ def get_role_by_id(
         ..., description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
     db: Session = Depends(get_db),
-    user: User = Depends(require_namespace_permission("role", "GET")),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_ROLES, "GET")
+    ),
 ):
     """
     Get a specific role by ID with all permissions.
 
     - **role_id**: UUID of the role
 
-    Requires permission: role::read
+    Requires permission: roles::read
     """
     role = role_service.get_role_by_id(db, role_id)
 

@@ -7,8 +7,9 @@ from app.api.dependencies.auth import get_current_user
 from app.models.users import User
 from app.services import permission_service
 from app.utils.permission_utils import get_action_from_method, build_permission
-from app.constants.error_codes import PERMISSION_DENIED
+from app.constants.error_codes import FORBIDDEN
 from app.constants.error_messages import ERROR_PERMISSION_DENIED
+from app.constants.permissions import PERMISSION_NAMESPACE_CATEGORIES
 
 
 def require_permission(permission: str):
@@ -66,18 +67,16 @@ def require_namespace_permission(namespace: str, method: str = "GET"):
 
     Usage:
         @router.get("/categories")
-        def get_categories(user: User = Depends(require_namespace_permission("category", "GET"))):
+        def get_categories(user: User = Depends(require_namespace_permission(PERMISSION_NAMESPACE_CATEGORIES, "GET"))):
             ...
 
     Args:
         namespace: Permission namespace (e.g., "category", "role")
         method: HTTP method (GET, POST, PUT, PATCH, DELETE). Defaults to "GET"
-    
+
     Returns:
         Dependency function that checks permission
     """
     action = get_action_from_method(method)
     permission = build_permission(namespace, action)
     return require_permission(permission)
-
-

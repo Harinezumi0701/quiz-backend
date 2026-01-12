@@ -5,6 +5,11 @@ from uuid import UUID
 from datetime import date
 from app.schemas.http_response import SuccessResponse
 from app.schemas.role import PermissionOut
+from app.constants.permissions import (
+    PERMISSION_NAMESPACE_CATEGORIES,
+    PERMISSION_ACTION_READ,
+    PERMISSION_WILDCARD_ALL,
+)
 
 
 class UserOut(BaseModel):
@@ -33,7 +38,12 @@ class UserOut(BaseModel):
         None, description="Join date", example="2024-01-01"
     )
     permissions: List[str] = Field(
-        default_factory=list, description="List of user permissions", example=["category::read", "*::*"]
+        default_factory=list,
+        description="List of user permissions",
+        example=[
+            f"{PERMISSION_NAMESPACE_CATEGORIES}::{PERMISSION_ACTION_READ}",
+            PERMISSION_WILDCARD_ALL,
+        ],
     )
 
     class Config:
@@ -50,7 +60,10 @@ class UserOut(BaseModel):
                 "job_title": "Software Engineer",
                 "company": "Tech Corp",
                 "join_date": "2024-01-01",
-                "permissions": ["category::read", "*::*"],
+                "permissions": [
+                    f"{PERMISSION_NAMESPACE_CATEGORIES}::{PERMISSION_ACTION_READ}",
+                    PERMISSION_WILDCARD_ALL,
+                ],
             }
         }
 

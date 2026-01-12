@@ -5,62 +5,98 @@ from app.models.categories import Category
 from app.models.questions import Question
 from app.models.tests import Test
 from app.utils.datetime_utils import datetime_to_timestamp
-from app.utils.search_pagination import paginate_query
+from app.utils.search_pagination import (
+    paginate_query,
+    paginate_query_with_multiple_filters,
+)
+from typing import Dict, Any
 
 
 def get_all_categories_with_search(
     db: Session,
     search_key: Optional[str] = None,
-    search_value: Optional[str] = None
-):
-    """Get all categories with optional name search."""
+    search_value: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 10,
+    request_params: Optional[Dict[str, Any]] = None,
+) -> Tuple[list, int]:
+    """Get all categories with optional name search and pagination."""
     query = db.query(Category).filter(Category.deleted_at.is_(None))
-    
-    # Apply search filter
-    if search_key == "name" and search_value:
-        query = query.filter(Category.name.ilike(f"%{search_value}%"))
-    
-    categories = query.all()
-    
+
+    # Define search configuration
+    search_config = {
+        "name": {
+            "column": Category.name,
+            "type": "text",
+            "case_sensitive": False,
+        },
+    }
+
+    # Apply search filter and pagination
+    if request_params:
+        paginated_query, total = paginate_query_with_multiple_filters(
+            query,
+            request_params=request_params,
+            search_config=search_config,
+            page=page,
+            page_size=page_size,
+        )
+    else:
+        paginated_query, total = paginate_query(
+            query,
+            search_key=search_key,
+            search_value=search_value,
+            search_config=search_config,
+            page=page,
+            page_size=page_size,
+        )
+
+    categories = paginated_query.all()
+
     result = []
     for category in categories:
-        count = db.query(Question).filter(
-            Question.category_id == category.id,
-            Question.deleted_at.is_(None)
-        ).count()
-        
-        result.append({
-            'id': category.id,
-            'name': category.name,
-            'question_count': count,
-            'created_at': datetime_to_timestamp(category.created_at),
-            'updated_at': datetime_to_timestamp(category.updated_at)
-        })
-    
-    return result
+        count = (
+            db.query(Question)
+            .filter(Question.category_id == category.id, Question.deleted_at.is_(None))
+            .count()
+        )
+
+        result.append(
+            {
+                "id": category.id,
+                "name": category.name,
+                "question_count": count,
+                "created_at": datetime_to_timestamp(category.created_at),
+                "updated_at": datetime_to_timestamp(category.updated_at),
+            }
+        )
+
+    return result, total
 
 
 def get_category_by_id(db: Session, category_id: str):
     """Get a specific category by ID."""
-    category = db.query(Category).filter(
-        Category.id == category_id,
-        Category.deleted_at.is_(None)
-    ).first()
-    
+    category = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.deleted_at.is_(None))
+        .first()
+    )
+
     if not category:
         return None
-    
-    count = db.query(Question).filter(
-        Question.category_id == category.id,
-        Question.deleted_at.is_(None)
-    ).count()
-    
+
+    count = (
+        db.query(Question)
+        .filter(Question.category_id == category.id, Question.deleted_at.is_(None))
+        .count()
+    )
+
     return {
-        'id': category.id,
-        'name': category.name,
-        'question_count': count,
-        'created_at': datetime_to_timestamp(category.created_at),
-        'updated_at': datetime_to_timestamp(category.updated_at)
+        "id": category.id,
+        "name": category.name,
+        "question_count": count,
+        "created_at": datetime_to_timestamp(category.created_at),
+        "updated_at": datetime_to_timestamp(category.updated_at),
     }
 
 
@@ -71,6 +107,7 @@ def get_tests_by_category_id(
     search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
+    request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """
     Get all tests for a specific category with optional filtering and pagination.
@@ -82,23 +119,24 @@ def get_tests_by_category_id(
         search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
+        request_params: Optional dict of request parameters for multiple filters
 
     Returns:
         Tuple of (tests list, total count)
     """
     # Verify category exists
-    category = db.query(Category).filter(
-        Category.id == category_id,
-        Category.deleted_at.is_(None)
-    ).first()
+    category = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.deleted_at.is_(None))
+        .first()
+    )
 
     if not category:
         return [], 0
 
     # Base query
     query = db.query(Test).filter(
-        Test.category_id == category_id,
-        Test.deleted_at.is_(None)
+        Test.category_id == category_id, Test.deleted_at.is_(None)
     )
 
     # Define search configuration
@@ -111,14 +149,23 @@ def get_tests_by_category_id(
     }
 
     # Apply search filter and pagination
-    paginated_query, total = paginate_query(
-        query,
-        search_key=search_key,
-        search_value=search_value,
-        search_config=search_config,
-        page=page,
-        page_size=page_size,
-    )
+    if request_params:
+        paginated_query, total = paginate_query_with_multiple_filters(
+            query,
+            request_params=request_params,
+            search_config=search_config,
+            page=page,
+            page_size=page_size,
+        )
+    else:
+        paginated_query, total = paginate_query(
+            query,
+            search_key=search_key,
+            search_value=search_value,
+            search_config=search_config,
+            page=page,
+            page_size=page_size,
+        )
 
     # Execute query
     tests = paginated_query.all()
@@ -126,19 +173,22 @@ def get_tests_by_category_id(
     result = []
     for test in tests:
         # Count questions in this test
-        question_count = db.query(Question).filter(
-            Question.test_id == test.id,
-            Question.deleted_at.is_(None)
-        ).count()
+        question_count = (
+            db.query(Question)
+            .filter(Question.test_id == test.id, Question.deleted_at.is_(None))
+            .count()
+        )
 
-        result.append({
-            'id': test.id,
-            'name': test.name,
-            'category_id': test.category_id,
-            'question_count': question_count,
-            'created_at': datetime_to_timestamp(test.created_at),
-            'updated_at': datetime_to_timestamp(test.updated_at)
-        })
+        result.append(
+            {
+                "id": test.id,
+                "name": test.name,
+                "category_id": test.category_id,
+                "question_count": question_count,
+                "created_at": datetime_to_timestamp(test.created_at),
+                "updated_at": datetime_to_timestamp(test.updated_at),
+            }
+        )
 
     return result, total
 
@@ -149,6 +199,7 @@ def get_all_tests(
     search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
+    request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """
     Get all tests with optional filtering and pagination.
@@ -159,14 +210,13 @@ def get_all_tests(
         search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
+        request_params: Optional dict of request parameters for multiple filters
 
     Returns:
         Tuple of (tests list, total count)
     """
     # Base query
-    query = db.query(Test).filter(
-        Test.deleted_at.is_(None)
-    )
+    query = db.query(Test).filter(Test.deleted_at.is_(None))
 
     # Define search configuration
     search_config = {
@@ -178,14 +228,23 @@ def get_all_tests(
     }
 
     # Apply search filter and pagination
-    paginated_query, total = paginate_query(
-        query,
-        search_key=search_key,
-        search_value=search_value,
-        search_config=search_config,
-        page=page,
-        page_size=page_size,
-    )
+    if request_params:
+        paginated_query, total = paginate_query_with_multiple_filters(
+            query,
+            request_params=request_params,
+            search_config=search_config,
+            page=page,
+            page_size=page_size,
+        )
+    else:
+        paginated_query, total = paginate_query(
+            query,
+            search_key=search_key,
+            search_value=search_value,
+            search_config=search_config,
+            page=page,
+            page_size=page_size,
+        )
 
     # Execute query
     tests = paginated_query.all()
@@ -193,19 +252,22 @@ def get_all_tests(
     result = []
     for test in tests:
         # Count questions in this test
-        question_count = db.query(Question).filter(
-            Question.test_id == test.id,
-            Question.deleted_at.is_(None)
-        ).count()
+        question_count = (
+            db.query(Question)
+            .filter(Question.test_id == test.id, Question.deleted_at.is_(None))
+            .count()
+        )
 
-        result.append({
-            'id': test.id,
-            'name': test.name,
-            'category_id': test.category_id,
-            'question_count': question_count,
-            'created_at': datetime_to_timestamp(test.created_at),
-            'updated_at': datetime_to_timestamp(test.updated_at)
-        })
+        result.append(
+            {
+                "id": test.id,
+                "name": test.name,
+                "category_id": test.category_id,
+                "question_count": question_count,
+                "created_at": datetime_to_timestamp(test.created_at),
+                "updated_at": datetime_to_timestamp(test.updated_at),
+            }
+        )
 
     return result, total
 
@@ -227,37 +289,43 @@ def get_test_by_id(
         Test dict or None if not found
     """
     # Verify category exists
-    category = db.query(Category).filter(
-        Category.id == category_id,
-        Category.deleted_at.is_(None)
-    ).first()
+    category = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.deleted_at.is_(None))
+        .first()
+    )
 
     if not category:
         return None
 
     # Get test
-    test = db.query(Test).filter(
-        Test.id == test_id,
-        Test.category_id == category_id,
-        Test.deleted_at.is_(None)
-    ).first()
+    test = (
+        db.query(Test)
+        .filter(
+            Test.id == test_id,
+            Test.category_id == category_id,
+            Test.deleted_at.is_(None),
+        )
+        .first()
+    )
 
     if not test:
         return None
 
     # Count questions in this test
-    question_count = db.query(Question).filter(
-        Question.test_id == test.id,
-        Question.deleted_at.is_(None)
-    ).count()
+    question_count = (
+        db.query(Question)
+        .filter(Question.test_id == test.id, Question.deleted_at.is_(None))
+        .count()
+    )
 
     return {
-        'id': test.id,
-        'name': test.name,
-        'category_id': test.category_id,
-        'question_count': question_count,
-        'created_at': datetime_to_timestamp(test.created_at),
-        'updated_at': datetime_to_timestamp(test.updated_at)
+        "id": test.id,
+        "name": test.name,
+        "category_id": test.category_id,
+        "question_count": question_count,
+        "created_at": datetime_to_timestamp(test.created_at),
+        "updated_at": datetime_to_timestamp(test.updated_at),
     }
 
 
@@ -276,27 +344,25 @@ def get_test_by_id_only(
         Test dict or None if not found
     """
     # Get test
-    test = db.query(Test).filter(
-        Test.id == test_id,
-        Test.deleted_at.is_(None)
-    ).first()
+    test = db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
 
     if not test:
         return None
 
     # Count questions in this test
-    question_count = db.query(Question).filter(
-        Question.test_id == test.id,
-        Question.deleted_at.is_(None)
-    ).count()
+    question_count = (
+        db.query(Question)
+        .filter(Question.test_id == test.id, Question.deleted_at.is_(None))
+        .count()
+    )
 
     return {
-        'id': test.id,
-        'name': test.name,
-        'category_id': test.category_id,
-        'question_count': question_count,
-        'created_at': datetime_to_timestamp(test.created_at),
-        'updated_at': datetime_to_timestamp(test.updated_at)
+        "id": test.id,
+        "name": test.name,
+        "category_id": test.category_id,
+        "question_count": question_count,
+        "created_at": datetime_to_timestamp(test.created_at),
+        "updated_at": datetime_to_timestamp(test.updated_at),
     }
 
 
@@ -316,17 +382,18 @@ def create_category(db: Session, name: str):
     db.commit()
     db.refresh(category)
 
-    count = db.query(Question).filter(
-        Question.category_id == category.id,
-        Question.deleted_at.is_(None)
-    ).count()
+    count = (
+        db.query(Question)
+        .filter(Question.category_id == category.id, Question.deleted_at.is_(None))
+        .count()
+    )
 
     return {
-        'id': category.id,
-        'name': category.name,
-        'question_count': count,
-        'created_at': datetime_to_timestamp(category.created_at),
-        'updated_at': datetime_to_timestamp(category.updated_at)
+        "id": category.id,
+        "name": category.name,
+        "question_count": count,
+        "created_at": datetime_to_timestamp(category.created_at),
+        "updated_at": datetime_to_timestamp(category.updated_at),
     }
 
 
@@ -342,10 +409,11 @@ def update_category(db: Session, category_id: str, name: str):
     Returns:
         Category dict or None if not found
     """
-    category = db.query(Category).filter(
-        Category.id == category_id,
-        Category.deleted_at.is_(None)
-    ).first()
+    category = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.deleted_at.is_(None))
+        .first()
+    )
 
     if not category:
         return None
@@ -354,17 +422,18 @@ def update_category(db: Session, category_id: str, name: str):
     db.commit()
     db.refresh(category)
 
-    count = db.query(Question).filter(
-        Question.category_id == category.id,
-        Question.deleted_at.is_(None)
-    ).count()
+    count = (
+        db.query(Question)
+        .filter(Question.category_id == category.id, Question.deleted_at.is_(None))
+        .count()
+    )
 
     return {
-        'id': category.id,
-        'name': category.name,
-        'question_count': count,
-        'created_at': datetime_to_timestamp(category.created_at),
-        'updated_at': datetime_to_timestamp(category.updated_at)
+        "id": category.id,
+        "name": category.name,
+        "question_count": count,
+        "created_at": datetime_to_timestamp(category.created_at),
+        "updated_at": datetime_to_timestamp(category.updated_at),
     }
 
 
@@ -381,10 +450,11 @@ def delete_category(db: Session, category_id: str):
     """
     from datetime import datetime, timezone
 
-    category = db.query(Category).filter(
-        Category.id == category_id,
-        Category.deleted_at.is_(None)
-    ).first()
+    category = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.deleted_at.is_(None))
+        .first()
+    )
 
     if not category:
         return False

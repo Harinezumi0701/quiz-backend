@@ -1,5 +1,14 @@
 # app/api/v1/category.py
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status, Body
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Path,
+    Query,
+    Request,
+    status,
+    Body,
+)
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.schemas.question import (
@@ -32,7 +41,7 @@ router = APIRouter()
     "",
     response_model=CategoryDetailListResponse,
     summary="Get all categories",
-    description="Get list of all categories with optional name search",
+    description="Get list of all categories with optional name search and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition.",
     responses={
         200: {
             "description": "List of categories",
@@ -40,26 +49,65 @@ router = APIRouter()
     },
 )
 def get_all_categories(
-    key: Optional[str] = Query(None, description="Search key: name"),
-    value: Optional[str] = Query(None, description="Search value for category name"),
+    request: Request,
+    key: Optional[str] = Query(None, description="Search key: name (legacy format)"),
+    value: Optional[str] = Query(
+        None, description="Search value for category name (legacy format)"
+    ),
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    filter_key_1: Optional[str] = Query(
+        None, alias="filter-key-1", description="First filter key (e.g., name)"
+    ),
+    filter_value_1: Optional[str] = Query(
+        None,
+        alias="filter-value-1",
+        description="First filter value (supports comma-separated for OR)",
+    ),
+    filter_key_2: Optional[str] = Query(
+        None, alias="filter-key-2", description="Second filter key"
+    ),
+    filter_value_2: Optional[str] = Query(
+        None, alias="filter-value-2", description="Second filter value"
+    ),
     db: Session = Depends(get_db),
     user: User = Depends(
         require_namespace_permission(PERMISSION_NAMESPACE_CATEGORIES, "GET")
     ),
 ):
     """
-    Get all categories with optional name search.
+    Get all categories with optional name search and pagination.
 
-    - **key**: Search key (only "name" is supported)
-    - **value**: Value to search for in category name
+    **Filter Options:**
+    - **Legacy format**: Use `key` and `value` parameters for single filter
+    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
+    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=cat1,cat2,cat3`)
+
+    **Search Keys:**
+    - `name`: Search in category name (text search)
+
+    **Examples:**
+    - Single filter: `?key=name&value=math`
+    - Multiple filters: `?filter-key-1=name&filter-value-1=math&filter-key-2=name&filter-value-2=science`
+    - OR condition: `?filter-key-1=name&filter-value-1=math,science,history`
 
     Requires permission: categories::read
     """
-    categories = category_service.get_all_categories_with_search(
-        db, search_key=key, search_value=value
+    request_params = dict(request.query_params)
+    categories, total = category_service.get_all_categories_with_search(
+        db,
+        search_key=key,
+        search_value=value,
+        page=page,
+        page_size=page_size,
+        request_params=request_params,
     )
 
-    return CategoryDetailListResponse(data=categories, meta={})
+    from app.utils.search_pagination import get_pagination_meta
+
+    meta = get_pagination_meta(total, page, page_size)
+
+    return CategoryDetailListResponse(data=categories, meta=meta)
 
 
 @router.get(
@@ -120,13 +168,30 @@ def get_category_by_id(
     },
 )
 def get_tests_by_category(
+    request: Request,
     category_id: str = Path(
         ..., description="Category ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
-    key: Optional[str] = Query(None, description="Search key: name"),
-    value: Optional[str] = Query(None, description="Search value for test name"),
+    key: Optional[str] = Query(None, description="Search key: name (legacy format)"),
+    value: Optional[str] = Query(
+        None, description="Search value for test name (legacy format)"
+    ),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    filter_key_1: Optional[str] = Query(
+        None, alias="filter-key-1", description="First filter key (e.g., name)"
+    ),
+    filter_value_1: Optional[str] = Query(
+        None,
+        alias="filter-value-1",
+        description="First filter value (supports comma-separated for OR)",
+    ),
+    filter_key_2: Optional[str] = Query(
+        None, alias="filter-key-2", description="Second filter key"
+    ),
+    filter_value_2: Optional[str] = Query(
+        None, alias="filter-value-2", description="Second filter value"
+    ),
     db: Session = Depends(get_db),
     user: User = Depends(
         require_namespace_permission(PERMISSION_NAMESPACE_CATEGORIES, "GET")
@@ -135,14 +200,21 @@ def get_tests_by_category(
     """
     Get all tests of a specific category with optional filtering and pagination.
 
-    - **category_id**: UUID of the category
-    - **key**: Search key (only "name" is supported)
-    - **value**: Value to search for in test name
-    - **page**: Page number (default: 1)
-    - **page_size**: Number of items per page (default: 10, max: 100)
+    **Filter Options:**
+    - **Legacy format**: Use `key` and `value` parameters for single filter
+    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
+    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=test1,test2,test3`)
+
+    **Search Keys:**
+    - `name`: Search in test name (text search)
+
+    **Examples:**
+    - Single filter: `?key=name&value=exam`
+    - Multiple filters: `?filter-key-1=name&filter-value-1=exam&filter-key-2=name&filter-value-2=test`
 
     Requires permission: categories::read
     """
+    request_params = dict(request.query_params)
     tests, total = category_service.get_tests_by_category_id(
         db,
         category_id,
@@ -150,6 +222,7 @@ def get_tests_by_category(
         search_value=value,
         page=page,
         page_size=page_size,
+        request_params=request_params,
     )
 
     # If no results and first page, verify category exists
@@ -230,6 +303,7 @@ def get_test_by_id(
     },
 )
 def get_questions_by_test(
+    request: Request,
     category_id: str = Path(
         ..., description="Category ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
@@ -238,10 +312,28 @@ def get_questions_by_test(
         description="Test ID",
         example="550e8400-e29b-41d4-a716-446655440000",
     ),
-    key: Optional[str] = Query(None, description="Search key: content or created_at"),
-    value: Optional[str] = Query(None, description="Search value"),
+    key: Optional[str] = Query(
+        None, description="Search key: content or created_at (legacy format)"
+    ),
+    value: Optional[str] = Query(None, description="Search value (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    filter_key_1: Optional[str] = Query(
+        None,
+        alias="filter-key-1",
+        description="First filter key (e.g., content, created_at)",
+    ),
+    filter_value_1: Optional[str] = Query(
+        None,
+        alias="filter-value-1",
+        description="First filter value (supports comma-separated for OR)",
+    ),
+    filter_key_2: Optional[str] = Query(
+        None, alias="filter-key-2", description="Second filter key"
+    ),
+    filter_value_2: Optional[str] = Query(
+        None, alias="filter-value-2", description="Second filter value"
+    ),
     db: Session = Depends(get_db),
     user: User = Depends(
         require_namespace_permission(PERMISSION_NAMESPACE_CATEGORIES, "GET")
@@ -250,15 +342,22 @@ def get_questions_by_test(
     """
     Get all questions of a specific test with optional filtering and pagination.
 
-    - **category_id**: UUID of the category
-    - **test_id**: UUID of the test
-    - **key**: Search key (content or created_at)
-    - **value**: Value to search for
-    - **page**: Page number (default: 1)
-    - **page_size**: Number of items per page (default: 10, max: 100)
+    **Filter Options:**
+    - **Legacy format**: Use `key` and `value` parameters for single filter
+    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
+    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=id1,id2,id3`)
+
+    **Search Keys:**
+    - `content`: Search in question content (text search)
+    - `created_at`: Search by creation date (date search)
+
+    **Examples:**
+    - Single filter: `?key=content&value=test`
+    - Multiple filters: `?filter-key-1=content&filter-value-1=test&filter-key-2=created_at&filter-value-2=2024-01-01`
 
     Requires permission: categories::read
     """
+    request_params = dict(request.query_params)
     questions, total = question_service.get_questions_by_category_and_test_id(
         db,
         category_id,
@@ -267,6 +366,7 @@ def get_questions_by_test(
         search_value=value,
         page=page,
         page_size=page_size,
+        request_params=request_params,
     )
 
     # If no results and first page, verify category and test exist

@@ -1,5 +1,5 @@
 # app/api/v1/test.py
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.schemas.question import (
@@ -23,7 +23,7 @@ router = APIRouter()
     "",
     response_model=TestDetailListResponse,
     summary="Get all tests",
-    description="Get all tests with optional name search and pagination",
+    description="Get all tests with optional name search and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition.",
     responses={
         200: {
             "description": "List of tests",
@@ -31,24 +31,38 @@ router = APIRouter()
     },
 )
 def get_all_tests(
-    key: Optional[str] = Query(None, description="Search key: name"),
-    value: Optional[str] = Query(None, description="Search value for test name"),
+    request: Request,
+    key: Optional[str] = Query(None, description="Search key: name (legacy format)"),
+    value: Optional[str] = Query(None, description="Search value for test name (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    filter_key_1: Optional[str] = Query(None, alias="filter-key-1", description="First filter key (e.g., name)"),
+    filter_value_1: Optional[str] = Query(None, alias="filter-value-1", description="First filter value (supports comma-separated for OR)"),
+    filter_key_2: Optional[str] = Query(None, alias="filter-key-2", description="Second filter key"),
+    filter_value_2: Optional[str] = Query(None, alias="filter-value-2", description="Second filter value"),
     db: Session = Depends(get_db),
 ):
     """
     Get all tests with optional filtering and pagination.
 
-    - **key**: Search key (only "name" is supported)
-    - **value**: Value to search for in test name
-    - **page**: Page number (default: 1)
-    - **page_size**: Number of items per page (default: 10, max: 100)
+    **Filter Options:**
+    - **Legacy format**: Use `key` and `value` parameters for single filter
+    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
+    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=test1,test2,test3`)
+    
+    **Search Keys:**
+    - `name`: Search in test name (text search)
+    
+    **Examples:**
+    - Single filter: `?key=name&value=exam`
+    - Multiple filters: `?filter-key-1=name&filter-value-1=exam&filter-key-2=name&filter-value-2=test`
+    - OR condition: `?filter-key-1=name&filter-value-1=exam1,exam2,exam3`
 
     This endpoint does not require authentication.
     """
+    request_params = dict(request.query_params)
     tests, total = category_service.get_all_tests(
-        db, search_key=key, search_value=value, page=page, page_size=page_size
+        db, search_key=key, search_value=value, page=page, page_size=page_size, request_params=request_params
     )
 
     meta = get_pagination_meta(total, page, page_size)
@@ -101,7 +115,7 @@ def get_test_by_id(
     "/{test_id}/questions",
     response_model=QuestionListResponse,
     summary="Get questions by test ID",
-    description="Get all questions of a specific test with optional filtering and pagination",
+    description="Get all questions of a specific test with optional filtering and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition.",
     responses={
         200: {
             "description": "List of questions with answers",
@@ -113,28 +127,41 @@ def get_test_by_id(
     },
 )
 def get_questions_by_test(
+    request: Request,
     test_id: str = Path(
         ...,
         description="Test ID",
         example="550e8400-e29b-41d4-a716-446655440000",
     ),
-    key: Optional[str] = Query(None, description="Search key: content, created_at"),
-    value: Optional[str] = Query(None, description="Search value"),
+    key: Optional[str] = Query(None, description="Search key: content, created_at (legacy format)"),
+    value: Optional[str] = Query(None, description="Search value (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    filter_key_1: Optional[str] = Query(None, alias="filter-key-1", description="First filter key (e.g., content, created_at)"),
+    filter_value_1: Optional[str] = Query(None, alias="filter-value-1", description="First filter value (supports comma-separated for OR)"),
+    filter_key_2: Optional[str] = Query(None, alias="filter-key-2", description="Second filter key"),
+    filter_value_2: Optional[str] = Query(None, alias="filter-value-2", description="Second filter value"),
     db: Session = Depends(get_db),
 ):
     """
     Get all questions of a specific test with optional filtering and pagination.
 
-    - **test_id**: UUID of the test
-    - **key**: Search key (content, created_at)
-    - **value**: Value to search for
-    - **page**: Page number (default: 1)
-    - **page_size**: Number of items per page (default: 10, max: 100)
+    **Filter Options:**
+    - **Legacy format**: Use `key` and `value` parameters for single filter
+    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
+    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=id1,id2,id3`)
+    
+    **Search Keys:**
+    - `content`: Search in question content (text search)
+    - `created_at`: Search by creation date (date search)
+    
+    **Examples:**
+    - Single filter: `?key=content&value=test`
+    - Multiple filters: `?filter-key-1=content&filter-value-1=test&filter-key-2=created_at&filter-value-2=2024-01-01`
 
     This endpoint does not require authentication.
     """
+    request_params = dict(request.query_params)
     questions, total = question_service.get_questions_by_test_id(
         db,
         test_id,
@@ -142,6 +169,7 @@ def get_questions_by_test(
         search_value=value,
         page=page,
         page_size=page_size,
+        request_params=request_params,
     )
 
     # If no results and first page, verify test exists

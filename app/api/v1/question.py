@@ -1,5 +1,5 @@
 # app/api/v1/question.py
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.schemas.question import (
@@ -20,7 +20,7 @@ router = APIRouter()
     "",
     response_model=QuestionListResponse,
     summary="Get all questions",
-    description="Get all questions with optional filtering and pagination",
+    description="Get all questions with optional filtering and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition (e.g., filter-value-3=id1,id2,id3).",
     responses={
         200: {
             "description": "List of questions with answers",
@@ -28,24 +28,42 @@ router = APIRouter()
     }
 )
 def get_all_questions(
-    key: Optional[str] = Query(None, description="Search key: content, created_at, or test"),
-    value: Optional[str] = Query(None, description="Search value"),
+    request: Request,
+    key: Optional[str] = Query(None, description="Search key: content, created_at, or test (legacy format)"),
+    value: Optional[str] = Query(None, description="Search value (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    filter_key_1: Optional[str] = Query(None, alias="filter-key-1", description="First filter key (e.g., content, created_at, test)"),
+    filter_value_1: Optional[str] = Query(None, alias="filter-value-1", description="First filter value (supports comma-separated for OR: id1,id2,id3)"),
+    filter_key_2: Optional[str] = Query(None, alias="filter-key-2", description="Second filter key"),
+    filter_value_2: Optional[str] = Query(None, alias="filter-value-2", description="Second filter value"),
+    filter_key_3: Optional[str] = Query(None, alias="filter-key-3", description="Third filter key"),
+    filter_value_3: Optional[str] = Query(None, alias="filter-value-3", description="Third filter value"),
     db: Session = Depends(get_db)
 ):
     """
     Get all questions with optional filtering and pagination.
     
-    - **key**: Field to search (content, created_at, test)
-    - **value**: Value to search for
-    - **page**: Page number (default: 1)
-    - **page_size**: Number of items per page (default: 10, max: 100)
+    **Filter Options:**
+    - **Legacy format**: Use `key` and `value` parameters for single filter
+    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
+    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-3=id1,id2,id3`)
+    
+    **Search Keys:**
+    - `content`: Search in question content (text search)
+    - `created_at`: Search by creation date (date search)
+    - `test`: Search by test name (text search)
+    
+    **Examples:**
+    - Single filter: `?key=content&value=test`
+    - Multiple filters: `?filter-key-1=content&filter-value-1=test&filter-key-2=test&filter-value-2=exam1`
+    - OR condition: `?filter-key-1=id&filter-value-1=id1,id2,id3`
     
     This endpoint does not require authentication.
     """
+    request_params = dict(request.query_params)
     questions, total = question_service.get_all_questions(
-        db, search_key=key, search_value=value, page=page, page_size=page_size
+        db, search_key=key, search_value=value, page=page, page_size=page_size, request_params=request_params
     )
     
     meta = get_pagination_meta(total, page, page_size)
@@ -106,28 +124,40 @@ def get_question_by_id(
     },
 )
 def get_answers_by_question(
+    request: Request,
     question_id: str = Path(
         ..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
     key: Optional[str] = Query(
-        None, description="Search key: content or is_correct"
+        None, description="Search key: content or is_correct (legacy format)"
     ),
-    value: Optional[str] = Query(None, description="Search value"),
+    value: Optional[str] = Query(None, description="Search value (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    filter_key_1: Optional[str] = Query(None, alias="filter-key-1", description="First filter key (e.g., content, is_correct)"),
+    filter_value_1: Optional[str] = Query(None, alias="filter-value-1", description="First filter value"),
+    filter_key_2: Optional[str] = Query(None, alias="filter-key-2", description="Second filter key"),
+    filter_value_2: Optional[str] = Query(None, alias="filter-value-2", description="Second filter value"),
     db: Session = Depends(get_db),
 ):
     """
     Get all answers of a specific question with optional filtering and pagination.
 
-    - **question_id**: UUID of the question
-    - **key**: Search key (content or is_correct)
-    - **value**: Value to search for
-    - **page**: Page number (default: 1)
-    - **page_size**: Number of items per page (default: 10, max: 100)
+    **Filter Options:**
+    - **Legacy format**: Use `key` and `value` parameters for single filter
+    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
+    
+    **Search Keys:**
+    - `content`: Search in answer content (text search)
+    - `is_correct`: Filter by correctness (exact match: true/false)
+    
+    **Examples:**
+    - Single filter: `?key=content&value=answer`
+    - Multiple filters: `?filter-key-1=content&filter-value-1=test&filter-key-2=is_correct&filter-value-2=true`
 
     This endpoint does not require authentication.
     """
+    request_params = dict(request.query_params)
     answers, total = question_service.get_answers_by_question_id(
         db,
         question_id,
@@ -135,6 +165,7 @@ def get_answers_by_question(
         search_value=value,
         page=page,
         page_size=page_size,
+        request_params=request_params,
     )
 
     # If no results and first page, verify question exists

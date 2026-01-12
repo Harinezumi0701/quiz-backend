@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.schemas.user import UserResponse, UserUpdateRequest, ChangePasswordRequest
 from app.schemas.submission import DashboardResponse
 from app.schemas.http_response import ErrorResponse
-from app.services import submission_service, user_service
+from app.services import submission_service, user_service, permission_service
 from app.db.session import get_db
 from app.api.dependencies.auth import get_current_user
 from app.models.users import User
@@ -27,13 +27,34 @@ router = APIRouter()
         }
     }
 )
-def read_current_user(current_user: User = Depends(get_current_user)):
+def read_current_user(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
-    Get current user information.
+    Get current user information including role and permissions.
     
     Requires authentication token in header: `Authorization: Bearer <token>`
     """
-    return UserResponse(data=current_user, meta={})
+    # Get user permissions
+    permissions = permission_service.get_user_permissions(db, current_user)
+    
+    # Create user data with role and permissions
+    user_data = {
+        "id": current_user.id,
+        "user_id": current_user.user_id,
+        "email": current_user.email,
+        "full_name": current_user.full_name,
+        "phone": current_user.phone,
+        "birthday": current_user.birthday,
+        "address": current_user.address,
+        "job_title": current_user.job_title,
+        "company": current_user.company,
+        "join_date": current_user.join_date,
+        "permissions": permissions,
+    }
+    
+    return UserResponse(data=user_data, meta={})
 
 
 @router.put(
@@ -76,7 +97,27 @@ def update_current_user(
     """
     update_dict = update_data.model_dump(exclude_unset=True)
     updated_user = user_service.update_user_profile(db, current_user.id, update_dict)
-    return UserResponse(data=updated_user, meta={})
+    
+    # Get user permissions
+    permissions = permission_service.get_user_permissions(db, updated_user)
+    
+    # Create user data with role and permissions
+    user_data = {
+        "id": updated_user.id,
+        "user_id": updated_user.user_id,
+        "email": updated_user.email,
+        "full_name": updated_user.full_name,
+        "phone": updated_user.phone,
+        "birthday": updated_user.birthday,
+        "address": updated_user.address,
+        "job_title": updated_user.job_title,
+        "company": updated_user.company,
+        "join_date": updated_user.join_date,
+        "role_id": updated_user.role_id,
+        "permissions": permissions,
+    }
+    
+    return UserResponse(data=user_data, meta={})
 
 
 @router.get(

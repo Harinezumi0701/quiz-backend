@@ -19,3 +19,6 @@ ERROR_INVALID_USER_ID_FORMAT = "User ID must match pattern [A-Za-z\\._-] and be 
 ERROR_INVALID_REFRESH_TOKEN = "Invalid refresh token"
 ERROR_INCORRECT_OLD_PASSWORD = "Incorrect old password"
 ERROR_NEW_PASSWORD_SAME_AS_OLD = "New password must be different from old password"
+ERROR_PERMISSION_DENIED = "Permission denied"
+ERROR_ROLE_NOT_FOUND = "Role not found"
+ERROR_ROLE_ALREADY_EXISTS = "Role already exists"

@@ -11,6 +11,7 @@ from app.models.submissions import Submission
 from app.models.answer_options import AnswerOption
 from app.models.submission_history import SubmissionHistory
 from app.models.refresh_tokens import RefreshToken
+from app.models.roles import Role, RolePermission
 from dotenv import load_dotenv
 load_dotenv()
 

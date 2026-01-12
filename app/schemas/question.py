@@ -97,3 +97,27 @@ class AnswerListResponse(SuccessResponse[List[AnswerOut]]):
 class AnswerResponse(SuccessResponse[AnswerOut]):
     """Response schema for single answer"""
     pass
+
+
+class CategoryCreateRequest(BaseModel):
+    """Request schema for creating a category"""
+    name: str = Field(..., min_length=1, max_length=100, description="Category name", example="DVA-C02")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "DVA-C02"
+            }
+        }
+
+
+class CategoryUpdateRequest(BaseModel):
+    """Request schema for updating a category"""
+    name: str = Field(..., min_length=1, max_length=100, description="Category name", example="DVA-C02")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "DVA-C02"
+            }
+        }

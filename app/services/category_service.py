@@ -49,3 +49,18 @@ def get_all_tests(
 def get_test_by_id_only(db: Session, test_id: str):
     """Get a specific test by test_id only."""
     return category_repo.get_test_by_id_only(db, test_id)
+
+
+def create_category(db: Session, name: str):
+    """Create a new category."""
+    return category_repo.create_category(db, name)
+
+
+def update_category(db: Session, category_id: str, name: str):
+    """Update a category."""
+    return category_repo.update_category(db, category_id, name)
+
+
+def delete_category(db: Session, category_id: str):
+    """Delete a category (soft delete)."""
+    return category_repo.delete_category(db, category_id)

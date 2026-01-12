@@ -298,3 +298,97 @@ def get_test_by_id_only(
         'created_at': datetime_to_timestamp(test.created_at),
         'updated_at': datetime_to_timestamp(test.updated_at)
     }
+
+
+def create_category(db: Session, name: str):
+    """
+    Create a new category.
+
+    Args:
+        db: Database session
+        name: Category name
+
+    Returns:
+        Category dict
+    """
+    category = Category(name=name)
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+
+    count = db.query(Question).filter(
+        Question.category_id == category.id,
+        Question.deleted_at.is_(None)
+    ).count()
+
+    return {
+        'id': category.id,
+        'name': category.name,
+        'question_count': count,
+        'created_at': datetime_to_timestamp(category.created_at),
+        'updated_at': datetime_to_timestamp(category.updated_at)
+    }
+
+
+def update_category(db: Session, category_id: str, name: str):
+    """
+    Update a category.
+
+    Args:
+        db: Database session
+        category_id: Category UUID
+        name: New category name
+
+    Returns:
+        Category dict or None if not found
+    """
+    category = db.query(Category).filter(
+        Category.id == category_id,
+        Category.deleted_at.is_(None)
+    ).first()
+
+    if not category:
+        return None
+
+    category.name = name
+    db.commit()
+    db.refresh(category)
+
+    count = db.query(Question).filter(
+        Question.category_id == category.id,
+        Question.deleted_at.is_(None)
+    ).count()
+
+    return {
+        'id': category.id,
+        'name': category.name,
+        'question_count': count,
+        'created_at': datetime_to_timestamp(category.created_at),
+        'updated_at': datetime_to_timestamp(category.updated_at)
+    }
+
+
+def delete_category(db: Session, category_id: str):
+    """
+    Soft delete a category.
+
+    Args:
+        db: Database session
+        category_id: Category UUID
+
+    Returns:
+        bool: True if deleted, False if not found
+    """
+    from datetime import datetime, timezone
+
+    category = db.query(Category).filter(
+        Category.id == category_id,
+        Category.deleted_at.is_(None)
+    ).first()
+
+    if not category:
+        return False
+
+    category.deleted_at = datetime.now(timezone.utc)
+    db.commit()
+    return True

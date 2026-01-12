@@ -4,21 +4,37 @@ from typing import List, Optional
 from uuid import UUID
 from datetime import date
 from app.schemas.http_response import SuccessResponse
+from app.schemas.role import PermissionOut
 
 
 class UserOut(BaseModel):
     """Schema for user information"""
-    id: UUID = Field(..., description="User ID", example="550e8400-e29b-41d4-a716-446655440000")
-    user_id: str = Field(..., description="User ID (editable unique identifier)", example="abc123")
+
+    id: UUID = Field(
+        ..., description="User ID", example="550e8400-e29b-41d4-a716-446655440000"
+    )
+    user_id: str = Field(
+        ..., description="User ID (editable unique identifier)", example="abc123"
+    )
     email: str = Field(..., description="User email", example="user@example.com")
     full_name: str = Field(..., description="Full name", example="John Doe")
-    role: str = Field(..., description="User role", example="user")
-    phone: Optional[str] = Field(None, description="Phone number", example="+84123456789")
+    phone: Optional[str] = Field(
+        None, description="Phone number", example="+84123456789"
+    )
     birthday: Optional[date] = Field(None, description="Birthday", example="1990-01-01")
-    address: Optional[str] = Field(None, description="Address", example="123 Main St, City")
-    job_title: Optional[str] = Field(None, description="Job title", example="Software Engineer")
+    address: Optional[str] = Field(
+        None, description="Address", example="123 Main St, City"
+    )
+    job_title: Optional[str] = Field(
+        None, description="Job title", example="Software Engineer"
+    )
     company: Optional[str] = Field(None, description="Company", example="Tech Corp")
-    join_date: Optional[date] = Field(None, description="Join date", example="2024-01-01")
+    join_date: Optional[date] = Field(
+        None, description="Join date", example="2024-01-01"
+    )
+    permissions: List[str] = Field(
+        default_factory=list, description="List of user permissions", example=["category::read", "*::*"]
+    )
 
     class Config:
         from_attributes = True
@@ -28,37 +44,58 @@ class UserOut(BaseModel):
                 "user_id": "my_custom_user_id",
                 "email": "user@example.com",
                 "full_name": "John Doe",
-                "role": "user",
                 "phone": "+84123456789",
                 "birthday": "1990-01-01",
                 "address": "123 Main St, City",
                 "job_title": "Software Engineer",
                 "company": "Tech Corp",
-                "join_date": "2024-01-01"
+                "join_date": "2024-01-01",
+                "permissions": ["category::read", "*::*"],
             }
         }
 
 
 class UserListResponse(SuccessResponse[List[UserOut]]):
     """Response schema for list of users"""
+
     pass
 
 
 class UserResponse(SuccessResponse[UserOut]):
     """Response schema for single user"""
+
     pass
 
 
 class UserUpdateRequest(BaseModel):
     """Request schema for updating user information"""
-    user_id: Optional[str] = Field(None, min_length=1, max_length=125, description="User ID (editable unique identifier matching [A-Za-z\\._-], 1-125 characters)", example="abc123")
-    full_name: Optional[str] = Field(None, min_length=1, max_length=255, description="Full name", example="John Doe")
-    phone: Optional[str] = Field(None, max_length=20, description="Phone number", example="+84123456789")
+
+    user_id: Optional[str] = Field(
+        None,
+        min_length=1,
+        max_length=125,
+        description="User ID (editable unique identifier matching [A-Za-z\\._-], 1-125 characters)",
+        example="abc123",
+    )
+    full_name: Optional[str] = Field(
+        None, min_length=1, max_length=255, description="Full name", example="John Doe"
+    )
+    phone: Optional[str] = Field(
+        None, max_length=20, description="Phone number", example="+84123456789"
+    )
     birthday: Optional[date] = Field(None, description="Birthday", example="1990-01-01")
-    address: Optional[str] = Field(None, max_length=500, description="Address", example="123 Main St, City")
-    job_title: Optional[str] = Field(None, max_length=100, description="Job title", example="Software Engineer")
-    company: Optional[str] = Field(None, max_length=100, description="Company", example="Tech Corp")
-    join_date: Optional[date] = Field(None, description="Join date", example="2024-01-01")
+    address: Optional[str] = Field(
+        None, max_length=500, description="Address", example="123 Main St, City"
+    )
+    job_title: Optional[str] = Field(
+        None, max_length=100, description="Job title", example="Software Engineer"
+    )
+    company: Optional[str] = Field(
+        None, max_length=100, description="Company", example="Tech Corp"
+    )
+    join_date: Optional[date] = Field(
+        None, description="Join date", example="2024-01-01"
+    )
 
     class Config:
         json_schema_extra = {
@@ -70,20 +107,28 @@ class UserUpdateRequest(BaseModel):
                 "address": "123 Main St, City",
                 "job_title": "Software Engineer",
                 "company": "Tech Corp",
-                "join_date": "2024-01-01"
+                "join_date": "2024-01-01",
             }
         }
 
 
 class ChangePasswordRequest(BaseModel):
     """Request schema for changing user password"""
-    old_password: str = Field(..., min_length=1, description="Current password", example="oldpassword123")
-    new_password: str = Field(..., min_length=6, description="New password (minimum 6 characters)", example="newpassword123")
+
+    old_password: str = Field(
+        ..., min_length=1, description="Current password", example="oldpassword123"
+    )
+    new_password: str = Field(
+        ...,
+        min_length=6,
+        description="New password (minimum 6 characters)",
+        example="newpassword123",
+    )
 
     class Config:
         json_schema_extra = {
             "example": {
                 "old_password": "oldpassword123",
-                "new_password": "newpassword123"
+                "new_password": "newpassword123",
             }
         }

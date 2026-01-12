@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, TIMESTAMP, Date, text
+from sqlalchemy import Column, String, TIMESTAMP, Date, ForeignKey, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from app.db.base import Base
@@ -12,7 +12,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False)
     full_name = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
-    role = Column(String(50), nullable=False, server_default="user")
+    role_id = Column(UUID(as_uuid=True), ForeignKey("roles.id", ondelete="SET NULL"), nullable=True, index=True)
     phone = Column(String(20), nullable=True)
     birthday = Column(Date, nullable=True)
     address = Column(String(500), nullable=True)
@@ -23,6 +23,7 @@ class User(Base):
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
     deleted_at = Column(TIMESTAMP, nullable=True)
     
+    role_obj = relationship("Role", back_populates="users")
     submissions = relationship("Submission", back_populates="user")
     submission_history = relationship("SubmissionHistory", back_populates="user")
     refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")

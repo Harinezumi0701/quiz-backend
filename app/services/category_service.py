@@ -81,22 +81,22 @@ def create_test(
     db: Session,
     name: str,
     category_id: str,
+    time_limit: int,
     description: str | None = None,
-    time_limit: int | None = None,
 ):
     """Create a new test."""
-    return test_repo.create_test(db, name, category_id, description, time_limit)
+    return test_repo.create_test(db, name, category_id, time_limit, description)
 
 
 def update_test(
     db: Session,
     test_id: str,
     name: str,
+    time_limit: int,
     description: str | None = None,
-    time_limit: int | None = None,
 ):
     """Update a test."""
-    return test_repo.update_test(db, test_id, name, description, time_limit)
+    return test_repo.update_test(db, test_id, name, time_limit, description)
 
 
 def delete_test(db: Session, test_id: str):

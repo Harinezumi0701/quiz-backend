@@ -1,5 +1,14 @@
 # app/api/v1/test.py
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    HTTPException,
+    Path,
+    Query,
+    Request,
+    status,
+)
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.schemas.test import (
@@ -39,13 +48,25 @@ router = APIRouter()
 def get_all_tests(
     request: Request,
     key: Optional[str] = Query(None, description="Search key: name (legacy format)"),
-    value: Optional[str] = Query(None, description="Search value for test name (legacy format)"),
+    value: Optional[str] = Query(
+        None, description="Search value for test name (legacy format)"
+    ),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
-    filter_key_1: Optional[str] = Query(None, alias="filter-key-1", description="First filter key (e.g., name)"),
-    filter_value_1: Optional[str] = Query(None, alias="filter-value-1", description="First filter value (supports comma-separated for OR)"),
-    filter_key_2: Optional[str] = Query(None, alias="filter-key-2", description="Second filter key"),
-    filter_value_2: Optional[str] = Query(None, alias="filter-value-2", description="Second filter value"),
+    filter_key_1: Optional[str] = Query(
+        None, alias="filter-key-1", description="First filter key (e.g., name)"
+    ),
+    filter_value_1: Optional[str] = Query(
+        None,
+        alias="filter-value-1",
+        description="First filter value (supports comma-separated for OR)",
+    ),
+    filter_key_2: Optional[str] = Query(
+        None, alias="filter-key-2", description="Second filter key"
+    ),
+    filter_value_2: Optional[str] = Query(
+        None, alias="filter-value-2", description="Second filter value"
+    ),
     db: Session = Depends(get_db),
 ):
     """
@@ -55,10 +76,10 @@ def get_all_tests(
     - **Legacy format**: Use `key` and `value` parameters for single filter
     - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
     - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=test1,test2,test3`)
-    
+
     **Search Keys:**
     - `name`: Search in test name (text search)
-    
+
     **Examples:**
     - Single filter: `?key=name&value=exam`
     - Multiple filters: `?filter-key-1=name&filter-value-1=exam&filter-key-2=name&filter-value-2=test`
@@ -68,7 +89,12 @@ def get_all_tests(
     """
     request_params = dict(request.query_params)
     tests, total = category_service.get_all_tests(
-        db, search_key=key, search_value=value, page=page, page_size=page_size, request_params=request_params
+        db,
+        search_key=key,
+        search_value=value,
+        page=page,
+        page_size=page_size,
+        request_params=request_params,
     )
 
     meta = get_pagination_meta(total, page, page_size)
@@ -139,14 +165,28 @@ def get_questions_by_test(
         description="Test ID",
         example="550e8400-e29b-41d4-a716-446655440000",
     ),
-    key: Optional[str] = Query(None, description="Search key: content, created_at (legacy format)"),
+    key: Optional[str] = Query(
+        None, description="Search key: content, created_at (legacy format)"
+    ),
     value: Optional[str] = Query(None, description="Search value (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
-    filter_key_1: Optional[str] = Query(None, alias="filter-key-1", description="First filter key (e.g., content, created_at)"),
-    filter_value_1: Optional[str] = Query(None, alias="filter-value-1", description="First filter value (supports comma-separated for OR)"),
-    filter_key_2: Optional[str] = Query(None, alias="filter-key-2", description="Second filter key"),
-    filter_value_2: Optional[str] = Query(None, alias="filter-value-2", description="Second filter value"),
+    filter_key_1: Optional[str] = Query(
+        None,
+        alias="filter-key-1",
+        description="First filter key (e.g., content, created_at)",
+    ),
+    filter_value_1: Optional[str] = Query(
+        None,
+        alias="filter-value-1",
+        description="First filter value (supports comma-separated for OR)",
+    ),
+    filter_key_2: Optional[str] = Query(
+        None, alias="filter-key-2", description="Second filter key"
+    ),
+    filter_value_2: Optional[str] = Query(
+        None, alias="filter-value-2", description="Second filter value"
+    ),
     db: Session = Depends(get_db),
 ):
     """
@@ -156,11 +196,11 @@ def get_questions_by_test(
     - **Legacy format**: Use `key` and `value` parameters for single filter
     - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
     - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=id1,id2,id3`)
-    
+
     **Search Keys:**
     - `content`: Search in question content (text search)
     - `created_at`: Search by creation date (date search)
-    
+
     **Examples:**
     - Single filter: `?key=content&value=test`
     - Multiple filters: `?filter-key-1=content&filter-value-1=test&filter-key-2=created_at&filter-value-2=2024-01-01`
@@ -228,9 +268,7 @@ def get_question_by_test(
 
     This endpoint does not require authentication.
     """
-    question = question_service.get_question_by_test_and_id(
-        db, test_id, question_id
-    )
+    question = question_service.get_question_by_test_and_id(db, test_id, question_id)
 
     if not question:
         raise HTTPException(
@@ -258,7 +296,7 @@ def get_question_by_test(
             "description": "Test not found or question not found or answer not found",
             "model": ErrorResponse,
         },
-    }
+    },
 )
 def submit_test_submissions(
     test_id: str = Path(
@@ -268,19 +306,19 @@ def submit_test_submissions(
     ),
     bulk_data: SubmissionBulkCreate = Body(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     """
     Submit multiple submissions for a test at once.
-    
+
     - **test_id**: Test ID
     - **submissions**: List of submissions (minimum 1 submission)
-    
+
     Each submission in the list includes:
     - question_id: Question ID
     - answer_id: Selected answer option ID
     - is_correct: Whether the submission is correct
-    
+
     Requires authentication token in header: `Authorization: Bearer <token>`
     """
     # Verify test exists
@@ -290,8 +328,10 @@ def submit_test_submissions(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Test with ID {test_id} not found",
         )
-    
-    submissions = submission_service.submit_submissions_bulk(db, current_user.id, bulk_data.submissions)
+
+    submissions = submission_service.submit_submissions_bulk(
+        db, current_user.id, bulk_data.submissions
+    )
     return SubmissionListResponse(data=submissions, meta={})
 
 
@@ -362,11 +402,11 @@ def create_test(
         )
 
     test = category_service.create_test(
-        db, 
-        test_data.name, 
+        db,
+        test_data.name,
         str(test_data.category_id),
+        test_data.time_limit,
         test_data.description,
-        test_data.time_limit
     )
     if not test:
         raise HTTPException(
@@ -432,9 +472,7 @@ def update_test(
     from app.models.tests import Test
 
     test_obj = (
-        db.query(Test)
-        .filter(Test.id == test_id, Test.deleted_at.is_(None))
-        .first()
+        db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
     )
 
     existing_test = (
@@ -454,11 +492,7 @@ def update_test(
         )
 
     test = category_service.update_test(
-        db, 
-        test_id, 
-        test_data.name,
-        test_data.description,
-        test_data.time_limit
+        db, test_id, test_data.name, test_data.time_limit, test_data.description
     )
     if not test:
         raise HTTPException(

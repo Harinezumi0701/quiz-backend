@@ -19,8 +19,8 @@ class TestDetailOut(BaseModel):
         description="Test description",
         example="AWS DVA-C02 certification practice test",
     )
-    time_limit: int | None = Field(
-        None, description="Time limit in seconds", example=3600, ge=1
+    time_limit: int = Field(
+        ..., description="Time limit in minutes", example=60, ge=1
     )
     question_count: int = Field(
         ..., description="Number of questions in test", example=50
@@ -66,8 +66,8 @@ class TestCreateRequest(BaseModel):
         description="Test description",
         example="AWS DVA-C02 certification practice test",
     )
-    time_limit: int | None = Field(
-        None, description="Time limit in seconds", example=3600, ge=1
+    time_limit: int = Field(
+        ..., description="Time limit in minutes", example=60, ge=1
     )
 
     class Config:
@@ -76,7 +76,7 @@ class TestCreateRequest(BaseModel):
                 "name": "DVA-C02_Day_1",
                 "category_id": "550e8400-e29b-41d4-a716-446655440000",
                 "description": "AWS DVA-C02 certification practice test",
-                "time_limit": 3600,
+                "time_limit": 60,
             }
         }
 
@@ -96,8 +96,8 @@ class TestUpdateRequest(BaseModel):
         description="Test description",
         example="AWS DVA-C02 certification practice test",
     )
-    time_limit: int | None = Field(
-        None, description="Time limit in seconds", example=3600, ge=1
+    time_limit: int = Field(
+        ..., description="Time limit in minutes", example=60, ge=1
     )
 
     class Config:
@@ -105,6 +105,6 @@ class TestUpdateRequest(BaseModel):
             "example": {
                 "name": "DVA-C02_Day_1",
                 "description": "AWS DVA-C02 certification practice test",
-                "time_limit": 3600,
+                "time_limit": 60,
             }
         }

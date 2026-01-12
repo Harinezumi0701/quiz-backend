@@ -294,8 +294,8 @@ def create_test(
     db: Session,
     name: str,
     category_id: str,
+    time_limit: int,
     description: str | None = None,
-    time_limit: int | None = None,
 ):
     """
     Create a new test.
@@ -304,8 +304,8 @@ def create_test(
         db: Database session
         name: Test name
         category_id: Category UUID
+        time_limit: Time limit in minutes (required)
         description: Test description (optional)
-        time_limit: Time limit in seconds (optional)
 
     Returns:
         Test dict or None if category not found
@@ -353,8 +353,8 @@ def update_test(
     db: Session,
     test_id: str,
     name: str,
+    time_limit: int,
     description: str | None = None,
-    time_limit: int | None = None,
 ):
     """
     Update a test.
@@ -363,8 +363,8 @@ def update_test(
         db: Database session
         test_id: Test UUID
         name: New test name
+        time_limit: Time limit in minutes (required)
         description: Test description (optional)
-        time_limit: Time limit in seconds (optional)
 
     Returns:
         Test dict or None if not found
@@ -375,10 +375,9 @@ def update_test(
         return None
 
     test.name = name
+    test.time_limit = time_limit
     if description is not None:
         test.description = description
-    if time_limit is not None:
-        test.time_limit = time_limit
     db.commit()
     db.refresh(test)
 

@@ -2,9 +2,13 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.orm import Session
 from typing import Optional
-from app.schemas.question import (
+from app.schemas.test import (
     TestDetailListResponse,
     TestDetailResponse,
+    TestCreateRequest,
+    TestUpdateRequest,
+)
+from app.schemas.question import (
     QuestionListResponse,
     QuestionResponse,
 )
@@ -14,7 +18,9 @@ from app.services import category_service, question_service, submission_service
 from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
 from app.api.dependencies.auth import get_current_user
+from app.api.dependencies.permissions import require_namespace_permission
 from app.models.users import User
+from app.constants.permissions import PERMISSION_NAMESPACE_TESTS
 
 router = APIRouter()
 
@@ -287,3 +293,212 @@ def submit_test_submissions(
     
     submissions = submission_service.submit_submissions_bulk(db, current_user.id, bulk_data.submissions)
     return SubmissionListResponse(data=submissions, meta={})
+
+
+@router.post(
+    "",
+    response_model=TestDetailResponse,
+    summary="Create a new test",
+    description="Create a new test (requires permission)",
+    responses={
+        200: {
+            "description": "Test created",
+        },
+        400: {
+            "description": "Test name already exists or category not found",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
+    },
+)
+def create_test(
+    test_data: TestCreateRequest = Body(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_TESTS, "POST")
+    ),
+):
+    """
+    Create a new test.
+
+    - **name**: Test name (1-100 characters)
+    - **category_id**: Category ID
+
+    Requires permission: tests::create
+    """
+    # Check if category exists
+    from app.models.categories import Category
+
+    category = (
+        db.query(Category)
+        .filter(Category.id == test_data.category_id, Category.deleted_at.is_(None))
+        .first()
+    )
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Category with ID {test_data.category_id} not found",
+        )
+
+    # Check if test name already exists in the same category (exact match)
+    from app.models.tests import Test
+
+    existing_test = (
+        db.query(Test)
+        .filter(
+            Test.name == test_data.name,
+            Test.category_id == test_data.category_id,
+            Test.deleted_at.is_(None),
+        )
+        .first()
+    )
+    if existing_test:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Test with name '{test_data.name}' already exists in this category",
+        )
+
+    test = category_service.create_test(db, test_data.name, str(test_data.category_id))
+    if not test:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to create test",
+        )
+
+    return TestDetailResponse(data=test, meta={})
+
+
+@router.put(
+    "/{test_id}",
+    response_model=TestDetailResponse,
+    summary="Update a test",
+    description="Update a test by ID (requires permission)",
+    responses={
+        200: {
+            "description": "Test updated",
+        },
+        404: {
+            "description": "Test not found",
+            "model": ErrorResponse,
+        },
+        400: {
+            "description": "Test name already exists",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
+    },
+)
+def update_test(
+    test_id: str = Path(
+        ...,
+        description="Test ID",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    test_data: TestUpdateRequest = Body(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_TESTS, "PUT")
+    ),
+):
+    """
+    Update a test by ID.
+
+    - **test_id**: UUID of the test
+    - **name**: New test name (1-100 characters)
+
+    Requires permission: tests::update
+    """
+    # Check if test exists
+    existing_test = category_service.get_test_by_id_only(db, test_id)
+    if not existing_test:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Test with ID {test_id} not found",
+        )
+
+    # Check if new name already exists in the same category (excluding current test, exact match)
+    from app.models.tests import Test
+
+    test_obj = (
+        db.query(Test)
+        .filter(Test.id == test_id, Test.deleted_at.is_(None))
+        .first()
+    )
+
+    existing_test = (
+        db.query(Test)
+        .filter(
+            Test.name == test_data.name,
+            Test.category_id == test_obj.category_id,
+            Test.id != test_id,
+            Test.deleted_at.is_(None),
+        )
+        .first()
+    )
+    if existing_test:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Test with name '{test_data.name}' already exists in this category",
+        )
+
+    test = category_service.update_test(db, test_id, test_data.name)
+    if not test:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Test with ID {test_id} not found",
+        )
+
+    return TestDetailResponse(data=test, meta={})
+
+
+@router.delete(
+    "/{test_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Delete a test",
+    description="Delete a test by ID (soft delete, requires permission)",
+    responses={
+        200: {
+            "description": "Test deleted successfully",
+        },
+        404: {
+            "description": "Test not found",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
+    },
+)
+def delete_test(
+    test_id: str = Path(
+        ...,
+        description="Test ID",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_TESTS, "DELETE")
+    ),
+):
+    """
+    Delete a test by ID (soft delete).
+
+    - **test_id**: UUID of the test
+
+    Requires permission: tests::delete
+    """
+    deleted = category_service.delete_test(db, test_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Test with ID {test_id} not found",
+        )
+
+    return {"message": "Test deleted successfully"}

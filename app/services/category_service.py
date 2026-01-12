@@ -1,7 +1,7 @@
 # app/services/category_service.py
 from sqlalchemy.orm import Session
 from typing import Tuple, Dict, Any, Optional
-from app.repository import category_repo
+from app.repository import category_repo, test_repo
 
 
 def get_all_categories_with_search(
@@ -33,14 +33,14 @@ def get_tests_by_category_id(
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all tests for a specific category with optional filtering and pagination."""
-    return category_repo.get_tests_by_category_id(
+    return test_repo.get_tests_by_category_id(
         db, category_id, search_key, search_value, page, page_size, request_params
     )
 
 
 def get_test_by_id(db: Session, category_id: str, test_id: str):
     """Get a specific test by category_id and test_id."""
-    return category_repo.get_test_by_id(db, category_id, test_id)
+    return test_repo.get_test_by_id(db, category_id, test_id)
 
 
 def get_all_tests(
@@ -52,14 +52,14 @@ def get_all_tests(
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all tests with optional filtering and pagination."""
-    return category_repo.get_all_tests(
+    return test_repo.get_all_tests(
         db, search_key, search_value, page, page_size, request_params
     )
 
 
 def get_test_by_id_only(db: Session, test_id: str):
     """Get a specific test by test_id only."""
-    return category_repo.get_test_by_id_only(db, test_id)
+    return test_repo.get_test_by_id_only(db, test_id)
 
 
 def create_category(db: Session, name: str):
@@ -75,3 +75,18 @@ def update_category(db: Session, category_id: str, name: str):
 def delete_category(db: Session, category_id: str):
     """Delete a category (soft delete)."""
     return category_repo.delete_category(db, category_id)
+
+
+def create_test(db: Session, name: str, category_id: str):
+    """Create a new test."""
+    return test_repo.create_test(db, name, category_id)
+
+
+def update_test(db: Session, test_id: str, name: str):
+    """Update a test."""
+    return test_repo.update_test(db, test_id, name)
+
+
+def delete_test(db: Session, test_id: str):
+    """Delete a test (soft delete)."""
+    return test_repo.delete_test(db, test_id)

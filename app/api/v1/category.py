@@ -11,14 +11,18 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 from typing import Optional
-from app.schemas.question import (
+from app.schemas.category import (
     CategoryDetailListResponse,
     CategoryDetailResponse,
-    TestDetailListResponse,
-    TestDetailResponse,
-    QuestionListResponse,
     CategoryCreateRequest,
     CategoryUpdateRequest,
+)
+from app.schemas.test import (
+    TestDetailListResponse,
+    TestDetailResponse,
+)
+from app.schemas.question import (
+    QuestionListResponse,
 )
 from app.schemas.http_response import ErrorResponse
 from app.services import category_service, question_service

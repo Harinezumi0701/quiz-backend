@@ -433,7 +433,7 @@ def admin_change_password(
 
 
 @router.put(
-    "/{user_id}/role",
+    "/{user_id}/roles",
     response_model=UserResponse,
     summary="Assign role to user",
     description="Assign role to user by ID (requires permission)",

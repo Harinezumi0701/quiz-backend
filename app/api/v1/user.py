@@ -202,7 +202,6 @@ def create_user(
 
     - **email**: User email (required, must be unique)
     - **full_name**: Full name (required)
-    - **password**: Password (required, minimum 6 characters)
     - **user_id**: User ID (optional, will be auto-generated if not provided)
     - **role_id**: Role ID (optional)
     - **phone**: Phone number (optional)
@@ -211,6 +210,8 @@ def create_user(
     - **job_title**: Job title (optional)
     - **company**: Company (optional)
     - **join_date**: Join date (optional)
+
+    Note: Password is not required. User can set password later via password change endpoint.
 
     Requires permission: users::create
     """

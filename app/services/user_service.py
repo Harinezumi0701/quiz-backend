@@ -137,8 +137,15 @@ def create_user(db: Session, user_data: dict):
                 detail=ERROR_USER_ID_ALREADY_EXISTS,
             )
 
-    # Hash password
-    hashed_password = get_password_hash(user_data["password"])
+    # Hash password if provided, otherwise use a default temporary password
+    if "password" in user_data and user_data.get("password"):
+        hashed_password = get_password_hash(user_data["password"])
+    else:
+        # Generate a temporary password (user should change it later)
+        import secrets
+        import string
+        temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
+        hashed_password = get_password_hash(temp_password)
 
     # Create user
     return user_repo.create_user(

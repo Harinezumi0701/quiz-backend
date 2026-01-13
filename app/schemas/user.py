@@ -91,12 +91,6 @@ class UserCreateRequest(BaseModel):
     full_name: str = Field(
         ..., min_length=1, max_length=255, description="Full name", example="John Doe"
     )
-    password: str = Field(
-        ...,
-        min_length=6,
-        description="Password (minimum 6 characters)",
-        example="password123",
-    )
     user_id: Optional[str] = Field(
         None,
         min_length=1,
@@ -129,7 +123,6 @@ class UserCreateRequest(BaseModel):
             "example": {
                 "email": "user@example.com",
                 "full_name": "John Doe",
-                "password": "password123",
                 "user_id": "abc123",
                 "role_id": "550e8400-e29b-41d4-a716-446655440000",
                 "phone": "+84123456789",

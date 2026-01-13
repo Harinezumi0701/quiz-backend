@@ -37,6 +37,9 @@ class UserOut(BaseModel):
     join_date: Optional[date] = Field(
         None, description="Join date", example="2024-01-01"
     )
+    role_id: Optional[UUID] = Field(
+        None, description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
+    )
     permissions: List[str] = Field(
         default_factory=list,
         description="List of user permissions",
@@ -60,6 +63,7 @@ class UserOut(BaseModel):
                 "job_title": "Software Engineer",
                 "company": "Tech Corp",
                 "join_date": "2024-01-01",
+                "role_id": "550e8400-e29b-41d4-a716-446655440000",
                 "permissions": [
                     f"{PERMISSION_NAMESPACE_CATEGORIES}::{PERMISSION_ACTION_READ}",
                     PERMISSION_WILDCARD_ALL,

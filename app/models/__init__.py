@@ -8,3 +8,4 @@ from .categories import Category
 from .tests import Test
 from .refresh_tokens import RefreshToken
 from .roles import Role, RolePermission
+from .namespaces import Namespace

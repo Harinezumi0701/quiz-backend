@@ -147,7 +147,27 @@ def read_user(user_identifier: str, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=ERROR_USER_NOT_FOUND
         )
-    return UserResponse(data=user, meta={})
+    
+    # Get user permissions
+    permissions = permission_service.get_user_permissions(db, user)
+    
+    # Create user data with role_id and permissions
+    user_data = {
+        "id": user.id,
+        "user_id": user.user_id,
+        "email": user.email,
+        "full_name": user.full_name,
+        "phone": user.phone,
+        "birthday": user.birthday,
+        "address": user.address,
+        "job_title": user.job_title,
+        "company": user.company,
+        "join_date": user.join_date,
+        "role_id": user.role_id,
+        "permissions": permissions,
+    }
+    
+    return UserResponse(data=user_data, meta={})
 
 
 @router.post(

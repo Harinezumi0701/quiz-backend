@@ -188,6 +188,30 @@ class DateSearchStrategy(SearchStrategy):
             return query
 
 
+class BooleanSearchStrategy(SearchStrategy):
+    """Strategy for boolean search."""
+
+    def apply(
+        self,
+        query: Query,
+        column: Any,
+        search_value: str,
+        **kwargs,
+    ) -> Query:
+        """Apply boolean search filter."""
+        # Convert string to boolean
+        # Accept: "true", "1", "yes", "t" (case-insensitive) -> True
+        # Accept: "false", "0", "no", "f" (case-insensitive) -> False
+        search_value_lower = search_value.lower().strip()
+        if search_value_lower in ("true", "1", "yes", "t", "on"):
+            return query.filter(column == True)
+        elif search_value_lower in ("false", "0", "no", "f", "off"):
+            return query.filter(column == False)
+        else:
+            # Invalid boolean value, return query without filter
+            return query
+
+
 class ExactSearchStrategy(SearchStrategy):
     """Strategy for exact match search."""
 
@@ -290,6 +314,14 @@ class MultipleValueSearchStrategy(SearchStrategy):
                         conditions.append(column.like(f"%{value}%"))
                     else:
                         conditions.append(column.ilike(f"%{value}%"))
+            elif base_strategy == "boolean":
+                # Convert string to boolean
+                value_lower = value.lower().strip()
+                if value_lower in ("true", "1", "yes", "t", "on"):
+                    conditions.append(column == True)
+                elif value_lower in ("false", "0", "no", "f", "off"):
+                    conditions.append(column == False)
+                # Invalid boolean value is ignored
             else:
                 # For other strategies, use exact match as fallback
                 conditions.append(column == value)
@@ -307,6 +339,7 @@ class SearchStrategyFactory:
         "text": TextSearchStrategy(),
         "date": DateSearchStrategy(),
         "exact": ExactSearchStrategy(),
+        "boolean": BooleanSearchStrategy(),
         "null": NullSearchStrategy(),
         "multiple": MultipleValueSearchStrategy(),
     }

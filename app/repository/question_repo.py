@@ -55,6 +55,10 @@ def get_all_questions(
             "type": "text",
             "case_sensitive": False,
         },
+        "is_multiple_choice": {
+            "column": Question.is_multiple_choice,
+            "type": "boolean",
+        },
     }
 
     # Apply search filter and pagination using helper
@@ -183,6 +187,10 @@ def get_questions_by_category_and_test_id(
             "case_sensitive": False,
         },
         "created_at": {"column": Question.created_at, "type": "date"},
+        "is_multiple_choice": {
+            "column": Question.is_multiple_choice,
+            "type": "boolean",
+        },
     }
 
     # Apply search filter and pagination
@@ -290,6 +298,10 @@ def get_questions_by_test_id(
             "case_sensitive": False,
         },
         "created_at": {"column": Question.created_at, "type": "date"},
+        "is_multiple_choice": {
+            "column": Question.is_multiple_choice,
+            "type": "boolean",
+        },
     }
 
     # Apply search filter and pagination

@@ -115,6 +115,7 @@ def get_all_questions(
                     question.category_obj.name if question.category_obj else None
                 ),
                 "test": question.test,
+                "is_multiple_choice": question.is_multiple_choice,
                 "created_at": datetime_to_timestamp(question.created_at),
                 "answers": [
                     {

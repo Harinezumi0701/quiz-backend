@@ -152,7 +152,7 @@ def get_dashboard(
     return DashboardResponse(data=dashboard_data, meta={})
 
 
-@router.post(
+@router.put(
     "/password",
     status_code=status.HTTP_200_OK,
     summary="Change user password",
@@ -187,7 +187,7 @@ def change_password(
     user_service.change_password(
         db=db,
         user_id=current_user.id,
-        old_password=password_data.old_password,
+        current_password=password_data.current_password,
         new_password=password_data.new_password
     )
     return {"message": "Password changed successfully"}

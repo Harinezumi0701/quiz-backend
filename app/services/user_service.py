@@ -73,7 +73,7 @@ def update_user_profile(db: Session, user_id: UUID, update_data: dict):
     return user_repo.update_user(db, user, **update_data)
 
 
-def change_password(db: Session, user_id: UUID, old_password: str, new_password: str):
+def change_password(db: Session, user_id: UUID, current_password: str, new_password: str):
     """Change user password."""
     user = user_repo.get_user_by_id(db, user_id)
     if not user:
@@ -82,7 +82,7 @@ def change_password(db: Session, user_id: UUID, old_password: str, new_password:
         )
 
     # Verify old password
-    if not verify_password(old_password, user.password):
+    if not verify_password(current_password, user.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=ERROR_INCORRECT_OLD_PASSWORD
         )

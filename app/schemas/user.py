@@ -189,8 +189,8 @@ class UserUpdateRequest(BaseModel):
 class ChangePasswordRequest(BaseModel):
     """Request schema for changing user password"""
 
-    old_password: str = Field(
-        ..., min_length=1, description="Current password", example="oldpassword123"
+    current_password: str = Field(
+        ..., min_length=1, description="Current password", example="currentpassword123"
     )
     new_password: str = Field(
         ...,
@@ -202,7 +202,7 @@ class ChangePasswordRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "old_password": "oldpassword123",
+                "current_password": "currentpassword123",
                 "new_password": "newpassword123",
             }
         }

@@ -43,7 +43,7 @@ def get_all_roles_with_search(
     Returns:
         Tuple[list, int]: List of roles and total count
     """
-    query = db.query(Role).filter(Role.deleted_at.is_(None))
+    query = db.query(Role).filter(Role.deleted_at.is_(None)).order_by(Role.created_at.desc())
     
     # Define search configuration
     search_config = {

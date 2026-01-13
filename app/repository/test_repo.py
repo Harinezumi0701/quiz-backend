@@ -49,7 +49,7 @@ def get_tests_by_category_id(
     # Base query
     query = db.query(Test).filter(
         Test.category_id == category_id, Test.deleted_at.is_(None)
-    )
+    ).order_by(Test.created_at.desc())
 
     # Define search configuration
     search_config = {
@@ -130,7 +130,7 @@ def get_all_tests(
         Tuple of (tests list, total count)
     """
     # Base query
-    query = db.query(Test).filter(Test.deleted_at.is_(None))
+    query = db.query(Test).filter(Test.deleted_at.is_(None)).order_by(Test.created_at.desc())
 
     # Define search configuration
     search_config = {

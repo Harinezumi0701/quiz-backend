@@ -49,7 +49,7 @@ def get_answers_by_question_id(
     # Base query
     query = db.query(AnswerOption).filter(
         AnswerOption.question_id == question_id, AnswerOption.deleted_at.is_(None)
-    )
+    ).order_by(AnswerOption.created_at.desc())
 
     # Define search configuration
     search_config = {
@@ -193,7 +193,7 @@ def get_all_answers(
         Tuple of (answers list, total count)
     """
     # Base query
-    query = db.query(AnswerOption).filter(AnswerOption.deleted_at.is_(None))
+    query = db.query(AnswerOption).filter(AnswerOption.deleted_at.is_(None)).order_by(AnswerOption.created_at.desc())
 
     # Define search configuration
     search_config = {

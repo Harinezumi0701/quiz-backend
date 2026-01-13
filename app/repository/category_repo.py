@@ -20,7 +20,7 @@ def get_all_categories_with_search(
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all categories with optional name search and pagination."""
-    query = db.query(Category).filter(Category.deleted_at.is_(None))
+    query = db.query(Category).filter(Category.deleted_at.is_(None)).order_by(Category.created_at.desc())
 
     # Define search configuration
     search_config = {

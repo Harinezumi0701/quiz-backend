@@ -19,7 +19,7 @@ def get_all_users(
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all users with optional filtering and pagination."""
-    query = db.query(User)
+    query = db.query(User).order_by(User.created_at.desc())
 
     # Define search configuration
     search_config = {

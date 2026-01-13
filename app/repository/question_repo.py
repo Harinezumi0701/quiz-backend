@@ -40,6 +40,7 @@ def get_all_questions(
         db.query(Question)
         .outerjoin(Test, Question.test_id == Test.id)
         .filter(Question.deleted_at.is_(None))
+        .order_by(Question.created_at.desc())
     )
 
     # Define search configuration
@@ -58,6 +59,14 @@ def get_all_questions(
         "is_multiple_choice": {
             "column": Question.is_multiple_choice,
             "type": "boolean",
+        },
+        "category_id": {
+            "column": Question.category_id,
+            "type": "exact",
+        },
+        "test_id": {
+            "column": Question.test_id,
+            "type": "exact",
         },
     }
 
@@ -177,7 +186,7 @@ def get_questions_by_category_and_test_id(
         Question.category_id == category_id,
         Question.test_id == test_id,
         Question.deleted_at.is_(None),
-    )
+    ).order_by(Question.created_at.desc())
 
     # Define search configuration
     search_config = {
@@ -288,7 +297,7 @@ def get_questions_by_test_id(
     # Base query
     query = db.query(Question).filter(
         Question.test_id == test_id, Question.deleted_at.is_(None)
-    )
+    ).order_by(Question.created_at.desc())
 
     # Define search configuration
     search_config = {
@@ -301,6 +310,10 @@ def get_questions_by_test_id(
         "is_multiple_choice": {
             "column": Question.is_multiple_choice,
             "type": "boolean",
+        },
+        "category_id": {
+            "column": Question.category_id,
+            "type": "exact",
         },
     }
 
@@ -473,6 +486,8 @@ def get_question_by_id(db: Session, question_id: str):
             for answer in answers
         ],
     }
+
+
 def question_exists(db: Session, question_id: UUID) -> bool:
     """
     Check if a question exists and is not deleted.

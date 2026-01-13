@@ -72,3 +72,32 @@ def remove_permission_from_role(db: Session, role_id: UUID, permission: str):
     """Remove a permission from a role."""
     role = get_role_by_id(db, role_id)
     role_repo.remove_role_permission(db, role_id, permission)
+
+
+def update_role(db: Session, role_id: UUID, name: str = None, description: str = None):
+    """Update a role."""
+    # Check if role exists
+    role = get_role_by_id(db, role_id)
+    
+    # Check if new name already exists (if name is being updated)
+    if name is not None and name != role.name:
+        existing_role = role_repo.get_role_by_name(db, name)
+        if existing_role:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=ERROR_ROLE_ALREADY_EXISTS,
+            )
+    
+    return role_repo.update_role(db, role_id, name, description)
+
+
+def delete_role(db: Session, role_id: UUID):
+    """Delete a role (soft delete)."""
+    role = get_role_by_id(db, role_id)
+    deleted = role_repo.delete_role(db, role_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ERROR_ROLE_NOT_FOUND,
+        )
+    return deleted

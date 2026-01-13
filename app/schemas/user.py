@@ -206,3 +206,36 @@ class ChangePasswordRequest(BaseModel):
                 "new_password": "newpassword123",
             }
         }
+
+
+class AdminChangePasswordRequest(BaseModel):
+    """Request schema for admin to change user password"""
+
+    new_password: str = Field(
+        ...,
+        min_length=6,
+        description="New password (minimum 6 characters)",
+        example="newpassword123",
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "new_password": "newpassword123",
+            }
+        }
+
+
+class AssignRoleRequest(BaseModel):
+    """Request schema for assigning role to user"""
+
+    role_id: UUID = Field(
+        ..., description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "role_id": "550e8400-e29b-41d4-a716-446655440000",
+            }
+        }

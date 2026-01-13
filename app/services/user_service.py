@@ -99,6 +99,19 @@ def change_password(db: Session, user_id: UUID, old_password: str, new_password:
     return user_repo.update_user(db, user, password=hashed_password)
 
 
+def admin_change_password(db: Session, user_id: UUID, new_password: str):
+    """Admin change user password (no old password verification required)."""
+    user = user_repo.get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=ERROR_USER_NOT_FOUND
+        )
+
+    # Hash new password and update
+    hashed_password = get_password_hash(new_password)
+    return user_repo.update_user(db, user, password=hashed_password)
+
+
 def create_user(db: Session, user_data: dict):
     """Create a new user."""
     from app.repository import auth_repo

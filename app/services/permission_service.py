@@ -1,8 +1,12 @@
 # app/services/permission_service.py
 import fnmatch
 from sqlalchemy.orm import Session
+from uuid import UUID
+from typing import Dict, Any, Optional, Tuple
+from fastapi import HTTPException, status
 from app.models.users import User
 from app.repository import role_repo
+from app.repository import permission_repo
 from app.constants.permissions import (
     PERMISSION_NAMESPACE_CATEGORIES,
     PERMISSION_ACTION_READ,
@@ -130,3 +134,93 @@ def get_user_permissions(db: Session, user: User) -> list[str]:
 
     role_permissions = role_repo.get_role_permissions(db, user.role_id)
     return [perm.permission for perm in role_permissions]
+
+
+def get_all_permissions(
+    db: Session,
+    search_key: str = None,
+    search_value: str = None,
+    page: int = 1,
+    page_size: int = 10,
+    request_params: Optional[Dict[str, Any]] = None,
+) -> Tuple[list, int]:
+    """Get all permissions with optional filtering and pagination."""
+    return permission_repo.get_all_permissions(
+        db, search_key, search_value, page, page_size, request_params
+    )
+
+
+def get_permission_by_id(db: Session, permission_id: UUID):
+    """Get permission by ID."""
+    permission = permission_repo.get_permission_by_id(db, permission_id)
+    if not permission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Permission with ID {permission_id} not found",
+        )
+    return permission
+
+
+def create_permission(
+    db: Session, role_id: UUID, permission: str, name: str = None, description: str = None
+):
+    """Create a new permission."""
+    # Check if permission already exists for this role
+    existing_permissions = role_repo.get_role_permissions(db, role_id)
+    for perm in existing_permissions:
+        if perm.permission == permission:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Permission '{permission}' already exists for this role",
+            )
+    
+    permission_obj = permission_repo.create_permission(
+        db, role_id, permission, name, description
+    )
+    if not permission_obj:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Role with ID {role_id} not found",
+        )
+    return permission_obj
+
+
+def update_permission(
+    db: Session,
+    permission_id: UUID,
+    role_id: UUID = None,
+    permission: str = None,
+    name: str = None,
+    description: str = None,
+):
+    """Update a permission."""
+    # Check if permission already exists for the role (if role_id is being updated)
+    if role_id is not None and permission is not None:
+        existing_permissions = role_repo.get_role_permissions(db, role_id)
+        for perm in existing_permissions:
+            if perm.permission == permission and perm.id != permission_id:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=f"Permission '{permission}' already exists for this role",
+                )
+    
+    permission_obj = permission_repo.update_permission(
+        db, permission_id, role_id, permission, name, description
+    )
+    if not permission_obj:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Permission with ID {permission_id} not found",
+        )
+    return permission_obj
+
+
+def delete_permission(db: Session, permission_id: UUID):
+    """Delete a permission."""
+    deleted = permission_repo.delete_permission(db, permission_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Permission with ID {permission_id} not found",
+        )
+    return deleted

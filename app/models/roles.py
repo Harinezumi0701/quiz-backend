@@ -26,6 +26,8 @@ class RolePermission(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, server_default=text("uuidv7()"))
     role_id = Column(UUID(as_uuid=True), ForeignKey("roles.id", ondelete="CASCADE"), nullable=False, index=True)
     permission = Column(String(200), nullable=False, index=True)  # Format: namespace::action or *::*
+    name = Column(String(200), nullable=True)
+    description = Column(String(500), nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     role = relationship("Role", back_populates="permissions")

@@ -21,6 +21,12 @@ class PermissionOut(BaseModel):
         description="Permission string",
         example=f"{PERMISSION_NAMESPACE_CATEGORIES}::{PERMISSION_ACTION_READ}",
     )
+    name: Optional[str] = Field(
+        None, description="Permission name", example="Read Categories"
+    )
+    description: Optional[str] = Field(
+        None, description="Permission description", example="Allow reading category information"
+    )
     created_at: datetime = Field(..., description="Created at timestamp")
 
     class Config:
@@ -75,3 +81,55 @@ class RoleResponse(SuccessResponse[RoleOut]):
     """Response schema for single role"""
 
     pass
+
+
+class RoleCreateRequest(BaseModel):
+    """Request schema for creating a role"""
+
+    name: str = Field(
+        ...,
+        min_length=1,
+        max_length=100,
+        description="Role name",
+        example="admin",
+    )
+    description: Optional[str] = Field(
+        None,
+        max_length=500,
+        description="Role description",
+        example="Administrator with full permissions",
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "admin",
+                "description": "Administrator with full permissions",
+            }
+        }
+
+
+class RoleUpdateRequest(BaseModel):
+    """Request schema for updating a role"""
+
+    name: Optional[str] = Field(
+        None,
+        min_length=1,
+        max_length=100,
+        description="Role name",
+        example="admin",
+    )
+    description: Optional[str] = Field(
+        None,
+        max_length=500,
+        description="Role description",
+        example="Administrator with full permissions",
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "admin",
+                "description": "Administrator with full permissions",
+            }
+        }

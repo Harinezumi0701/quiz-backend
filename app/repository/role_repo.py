@@ -88,6 +88,8 @@ def get_all_roles_with_search(
                 {
                     'id': perm.id,
                     'permission': perm.permission,
+                    'name': perm.name,
+                    'description': perm.description,
                     'created_at': perm.created_at,
                 }
                 for perm in permissions
@@ -128,3 +130,32 @@ def remove_role_permission(db: Session, role_id: UUID, permission: str):
         RolePermission.role_id == role_id, RolePermission.permission == permission
     ).delete()
     db.commit()
+
+
+def update_role(db: Session, role_id: UUID, name: str = None, description: str = None) -> Role:
+    """Update a role."""
+    role = get_role_by_id(db, role_id)
+    if not role:
+        return None
+    
+    if name is not None:
+        role.name = name
+    if description is not None:
+        role.description = description
+    
+    db.commit()
+    db.refresh(role)
+    return role
+
+
+def delete_role(db: Session, role_id: UUID) -> bool:
+    """Soft delete a role."""
+    from datetime import datetime, timezone
+    
+    role = get_role_by_id(db, role_id)
+    if not role:
+        return False
+    
+    role.deleted_at = datetime.now(timezone.utc)
+    db.commit()
+    return True

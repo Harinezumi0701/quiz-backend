@@ -18,6 +18,8 @@ from app.schemas.user import (
     UserResponse,
     UserCreateRequest,
     UserUpdateRequest,
+    AdminChangePasswordRequest,
+    AssignRoleRequest,
 )
 from app.schemas.http_response import ErrorResponse
 from app.services import user_service, permission_service
@@ -193,6 +195,8 @@ def create_user(
     Requires permission: users::create
     """
     user_dict = user_data.model_dump(exclude_unset=True)
+    # Remove permissions if present (should use role_id instead)
+    user_dict.pop("permissions", None)
     new_user = user_service.create_user(db, user_dict)
 
     # Get user permissions
@@ -277,6 +281,8 @@ def update_user(
         )
 
     update_dict = user_data.model_dump(exclude_unset=True)
+    # Remove permissions if present (should use role_id instead)
+    update_dict.pop("permissions", None)
     updated_user = user_service.update_user_profile(db, user_uuid, update_dict)
 
     # Get user permissions
@@ -348,3 +354,146 @@ def delete_user(
 
     user_service.delete_user(db, user_uuid)
     return {"message": "User deleted successfully"}
+
+
+@router.put(
+    "/{user_id}/change-password",
+    status_code=status.HTTP_200_OK,
+    summary="Admin change user password",
+    description="Admin change user password by ID (requires permission)",
+    responses={
+        200: {
+            "description": "Password changed successfully",
+        },
+        404: {
+            "description": "User not found",
+            "model": ErrorResponse,
+        },
+        400: {
+            "description": "Invalid input",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
+    },
+)
+def admin_change_password(
+    user_id: str = Path(
+        ...,
+        description="User ID (UUID)",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    password_data: AdminChangePasswordRequest = Body(...),
+    db: Session = Depends(get_db),
+    _user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_USERS, "PUT")
+    ),
+):
+    """
+    Admin change user password by ID.
+
+    - **user_id**: UUID of the user
+    - **new_password**: New password (required, minimum 6 characters)
+
+    Requires permission: users::update
+    """
+    # Try to parse as UUID
+    try:
+        user_uuid = UUID(user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid user ID format: {user_id}",
+        )
+
+    user_service.admin_change_password(db, user_uuid, password_data.new_password)
+    return {"message": "Password changed successfully"}
+
+
+@router.put(
+    "/{user_id}/role",
+    response_model=UserResponse,
+    summary="Assign role to user",
+    description="Assign role to user by ID (requires permission)",
+    responses={
+        200: {
+            "description": "Role assigned successfully",
+        },
+        404: {
+            "description": "User or role not found",
+            "model": ErrorResponse,
+        },
+        400: {
+            "description": "Invalid input",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
+    },
+)
+def assign_role(
+    user_id: str = Path(
+        ...,
+        description="User ID (UUID)",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    role_data: AssignRoleRequest = Body(...),
+    db: Session = Depends(get_db),
+    _user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_USERS, "PUT")
+    ),
+):
+    """
+    Assign role to user by ID.
+
+    - **user_id**: UUID of the user
+    - **role_id**: Role ID (required)
+
+    Requires permission: users::update
+    """
+    # Try to parse as UUID
+    try:
+        user_uuid = UUID(user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid user ID format: {user_id}",
+        )
+
+    # Verify role exists
+    from app.repository import role_repo
+
+    role = role_repo.get_role_by_id(db, role_data.role_id)
+    if not role:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Role with ID {role_data.role_id} not found",
+        )
+
+    # Update user role
+    update_dict = {"role_id": role_data.role_id}
+    updated_user = user_service.update_user_profile(db, user_uuid, update_dict)
+
+    # Get user permissions
+    permissions = permission_service.get_user_permissions(db, updated_user)
+
+    # Create user data with permissions
+    user_response_data = {
+        "id": updated_user.id,
+        "user_id": updated_user.user_id,
+        "email": updated_user.email,
+        "full_name": updated_user.full_name,
+        "phone": updated_user.phone,
+        "birthday": updated_user.birthday,
+        "address": updated_user.address,
+        "job_title": updated_user.job_title,
+        "company": updated_user.company,
+        "join_date": updated_user.join_date,
+        "permissions": permissions,
+    }
+
+    return UserResponse(data=user_response_data, meta={})

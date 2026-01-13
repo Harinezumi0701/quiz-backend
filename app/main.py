@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, category, test, answer, me, role
+from app.api.v1 import user, auth, question, category, test, answer, me, role, permission
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response
 from app.constants import (
@@ -23,6 +23,7 @@ from app.constants import (
     TESTS_PREFIX,
     ANSWERS_PREFIX,
     ROLES_PREFIX,
+    PERMISSIONS_PREFIX,
     HEALTH_CHECK_PATH,
     ROOT_PATH,
 )
@@ -76,6 +77,10 @@ tags_metadata = [
         "name": "roles",
         "description": "Role management. Get list of roles and role information with permissions.",
     },
+    {
+        "name": "permissions",
+        "description": "Permission management. Get list of permissions and manage role permissions.",
+    },
 ]
 
 app = FastAPI(
@@ -125,6 +130,7 @@ app.include_router(category.router, prefix=CATEGORIES_PREFIX, tags=["categories"
 app.include_router(test.router, prefix=TESTS_PREFIX, tags=["tests"])
 app.include_router(answer.router, prefix=ANSWERS_PREFIX, tags=["answers"])
 app.include_router(role.router, prefix=ROLES_PREFIX, tags=["roles"])
+app.include_router(permission.router, prefix=PERMISSIONS_PREFIX, tags=["permissions"])
 
 
 def custom_openapi():

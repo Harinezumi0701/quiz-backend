@@ -43,6 +43,10 @@ def get_all_users(
             "type": "text",
             "case_sensitive": False,
         },
+        "role_id": {
+            "column": User.role_id,
+            "type": "exact",
+        },
     }
 
     # Apply search filter and pagination

@@ -39,6 +39,10 @@ router = APIRouter()
         200: {
             "description": "List of tests",
         },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
     },
 )
 def get_all_tests(
@@ -64,6 +68,9 @@ def get_all_tests(
         None, alias="filter-value-2", description="Second filter value"
     ),
     db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_TESTS, "GET")
+    ),
 ):
     """
     Get all tests with optional filtering and pagination.
@@ -81,7 +88,7 @@ def get_all_tests(
     - Multiple filters: `?filter-key-1=name&filter-value-1=exam&filter-key-2=name&filter-value-2=test`
     - OR condition: `?filter-key-1=name&filter-value-1=exam1,exam2,exam3`
 
-    This endpoint does not require authentication.
+    Requires permission: tests::read
     """
     request_params = dict(request.query_params)
     tests, total = category_service.get_all_tests(
@@ -107,8 +114,12 @@ def get_all_tests(
         200: {
             "description": "Test details",
         },
-        404: {
+         404: {
             "description": "Test not found",
+            "model": ErrorResponse,
+        },
+        403: {
+            "description": "Permission denied",
             "model": ErrorResponse,
         },
     },
@@ -120,13 +131,16 @@ def get_test_by_id(
         example="550e8400-e29b-41d4-a716-446655440000",
     ),
     db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_TESTS, "GET")
+    ),
 ):
     """
     Get a specific test by ID.
 
     - **test_id**: UUID of the test
 
-    This endpoint does not require authentication.
+    Requires permission: tests::read
     """
     test = category_service.get_test_by_id_only(db, test_id)
 

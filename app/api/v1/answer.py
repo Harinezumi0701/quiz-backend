@@ -28,6 +28,10 @@ router = APIRouter()
         200: {
             "description": "List of answers",
         },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
     },
 )
 def get_all_answers(
@@ -62,6 +66,9 @@ def get_all_answers(
         None, alias="filter-value-3", description="Third filter value"
     ),
     db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_ANSWERS, "GET")
+    ),
 ):
     """
     Get all answers with optional filtering and pagination.
@@ -81,7 +88,7 @@ def get_all_answers(
     - Multiple filters: `?filter-key-1=content&filter-value-1=test&filter-key-2=is_correct&filter-value-2=true`
     - OR condition: `?filter-key-1=question_id&filter-value-1=id1,id2,id3`
 
-    This endpoint does not require authentication.
+    Requires permission: answers::read
     """
     request_params = dict(request.query_params)
     answers, total = answer_service.get_all_answers(
@@ -111,6 +118,10 @@ def get_all_answers(
             "description": "Answer not found",
             "model": ErrorResponse,
         },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
     },
 )
 def get_answer_by_id(
@@ -120,13 +131,16 @@ def get_answer_by_id(
         example="550e8400-e29b-41d4-a716-446655440000",
     ),
     db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_ANSWERS, "GET")
+    ),
 ):
     """
     Get a specific answer by ID.
 
     - **answer_id**: UUID of the answer
 
-    This endpoint does not require authentication.
+    Requires permission: answers::read
     """
     answer = answer_service.get_answer_by_id_only(db, answer_id)
 

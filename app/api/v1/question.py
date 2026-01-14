@@ -36,7 +36,11 @@ router = APIRouter()
     responses={
         200: {
             "description": "List of questions with answers",
-        }
+        },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
     },
 )
 def get_all_questions(
@@ -70,6 +74,9 @@ def get_all_questions(
         None, alias="filter-value-3", description="Third filter value"
     ),
     db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_QUESTIONS, "GET")
+    ),
 ):
     """
     Get all questions with optional filtering and pagination.
@@ -89,7 +96,7 @@ def get_all_questions(
     - Multiple filters: `?filter-key-1=content&filter-value-1=test&filter-key-2=test&filter-value-2=exam1`
     - OR condition: `?filter-key-1=id&filter-value-1=id1,id2,id3`
 
-    This endpoint does not require authentication.
+    Requires permission: questions::read
     """
     request_params = dict(request.query_params)
     questions, total = question_service.get_all_questions(
@@ -119,6 +126,10 @@ def get_all_questions(
             "description": "Question not found",
             "model": ErrorResponse,
         },
+        403: {
+            "description": "Permission denied",
+            "model": ErrorResponse,
+        },
     },
 )
 def get_question_by_id(
@@ -126,13 +137,16 @@ def get_question_by_id(
         ..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
     db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_QUESTIONS, "GET")
+    ),
 ):
     """
     Get a specific question by ID with answers.
 
     - **question_id**: UUID of the question
 
-    This endpoint does not require authentication.
+    Requires permission: questions::read
     """
     question = question_service.get_question_by_id(db, question_id)
 

@@ -101,10 +101,17 @@ def create_user(
 ) -> User:
     """Create a new user."""
     from app.utils.user_id_generator import generate_unique_user_id
+    from app.repository.role_repo import get_default_role
 
     # Generate user_id if not provided
     if not user_id:
         user_id = generate_unique_user_id(db)
+
+    # Get default role if role_id is not provided
+    if not role_id:
+        default_role = get_default_role(db)
+        if default_role:
+            role_id = default_role.id
 
     user = User(
         user_id=user_id,

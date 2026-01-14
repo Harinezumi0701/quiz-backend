@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.users import User
 from app.models.refresh_tokens import RefreshToken
 from app.utils.user_id_generator import generate_unique_user_id
+from app.repository.role_repo import get_default_role
 
 
 def get_user_by_email(db: Session, email: str) -> User | None:
@@ -14,11 +15,17 @@ def get_user_by_email(db: Session, email: str) -> User | None:
 def create_user(db: Session, email: str, full_name: str, hashed_password: str) -> User:
     """Create a new user."""
     user_id = generate_unique_user_id(db)
+    
+    # Get default role if exists
+    default_role = get_default_role(db)
+    role_id = default_role.id if default_role else None
+    
     user = User(
         user_id=user_id,
         email=email,
         full_name=full_name,
-        password=hashed_password
+        password=hashed_password,
+        role_id=role_id
     )
     db.add(user)
     db.commit()

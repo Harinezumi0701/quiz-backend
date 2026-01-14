@@ -124,6 +124,7 @@ def get_role_by_id(
         "id": role.id,
         "name": role.name,
         "description": role.description,
+        "default": role.default,
         "permissions": [
             {
                 "id": perm.id,
@@ -190,6 +191,7 @@ def create_role(
         "id": role.id,
         "name": role.name,
         "description": role.description,
+        "default": role.default,
         "permissions": [
             {
                 "id": perm.id,
@@ -262,6 +264,7 @@ def update_role(
         "id": role.id,
         "name": role.name,
         "description": role.description,
+        "default": role.default,
         "permissions": [
             {
                 "id": perm.id,

@@ -84,6 +84,7 @@ def get_all_roles_with_search(
             'id': role.id,
             'name': role.name,
             'description': role.description,
+            'default': role.default,
             'permissions': [
                 {
                     'id': perm.id,
@@ -159,3 +160,11 @@ def delete_role(db: Session, role_id: UUID) -> bool:
     role.deleted_at = datetime.now(timezone.utc)
     db.commit()
     return True
+
+
+def get_default_role(db: Session) -> Optional[Role]:
+    """Get the default role for new users."""
+    return db.query(Role).filter(
+        Role.default == True,
+        Role.deleted_at.is_(None)
+    ).first()

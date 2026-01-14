@@ -62,9 +62,6 @@ def get_all_namespaces(
         None, alias="filter-value-2", description="Second filter value"
     ),
     db: Session = Depends(get_db),
-    user: User = Depends(
-        require_namespace_permission(PERMISSION_NAMESPACE_NAMESPACES, "GET")
-    ),
 ):
     """
     Get all namespaces with optional name search and pagination.
@@ -82,7 +79,7 @@ def get_all_namespaces(
     - Multiple filters: `?filter-key-1=name&filter-value-1=categories&filter-key-2=name&filter-value-2=users`
     - OR condition: `?filter-key-1=name&filter-value-1=categories,users,roles`
 
-    Requires permission: namespaces::read
+    This endpoint is public and does not require authentication.
     """
     request_params = dict(request.query_params)
     namespaces, total = namespace_service.get_all_namespaces_with_search(
@@ -119,16 +116,13 @@ def get_namespace_by_id(
         ..., description="Namespace ID", example="550e8400-e29b-41d4-a716-446655440000"
     ),
     db: Session = Depends(get_db),
-    user: User = Depends(
-        require_namespace_permission(PERMISSION_NAMESPACE_NAMESPACES, "GET")
-    ),
 ):
     """
     Get a specific namespace by ID.
 
     - **namespace_id**: UUID of the namespace
 
-    Requires permission: namespaces::read
+    This endpoint is public and does not require authentication.
     """
     namespace = namespace_service.get_namespace_by_id(db, namespace_id)
 
@@ -182,9 +176,7 @@ def create_namespace(
     # Check if namespace name already exists
     existing_namespace = (
         db.query(Namespace)
-        .filter(
-            Namespace.name == namespace_data.name, Namespace.deleted_at.is_(None)
-        )
+        .filter(Namespace.name == namespace_data.name, Namespace.deleted_at.is_(None))
         .first()
     )
     if existing_namespace:

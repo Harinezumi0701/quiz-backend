@@ -1,5 +1,5 @@
 # app/models/roles.py
-from sqlalchemy import Column, String, ForeignKey, TIMESTAMP, text
+from sqlalchemy import Column, String, ForeignKey, TIMESTAMP, Boolean, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -12,6 +12,7 @@ class Role(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, server_default=text("uuidv7()"))
     name = Column(String(100), unique=True, nullable=False, index=True)
     description = Column(String(500), nullable=True)
+    default = Column(Boolean, nullable=False, default=False, index=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
     deleted_at = Column(TIMESTAMP, nullable=True)

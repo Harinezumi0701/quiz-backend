@@ -45,6 +45,11 @@ class RoleOut(BaseModel):
         description="Role description",
         example="Administrator with full permissions",
     )
+    default: bool = Field(
+        default=False,
+        description="Whether this is the default role for new users",
+        example=False,
+    )
     permissions: List[PermissionOut] = Field(
         default_factory=list, description="List of permissions for this role"
     )
@@ -58,6 +63,7 @@ class RoleOut(BaseModel):
                 "id": "550e8400-e29b-41d4-a716-446655440000",
                 "name": "admin",
                 "description": "Administrator with full permissions",
+                "default": False,
                 "permissions": [
                     {
                         "id": "550e8400-e29b-41d4-a716-446655440001",

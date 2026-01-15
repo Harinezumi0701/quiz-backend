@@ -19,7 +19,11 @@ def get_all_users(
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all users with optional filtering and pagination."""
-    query = db.query(User).order_by(User.created_at.desc())
+    query = (
+        db.query(User)
+        .filter(User.deleted_at.is_(None))
+        .order_by(User.created_at.desc())
+    )
 
     # Define search configuration
     search_config = {
@@ -73,17 +77,21 @@ def get_all_users(
 
 def get_user_by_id(db: Session, user_id: UUID):
     """Get user by UUID id."""
-    return db.query(User).filter(User.id == user_id).first()
+    return db.query(User).filter(User.id == user_id, User.deleted_at.is_(None)).first()
 
 
 def get_user_by_user_id(db: Session, user_id: str):
     """Get user by user_id (editable unique identifier)."""
-    return db.query(User).filter(User.user_id == user_id).first()
+    return (
+        db.query(User)
+        .filter(User.user_id == user_id, User.deleted_at.is_(None))
+        .first()
+    )
 
 
 def user_id_exists(db: Session, user_id: str, exclude_user_id: UUID = None) -> bool:
     """Check if user_id already exists, optionally excluding a specific user."""
-    query = db.query(User).filter(User.user_id == user_id)
+    query = db.query(User).filter(User.user_id == user_id, User.deleted_at.is_(None))
     if exclude_user_id:
         query = query.filter(User.id != exclude_user_id)
     return query.first() is not None
@@ -182,7 +190,11 @@ def delete_user_by_user_id(db: Session, user_id: str) -> bool:
     """
     from datetime import datetime, timezone
 
-    user = db.query(User).filter(User.user_id == user_id, User.deleted_at.is_(None)).first()
+    user = (
+        db.query(User)
+        .filter(User.user_id == user_id, User.deleted_at.is_(None))
+        .first()
+    )
 
     if not user:
         return False

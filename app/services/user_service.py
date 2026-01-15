@@ -165,8 +165,18 @@ def create_user(db: Session, user_data: dict):
 
 
 def delete_user(db: Session, user_id: UUID):
-    """Delete a user (soft delete)."""
+    """Delete a user by UUID (soft delete)."""
     deleted = user_repo.delete_user(db, user_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=ERROR_USER_NOT_FOUND
+        )
+    return deleted
+
+
+def delete_user_by_user_id(db: Session, user_id: str):
+    """Delete a user by user_id (editable identifier) (soft delete)."""
+    deleted = user_repo.delete_user_by_user_id(db, user_id)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=ERROR_USER_NOT_FOUND

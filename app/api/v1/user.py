@@ -338,10 +338,10 @@ def update_user(
 
 
 @router.delete(
-    "/{user_id}",
+    "/{user_identifier}",
     status_code=status.HTTP_200_OK,
     summary="Delete a user",
-    description="Delete a user by ID (soft delete, requires permission)",
+    description="Delete a user by ID or user_id (soft delete, requires permission)",
     responses={
         200: {
             "description": "User deleted successfully",
@@ -357,9 +357,9 @@ def update_user(
     },
 )
 def delete_user(
-    user_id: str = Path(
+    user_identifier: str = Path(
         ...,
-        description="User ID (UUID)",
+        description="User ID (UUID) or user_id (editable identifier)",
         example="550e8400-e29b-41d4-a716-446655440000",
     ),
     db: Session = Depends(get_db),
@@ -368,22 +368,18 @@ def delete_user(
     ),
 ):
     """
-    Delete a user by ID (soft delete).
+    Delete a user by ID or user_id (soft delete).
 
-    - **user_id**: UUID of the user
+    - **user_identifier**: UUID ID or user_id (editable identifier) of the user
 
     Requires permission: users::delete
     """
-    # Try to parse as UUID
     try:
-        user_uuid = UUID(user_id)
+        user_uuid = UUID(user_identifier)
+        user_service.delete_user(db, user_uuid)
     except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid user ID format: {user_id}",
-        )
-
-    user_service.delete_user(db, user_uuid)
+        user_service.delete_user_by_user_id(db, user_identifier)
+    
     return {"message": "User deleted successfully"}
 
 

@@ -148,7 +148,7 @@ def update_user(db: Session, user: User, **kwargs):
 
 def delete_user(db: Session, user_id: UUID) -> bool:
     """
-    Soft delete a user.
+    Soft delete a user by UUID.
 
     Args:
         db: Database session
@@ -160,6 +160,29 @@ def delete_user(db: Session, user_id: UUID) -> bool:
     from datetime import datetime, timezone
 
     user = db.query(User).filter(User.id == user_id, User.deleted_at.is_(None)).first()
+
+    if not user:
+        return False
+
+    user.deleted_at = datetime.now(timezone.utc)
+    db.commit()
+    return True
+
+
+def delete_user_by_user_id(db: Session, user_id: str) -> bool:
+    """
+    Soft delete a user by user_id (editable identifier).
+
+    Args:
+        db: Database session
+        user_id: User editable identifier
+
+    Returns:
+        bool: True if deleted, False if not found
+    """
+    from datetime import datetime, timezone
+
+    user = db.query(User).filter(User.user_id == user_id, User.deleted_at.is_(None)).first()
 
     if not user:
         return False

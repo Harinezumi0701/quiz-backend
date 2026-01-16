@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, category, test, answer, me, role, permission, namespace
+from app.api.v1 import user, auth, question, category, test, answer, me, role, permission, namespace, upload
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response
 from app.constants import (
@@ -25,6 +25,7 @@ from app.constants import (
     ROLES_PREFIX,
     PERMISSIONS_PREFIX,
     NAMESPACES_PREFIX,
+    UPLOADS_PREFIX,
     HEALTH_CHECK_PATH,
     ROOT_PATH,
 )
@@ -86,6 +87,10 @@ tags_metadata = [
         "name": "namespaces",
         "description": "Namespace management. Get list of namespaces and manage namespace resources.",
     },
+    {
+        "name": "uploads",
+        "description": "File upload management. Generate presigned URLs for uploading files to S3 Storage.",
+    },
 ]
 
 app = FastAPI(
@@ -137,6 +142,7 @@ app.include_router(answer.router, prefix=ANSWERS_PREFIX, tags=["answers"])
 app.include_router(role.router, prefix=ROLES_PREFIX, tags=["roles"])
 app.include_router(permission.router, prefix=PERMISSIONS_PREFIX, tags=["permissions"])
 app.include_router(namespace.router, prefix=NAMESPACES_PREFIX, tags=["namespaces"])
+app.include_router(upload.router, prefix=UPLOADS_PREFIX, tags=["uploads"])
 
 
 def custom_openapi():

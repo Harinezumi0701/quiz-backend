@@ -1,6 +1,7 @@
 # app/repository/question_repo.py
 from uuid import UUID
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import func
 from typing import Optional, Tuple, Dict, Any
 from app.models.questions import Question
 from app.models.answer_options import AnswerOption
@@ -94,6 +95,23 @@ def get_all_questions(
         joinedload(Question.category_obj), joinedload(Question.test_obj)
     ).all()
 
+    question_ids = [question.id for question in questions]
+    answer_counts = {}
+    if question_ids:
+        counts = (
+            db.query(
+                AnswerOption.question_id,
+                func.count(AnswerOption.id).label("count")
+            )
+            .filter(
+                AnswerOption.question_id.in_(question_ids),
+                AnswerOption.deleted_at.is_(None),
+            )
+            .group_by(AnswerOption.question_id)
+            .all()
+        )
+        answer_counts = {str(question_id): count for question_id, count in counts}
+
     result = []
     for question in questions:
         result.append(
@@ -107,6 +125,7 @@ def get_all_questions(
                 "test": question.test,
                 "is_multiple_choice": question.is_multiple_choice,
                 "created_at": datetime_to_timestamp(question.created_at),
+                "answer_count": answer_counts.get(str(question.id), 0),
             }
         )
 

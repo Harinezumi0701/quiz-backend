@@ -32,7 +32,7 @@ router = APIRouter()
     "",
     response_model=QuestionListResponse,
     summary="Get all questions",
-    description="Get all questions with optional filtering and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition (e.g., filter-value-3=id1,id2,id3). Does not return answers.",
+    description="Get all questions with optional filtering and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition (e.g., filter-value-3=id1,id2,id3). Returns answer count instead of full answer details.",
     responses={
         200: {
             "description": "List of questions",

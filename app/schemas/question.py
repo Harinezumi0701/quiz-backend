@@ -14,6 +14,7 @@ class Question(BaseModel):
     test: str | None = Field(None, description="Test", example="DVA-C02_Day_1")
     is_multiple_choice: bool = Field(False, description="Whether this question has multiple correct answers", example=False)
     created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
+    answer_count: int = Field(..., description="Number of answers for this question", example=4)
 
     class Config:
         from_attributes = True

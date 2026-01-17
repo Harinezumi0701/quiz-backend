@@ -32,10 +32,10 @@ router = APIRouter()
     "",
     response_model=QuestionListResponse,
     summary="Get all questions",
-    description="Get all questions with optional filtering and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition (e.g., filter-value-3=id1,id2,id3).",
+    description="Get all questions with optional filtering and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition (e.g., filter-value-3=id1,id2,id3). Does not return answers.",
     responses={
         200: {
-            "description": "List of questions with answers",
+            "description": "List of questions",
         },
         403: {
             "description": "Permission denied",

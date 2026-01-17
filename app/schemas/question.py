@@ -5,6 +5,20 @@ from app.schemas.http_response import SuccessResponse
 from app.schemas.answer import AnswerOut
 
 
+class Question(BaseModel):
+    """Schema for question without answers"""
+    id: UUID = Field(..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440000")
+    content: str = Field(..., description="Question content", example="What is AWS Lambda?")
+    image_url: str | None = Field(None, description="Image URL (if available)", example="https://example.com/image.png")
+    category: str | None = Field(None, description="Question category", example="DVA-C02")
+    test: str | None = Field(None, description="Test", example="DVA-C02_Day_1")
+    is_multiple_choice: bool = Field(False, description="Whether this question has multiple correct answers", example=False)
+    created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
+
+    class Config:
+        from_attributes = True
+
+
 class QuestionWithAnswers(BaseModel):
     """Schema for question with answers"""
     id: UUID = Field(..., description="Question ID", example="550e8400-e29b-41d4-a716-446655440000")
@@ -21,8 +35,8 @@ class QuestionWithAnswers(BaseModel):
         from_attributes = True
 
 
-class QuestionListResponse(SuccessResponse[List[QuestionWithAnswers]]):
-    """Response schema for list of questions with answers"""
+class QuestionListResponse(SuccessResponse[List[Question]]):
+    """Response schema for list of questions"""
     pass
 
 

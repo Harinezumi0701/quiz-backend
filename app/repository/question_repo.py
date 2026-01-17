@@ -96,16 +96,6 @@ def get_all_questions(
 
     result = []
     for question in questions:
-        # Get all answer options for this question
-        answers = (
-            db.query(AnswerOption)
-            .filter(
-                AnswerOption.question_id == question.id,
-                AnswerOption.deleted_at.is_(None),
-            )
-            .all()
-        )
-
         result.append(
             {
                 "id": question.id,
@@ -117,15 +107,6 @@ def get_all_questions(
                 "test": question.test,
                 "is_multiple_choice": question.is_multiple_choice,
                 "created_at": datetime_to_timestamp(question.created_at),
-                "answers": [
-                    {
-                        "id": answer.id,
-                        "content": answer.content,
-                        "is_correct": answer.is_correct,
-                        "explanation": answer.explanation,
-                    }
-                    for answer in answers
-                ],
             }
         )
 

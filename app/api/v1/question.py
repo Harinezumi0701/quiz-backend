@@ -32,7 +32,7 @@ router = APIRouter()
     "",
     response_model=QuestionListResponse,
     summary="Get all questions",
-    description="Get all questions with optional filtering and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition (e.g., filter-value-3=id1,id2,id3). Returns answer count instead of full answer details.",
+    description="Get all questions with optional filtering and pagination. Supports standard query parameters for filtering (key=value). For comma-separated values, use OR condition (e.g., test=id1,id2,id3). Returns answer count instead of full answer details.",
     responses={
         200: {
             "description": "List of questions",
@@ -45,34 +45,8 @@ router = APIRouter()
 )
 def get_all_questions(
     request: Request,
-    key: Optional[str] = Query(
-        None, description="Search key: content, created_at, or test (legacy format)"
-    ),
-    value: Optional[str] = Query(None, description="Search value (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
-    filter_key_1: Optional[str] = Query(
-        None,
-        alias="filter-key-1",
-        description="First filter key (e.g., content, created_at, test)",
-    ),
-    filter_value_1: Optional[str] = Query(
-        None,
-        alias="filter-value-1",
-        description="First filter value (supports comma-separated for OR: id1,id2,id3)",
-    ),
-    filter_key_2: Optional[str] = Query(
-        None, alias="filter-key-2", description="Second filter key"
-    ),
-    filter_value_2: Optional[str] = Query(
-        None, alias="filter-value-2", description="Second filter value"
-    ),
-    filter_key_3: Optional[str] = Query(
-        None, alias="filter-key-3", description="Third filter key"
-    ),
-    filter_value_3: Optional[str] = Query(
-        None, alias="filter-value-3", description="Third filter value"
-    ),
     db: Session = Depends(get_db),
     user: User = Depends(
         require_namespace_permission(PERMISSION_NAMESPACE_QUESTIONS, "GET")
@@ -82,9 +56,8 @@ def get_all_questions(
     Get all questions with optional filtering and pagination.
 
     **Filter Options:**
-    - **Legacy format**: Use `key` and `value` parameters for single filter
-    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
-    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-3=id1,id2,id3`)
+    - **Format**: Use `key=value` query parameters (e.g., `?content=test`)
+    - **OR condition**: Use comma-separated values (e.g., `?test=id1,id2`)
 
     **Search Keys:**
     - `content`: Search in question content (text search)
@@ -92,17 +65,15 @@ def get_all_questions(
     - `test`: Search by test name (text search)
 
     **Examples:**
-    - Single filter: `?key=content&value=test`
-    - Multiple filters: `?filter-key-1=content&filter-value-1=test&filter-key-2=test&filter-value-2=exam1`
-    - OR condition: `?filter-key-1=id&filter-value-1=id1,id2,id3`
+    - Simple filter: `?content=test`
+    - Multiple filters: `?content=test&test=exam1`
+    - OR condition: `?test=id1,id2,id3`
 
     Requires permission: questions::read
     """
     request_params = dict(request.query_params)
     questions, total = question_service.get_all_questions(
         db,
-        search_key=key,
-        search_value=value,
         page=page,
         page_size=page_size,
         request_params=request_params,

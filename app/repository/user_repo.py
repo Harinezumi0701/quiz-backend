@@ -4,16 +4,11 @@ from uuid import UUID
 from typing import Optional, Tuple, Dict, Any
 from datetime import date
 from app.models.users import User
-from app.utils.search_pagination import (
-    paginate_query,
-    paginate_query_with_multiple_filters,
-)
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 
 
 def get_all_users(
     db: Session,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -54,23 +49,13 @@ def get_all_users(
     }
 
     # Apply search filter and pagination
-    if request_params:
-        paginated_query, total = paginate_query_with_multiple_filters(
-            query,
-            request_params=request_params,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
-    else:
-        paginated_query, total = paginate_query(
-            query,
-            search_key=search_key,
-            search_value=search_value,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
 
     return paginated_query.all(), total
 

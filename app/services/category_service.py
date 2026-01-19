@@ -6,15 +6,13 @@ from app.repository import category_repo, test_repo
 
 def get_all_categories_with_search(
     db: Session,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all categories with optional name search and pagination."""
     return category_repo.get_all_categories_with_search(
-        db, search_key, search_value, page, page_size, request_params
+        db, page=page, page_size=page_size, request_params=request_params
     )
 
 
@@ -26,15 +24,13 @@ def get_category_by_id(db: Session, category_id: str):
 def get_tests_by_category_id(
     db: Session,
     category_id: str,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all tests for a specific category with optional filtering and pagination."""
     return test_repo.get_tests_by_category_id(
-        db, category_id, search_key, search_value, page, page_size, request_params
+        db, category_id, page=page, page_size=page_size, request_params=request_params
     )
 
 
@@ -45,15 +41,13 @@ def get_test_by_id(db: Session, category_id: str, test_id: str):
 
 def get_all_tests(
     db: Session,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all tests with optional filtering and pagination."""
     return test_repo.get_all_tests(
-        db, search_key, search_value, page, page_size, request_params
+        db, page=page, page_size=page_size, request_params=request_params
     )
 
 

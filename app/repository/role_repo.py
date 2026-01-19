@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import Optional, Tuple, Dict, Any
 from app.models.roles import Role, RolePermission
-from app.utils.search_pagination import paginate_query, paginate_query_with_multiple_filters
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 
 
 def get_role_by_name(db: Session, name: str) -> Role:
@@ -23,8 +23,6 @@ def get_all_roles(db: Session):
 
 def get_all_roles_with_search(
     db: Session,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -34,8 +32,6 @@ def get_all_roles_with_search(
     
     Args:
         db: Database session
-        search_key: Search key (only "name" is supported)
-        search_value: Value to search for in role name
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
@@ -55,23 +51,13 @@ def get_all_roles_with_search(
     }
     
     # Apply search filter and pagination
-    if request_params:
-        paginated_query, total = paginate_query_with_multiple_filters(
-            query,
-            request_params=request_params,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
-    else:
-        paginated_query, total = paginate_query(
-            query,
-            search_key=search_key,
-            search_value=search_value,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
     
     # Execute query
     roles = paginated_query.all()

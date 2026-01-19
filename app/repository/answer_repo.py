@@ -4,19 +4,13 @@ from sqlalchemy.orm import Session
 from typing import Optional, Tuple, Dict, Any
 from app.models.answer_options import AnswerOption
 from app.models.questions import Question
-from app.utils.search_pagination import (
-    parse_multiple_filters,
-    SearchFilter,
-    PaginationHandler,
-)
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 from app.utils.datetime_utils import datetime_to_timestamp
 
 
 def get_answers_by_question_id(
     db: Session,
     question_id: str,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -27,8 +21,6 @@ def get_answers_by_question_id(
     Args:
         db: Database session
         question_id: Question UUID
-        search_key: Field to search (content, is_correct)
-        search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
@@ -52,6 +44,7 @@ def get_answers_by_question_id(
     ).order_by(AnswerOption.created_at.desc())
 
     # Define search configuration
+    # Define search configuration
     search_config = {
         "content": {
             "column": AnswerOption.content,
@@ -60,42 +53,18 @@ def get_answers_by_question_id(
         },
         "is_correct": {
             "column": AnswerOption.is_correct,
-            "type": "exact",
+            "type": "boolean",
         },
     }
 
     # Apply search filter and pagination
-    if request_params:
-        # For multiple filters, handle is_correct specially
-        filters = []
-        if request_params:
-            filters = parse_multiple_filters(request_params)
-
-        if filters:
-            search_filter = SearchFilter(search_config)
-            for f_key, f_value in filters:
-                if f_key == "is_correct":
-                    # Convert string to boolean
-                    is_correct_value = f_value.lower() in ("true", "1", "yes", "t")
-                    query = query.filter(AnswerOption.is_correct == is_correct_value)
-                else:
-                    query = search_filter.apply(query, f_key, f_value)
-
-        paginated_query, total = PaginationHandler.apply(query, page, page_size)
-    else:
-        # Handle boolean search for is_correct separately
-        if search_key == "is_correct" and search_value:
-            # Convert string to boolean
-            is_correct_value = search_value.lower() in ("true", "1", "yes", "t")
-            query = query.filter(AnswerOption.is_correct == is_correct_value)
-        else:
-            # Apply search filter
-            if search_config and search_key in search_config:
-                search_filter = SearchFilter(search_config)
-                query = search_filter.apply(query, search_key, search_value)
-
-        # Apply pagination
-        paginated_query, total = PaginationHandler.apply(query, page, page_size)
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
 
     # Execute query
     answers = paginated_query.all()
@@ -172,8 +141,6 @@ def get_answer_by_id(
 
 def get_all_answers(
     db: Session,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -183,8 +150,6 @@ def get_all_answers(
 
     Args:
         db: Database session
-        search_key: Field to search (content, is_correct, question_id)
-        search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
@@ -196,6 +161,7 @@ def get_all_answers(
     query = db.query(AnswerOption).filter(AnswerOption.deleted_at.is_(None)).order_by(AnswerOption.created_at.desc())
 
     # Define search configuration
+    # Define search configuration
     search_config = {
         "content": {
             "column": AnswerOption.content,
@@ -204,7 +170,7 @@ def get_all_answers(
         },
         "is_correct": {
             "column": AnswerOption.is_correct,
-            "type": "exact",
+            "type": "boolean",
         },
         "question_id": {
             "column": AnswerOption.question_id,
@@ -213,42 +179,13 @@ def get_all_answers(
     }
 
     # Apply search filter and pagination
-    if request_params:
-        # For multiple filters, handle special cases
-        filters = parse_multiple_filters(request_params)
-
-        if filters:
-            search_filter = SearchFilter(search_config)
-            for f_key, f_value in filters:
-                if f_key == "is_correct":
-                    # Convert string to boolean
-                    is_correct_value = f_value.lower() in ("true", "1", "yes", "t")
-                    query = query.filter(AnswerOption.is_correct == is_correct_value)
-                else:
-                    query = search_filter.apply(query, f_key, f_value)
-
-        paginated_query, total = PaginationHandler.apply(query, page, page_size)
-    else:
-        # Handle boolean search for is_correct separately
-        if search_key == "is_correct" and search_value:
-            # Convert string to boolean
-            is_correct_value = search_value.lower() in ("true", "1", "yes", "t")
-            query = query.filter(AnswerOption.is_correct == is_correct_value)
-        elif search_key == "question_id" and search_value:
-            # Handle UUID search for question_id
-            try:
-                query = query.filter(AnswerOption.question_id == search_value)
-            except (ValueError, TypeError):
-                # Invalid UUID format, return empty result
-                return [], 0
-        else:
-            # Apply search filter
-            if search_config and search_key in search_config:
-                search_filter = SearchFilter(search_config)
-                query = search_filter.apply(query, search_key, search_value)
-
-        # Apply pagination
-        paginated_query, total = PaginationHandler.apply(query, page, page_size)
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
 
     # Execute query
     answers = paginated_query.all()

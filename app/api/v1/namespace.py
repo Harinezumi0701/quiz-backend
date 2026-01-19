@@ -32,7 +32,7 @@ router = APIRouter()
     "",
     response_model=NamespaceListResponse,
     summary="Get all namespaces",
-    description="Get list of all namespaces with optional name search and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition.",
+    description="Get list of all namespaces with optional name search and pagination. Supports standard query parameters for filtering (key=value). For comma-separated values, use OR condition.",
     responses={
         200: {
             "description": "List of namespaces",
@@ -41,51 +41,30 @@ router = APIRouter()
 )
 def get_all_namespaces(
     request: Request,
-    key: Optional[str] = Query(None, description="Search key: name (legacy format)"),
-    value: Optional[str] = Query(
-        None, description="Search value for namespace name (legacy format)"
-    ),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
-    filter_key_1: Optional[str] = Query(
-        None, alias="filter-key-1", description="First filter key (e.g., name)"
-    ),
-    filter_value_1: Optional[str] = Query(
-        None,
-        alias="filter-value-1",
-        description="First filter value (supports comma-separated for OR)",
-    ),
-    filter_key_2: Optional[str] = Query(
-        None, alias="filter-key-2", description="Second filter key"
-    ),
-    filter_value_2: Optional[str] = Query(
-        None, alias="filter-value-2", description="Second filter value"
-    ),
     db: Session = Depends(get_db),
 ):
     """
     Get all namespaces with optional name search and pagination.
 
     **Filter Options:**
-    - **Legacy format**: Use `key` and `value` parameters for single filter
-    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
-    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=ns1,ns2,ns3`)
+    - **Format**: Use `key=value` query parameters (e.g., `?name=categories`)
+    - **OR condition**: Use comma-separated values (e.g., `?name=ns1,ns2`)
 
     **Search Keys:**
     - `name`: Search in namespace name (text search)
 
     **Examples:**
-    - Single filter: `?key=name&value=categories`
-    - Multiple filters: `?filter-key-1=name&filter-value-1=categories&filter-key-2=name&filter-value-2=users`
-    - OR condition: `?filter-key-1=name&filter-value-1=categories,users,roles`
+    - Simple filter: `?name=categories`
+    - Multiple filters: `?name=categories&prefix=cat`
+    - OR condition: `?name=categories,users,roles`
 
     This endpoint is public and does not require authentication.
     """
     request_params = dict(request.query_params)
     namespaces, total = namespace_service.get_all_namespaces_with_search(
         db,
-        search_key=key,
-        search_value=value,
         page=page,
         page_size=page_size,
         request_params=request_params,

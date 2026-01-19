@@ -38,7 +38,3 @@ COPY . .
 
 # Expose port
 EXPOSE 8000
-
-# Run the application
-ENTRYPOINT ["uvicorn", "app.main:app", "--proxy-headers", "--forwarded-allow-ips", "*", "--host", "0.0.0.0", "--port", "8000"]
-

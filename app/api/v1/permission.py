@@ -24,7 +24,7 @@ router = APIRouter()
     "",
     response_model=PermissionListResponse,
     summary="Get all permissions",
-    description="Get list of all permissions with optional search and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition.",
+    description="Get list of all permissions with optional search and pagination. Supports standard query parameters for filtering (key=value). For comma-separated values, use OR condition.",
     responses={
         200: {
             "description": "List of permissions",
@@ -37,28 +37,8 @@ router = APIRouter()
 )
 def get_all_permissions(
     request: Request,
-    key: Optional[str] = Query(
-        None, description="Search key: permission, role_id, name (legacy format)"
-    ),
-    value: Optional[str] = Query(None, description="Search value (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
-    filter_key_1: Optional[str] = Query(
-        None,
-        alias="filter-key-1",
-        description="First filter key (e.g., permission, role_id, name)",
-    ),
-    filter_value_1: Optional[str] = Query(
-        None,
-        alias="filter-value-1",
-        description="First filter value (supports comma-separated for OR)",
-    ),
-    filter_key_2: Optional[str] = Query(
-        None, alias="filter-key-2", description="Second filter key"
-    ),
-    filter_value_2: Optional[str] = Query(
-        None, alias="filter-value-2", description="Second filter value"
-    ),
     db: Session = Depends(get_db),
     user: User = Depends(
         require_namespace_permission(PERMISSION_NAMESPACE_ROLES, "GET")
@@ -68,9 +48,8 @@ def get_all_permissions(
     Get all permissions with optional filtering and pagination.
 
     **Filter Options:**
-    - **Legacy format**: Use `key` and `value` parameters for single filter
-    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
-    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=id1,id2,id3`)
+    - **Format**: Use `key=value` query parameters (e.g., `?permission=categories`)
+    - **OR condition**: Use comma-separated values (e.g., `?role_id=id1,id2`)
     
     **Search Keys:**
     - `permission`: Search in permission string (text search)
@@ -78,18 +57,16 @@ def get_all_permissions(
     - `name`: Search in permission name (text search)
     
     **Examples:**
-    - Single filter: `?key=permission&value=categories`
-    - Multiple filters: `?filter-key-1=permission&filter-value-1=categories&filter-key-2=role_id&filter-value-2=550e8400-e29b-41d4-a716-446655440000`
-    - Search by name: `?key=name&value=Read Categories`
-    - OR condition: `?filter-key-1=role_id&filter-value-1=id1,id2,id3`
+    - Simple filter: `?permission=categories`
+    - Multiple filters: `?permission=categories&role_id=550e8400-e29b-41d4-a716-446655440000`
+    - Search by name: `?name=Read Categories`
+    - OR condition: `?role_id=id1,id2,id3`
 
     Requires permission: roles::read
     """
     request_params = dict(request.query_params)
     permissions, total = permission_service.get_all_permissions(
         db,
-        search_key=key,
-        search_value=value,
         page=page,
         page_size=page_size,
         request_params=request_params,

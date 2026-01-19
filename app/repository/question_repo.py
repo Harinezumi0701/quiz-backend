@@ -7,17 +7,12 @@ from app.models.questions import Question
 from app.models.answer_options import AnswerOption
 from app.models.categories import Category
 from app.models.tests import Test
-from app.utils.search_pagination import (
-    paginate_query,
-    paginate_query_with_multiple_filters,
-)
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 from app.utils.datetime_utils import datetime_to_timestamp
 
 
 def get_all_questions(
     db: Session,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -27,8 +22,6 @@ def get_all_questions(
 
     Args:
         db: Database session
-        search_key: Field to search (content, created_at, test)
-        search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
@@ -72,23 +65,13 @@ def get_all_questions(
     }
 
     # Apply search filter and pagination using helper
-    if request_params:
-        paginated_query, total = paginate_query_with_multiple_filters(
-            query,
-            request_params=request_params,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
-    else:
-        paginated_query, total = paginate_query(
-            query,
-            search_key=search_key,
-            search_value=search_value,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
 
     # Apply eager loading and execute query
     questions = paginated_query.options(
@@ -136,8 +119,6 @@ def get_questions_by_category_and_test_id(
     db: Session,
     category_id: str,
     test_id: str,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -149,8 +130,6 @@ def get_questions_by_category_and_test_id(
         db: Database session
         category_id: Category UUID
         test_id: Test UUID
-        search_key: Field to search (content, created_at)
-        search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
@@ -204,23 +183,14 @@ def get_questions_by_category_and_test_id(
     }
 
     # Apply search filter and pagination
-    if request_params:
-        paginated_query, total = paginate_query_with_multiple_filters(
-            query,
-            request_params=request_params,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
-    else:
-        paginated_query, total = paginate_query(
-            query,
-            search_key=search_key,
-            search_value=search_value,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
+    # Apply search filter and pagination
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
 
     # Apply eager loading and execute query
     questions = paginated_query.options(
@@ -268,8 +238,6 @@ def get_questions_by_category_and_test_id(
 def get_questions_by_test_id(
     db: Session,
     test_id: str,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -280,8 +248,6 @@ def get_questions_by_test_id(
     Args:
         db: Database session
         test_id: Test UUID
-        search_key: Field to search (content, created_at)
-        search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
@@ -319,23 +285,14 @@ def get_questions_by_test_id(
     }
 
     # Apply search filter and pagination
-    if request_params:
-        paginated_query, total = paginate_query_with_multiple_filters(
-            query,
-            request_params=request_params,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
-    else:
-        paginated_query, total = paginate_query(
-            query,
-            search_key=search_key,
-            search_value=search_value,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
+    # Apply search filter and pagination
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
 
     # Apply eager loading and execute query
     questions = paginated_query.options(

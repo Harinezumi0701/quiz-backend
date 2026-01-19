@@ -19,7 +19,7 @@ router = APIRouter()
     "",
     response_model=RoleListResponse,
     summary="Get all roles",
-    description="Get list of all roles with optional name search and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition.",
+    description="Get list of all roles with optional name search and pagination. Supports standard query parameters for filtering (key=value). For comma-separated values, use OR condition.",
     responses={
         200: {
             "description": "List of roles",
@@ -32,14 +32,8 @@ router = APIRouter()
 )
 def get_all_roles(
     request: Request,
-    key: Optional[str] = Query(None, description="Search key: name (legacy format)"),
-    value: Optional[str] = Query(None, description="Search value for role name (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
-    filter_key_1: Optional[str] = Query(None, alias="filter-key-1", description="First filter key (e.g., name)"),
-    filter_value_1: Optional[str] = Query(None, alias="filter-value-1", description="First filter value (supports comma-separated for OR)"),
-    filter_key_2: Optional[str] = Query(None, alias="filter-key-2", description="Second filter key"),
-    filter_value_2: Optional[str] = Query(None, alias="filter-value-2", description="Second filter value"),
     db: Session = Depends(get_db),
     user: User = Depends(
         require_namespace_permission(PERMISSION_NAMESPACE_ROLES, "GET")
@@ -49,23 +43,22 @@ def get_all_roles(
     Get all roles with optional filtering and pagination.
 
     **Filter Options:**
-    - **Legacy format**: Use `key` and `value` parameters for single filter
-    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
-    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=admin,user,guest`)
+    - **Format**: Use `key=value` query parameters (e.g., `?name=admin`)
+    - **OR condition**: Use comma-separated values (e.g., `?name=admin,user`)
     
     **Search Keys:**
     - `name`: Search in role name (text search)
     
     **Examples:**
-    - Single filter: `?key=name&value=admin`
-    - Multiple filters: `?filter-key-1=name&filter-value-1=admin&filter-key-2=name&filter-value-2=user`
-    - OR condition: `?filter-key-1=name&filter-value-1=admin,user,guest`
+    - Simple filter: `?name=admin`
+    - Multiple filters: `?name=admin&description=test` (if description search is supported)
+    - OR condition: `?name=admin,user,guest`
 
     Requires permission: roles::read
     """
     request_params = dict(request.query_params)
     roles, total = role_service.get_all_roles_with_search(
-        db, search_key=key, search_value=value, page=page, page_size=page_size, request_params=request_params
+        db, page=page, page_size=page_size, request_params=request_params
     )
 
     meta = get_pagination_meta(total, page, page_size)

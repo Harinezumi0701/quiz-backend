@@ -6,14 +6,12 @@ from app.repository import question_repo
 
 def get_all_questions(
     db: Session,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None
 ):
     """Get all questions with optional filtering and pagination."""
-    return question_repo.get_all_questions(db, search_key, search_value, page, page_size, request_params)
+    return question_repo.get_all_questions(db, page=page, page_size=page_size, request_params=request_params)
 
 
 def get_question_by_id(db: Session, question_id: str):
@@ -25,30 +23,26 @@ def get_questions_by_category_and_test_id(
     db: Session,
     category_id: str,
     test_id: str,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ):
     """Get all questions for a specific category and test with optional filtering and pagination."""
     return question_repo.get_questions_by_category_and_test_id(
-        db, category_id, test_id, search_key, search_value, page, page_size, request_params
+        db, category_id, test_id, page=page, page_size=page_size, request_params=request_params
     )
 
 
 def get_questions_by_test_id(
     db: Session,
     test_id: str,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ):
     """Get all questions for a specific test with optional filtering and pagination."""
     return question_repo.get_questions_by_test_id(
-        db, test_id, search_key, search_value, page, page_size, request_params
+        db, test_id, page=page, page_size=page_size, request_params=request_params
     )
 
 

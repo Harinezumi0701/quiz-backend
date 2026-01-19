@@ -7,15 +7,13 @@ from app.repository import answer_repo
 def get_answers_by_question_id(
     db: Session,
     question_id: str,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ):
     """Get all answers for a specific question with optional filtering and pagination."""
     return answer_repo.get_answers_by_question_id(
-        db, question_id, search_key, search_value, page, page_size, request_params
+        db, question_id, page=page, page_size=page_size, request_params=request_params
     )
 
 
@@ -26,15 +24,13 @@ def get_answer_by_id(db: Session, question_id: str, answer_id: str):
 
 def get_all_answers(
     db: Session,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ):
     """Get all answers with optional filtering and pagination."""
     return answer_repo.get_all_answers(
-        db, search_key, search_value, page, page_size, request_params
+        db, page=page, page_size=page_size, request_params=request_params
     )
 
 

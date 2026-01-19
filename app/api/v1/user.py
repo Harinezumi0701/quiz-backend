@@ -38,7 +38,7 @@ router = APIRouter()
     "",
     response_model=UserListResponse,
     summary="Get all users",
-    description="Get list of all users in the system with optional filtering and pagination. Supports both single filter (key, value) and multiple filters (filter-key-1, filter-value-1, ...). For comma-separated values, use OR condition.",
+    description="Get list of all users in the system with optional filtering and pagination. Supports standard query parameters for filtering (key=value). For comma-separated values, use OR condition.",
     responses={
         200: {
             "description": "List of users",
@@ -51,35 +51,8 @@ router = APIRouter()
 )
 def read_users(
     request: Request,
-    key: Optional[str] = Query(
-        None,
-        description="Search key: full_name, user_id, email, phone, or role_id (legacy format)",
-    ),
-    value: Optional[str] = Query(None, description="Search value (legacy format)"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
-    filter_key_1: Optional[str] = Query(
-        None,
-        alias="filter-key-1",
-        description="First filter key (e.g., full_name, user_id, email, phone, role_id)",
-    ),
-    filter_value_1: Optional[str] = Query(
-        None,
-        alias="filter-value-1",
-        description="First filter value (supports comma-separated for OR)",
-    ),
-    filter_key_2: Optional[str] = Query(
-        None, alias="filter-key-2", description="Second filter key"
-    ),
-    filter_value_2: Optional[str] = Query(
-        None, alias="filter-value-2", description="Second filter value"
-    ),
-    filter_key_3: Optional[str] = Query(
-        None, alias="filter-key-3", description="Third filter key"
-    ),
-    filter_value_3: Optional[str] = Query(
-        None, alias="filter-value-3", description="Third filter value"
-    ),
     db: Session = Depends(get_db),
     user: User = Depends(
         require_namespace_permission(PERMISSION_NAMESPACE_USERS, "GET")
@@ -89,9 +62,8 @@ def read_users(
     Get list of all users with optional filtering and pagination.
 
     **Filter Options:**
-    - **Legacy format**: Use `key` and `value` parameters for single filter
-    - **Multiple filters**: Use `filter-key-1`, `filter-value-1`, `filter-key-2`, `filter-value-2`, etc.
-    - **OR condition**: Use comma-separated values in filter-value (e.g., `filter-value-1=user1,user2,user3`)
+    - **Format**: Use `key=value` query parameters (e.g., `?full_name=John`)
+    - **OR condition**: Use comma-separated values (e.g., `?role_id=id1,id2`)
 
     **Search Keys:**
     - `full_name`: Search in user full name (text search)
@@ -101,19 +73,17 @@ def read_users(
     - `role_id`: Filter by role ID (exact match, supports comma-separated for OR)
 
     **Examples:**
-    - Single filter: `?key=full_name&value=John`
-    - Multiple filters: `?filter-key-1=full_name&filter-value-1=John&filter-key-2=email&filter-value-2=example`
-    - OR condition: `?filter-key-1=user_id&filter-value-1=user1,user2,user3`
-    - Filter by role: `?key=role_id&value=550e8400-e29b-41d4-a716-446655440000`
-    - Multiple roles: `?filter-key-1=role_id&filter-value-1=id1,id2,id3`
+    - Simple filter: `?full_name=John`
+    - Multiple filters: `?full_name=John&email=example`
+    - OR condition: `?user_id=user1,user2,user3`
+    - Filter by role: `?role_id=550e8400-e29b-41d4-a716-446655440000`
+    - Multiple roles: `?role_id=id1,id2,id3`
 
     Requires permission: users::read
     """
     request_params = dict(request.query_params)
     users, total = user_service.list_users(
         db,
-        search_key=key,
-        search_value=value,
         page=page,
         page_size=page_size,
         request_params=request_params,

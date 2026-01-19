@@ -6,15 +6,13 @@ from app.repository import namespace_repo
 
 def get_all_namespaces_with_search(
     db: Session,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all namespaces with optional name search and pagination."""
     return namespace_repo.get_all_namespaces_with_search(
-        db, search_key, search_value, page, page_size, request_params
+        db, page=page, page_size=page_size, request_params=request_params
     )
 
 

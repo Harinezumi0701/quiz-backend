@@ -5,18 +5,13 @@ from app.models.categories import Category
 from app.models.questions import Question
 from app.models.tests import Test
 from app.utils.datetime_utils import datetime_to_timestamp
-from app.utils.search_pagination import (
-    paginate_query,
-    paginate_query_with_multiple_filters,
-)
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 from typing import Dict, Any
 
 
 def get_tests_by_category_id(
     db: Session,
     category_id: str,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -27,8 +22,6 @@ def get_tests_by_category_id(
     Args:
         db: Database session
         category_id: Category UUID
-        search_key: Field to search (name)
-        search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
@@ -61,23 +54,14 @@ def get_tests_by_category_id(
     }
 
     # Apply search filter and pagination
-    if request_params:
-        paginated_query, total = paginate_query_with_multiple_filters(
-            query,
-            request_params=request_params,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
-    else:
-        paginated_query, total = paginate_query(
-            query,
-            search_key=search_key,
-            search_value=search_value,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
+    # Apply search filter and pagination
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
 
     # Execute query
     tests = paginated_query.all()
@@ -109,8 +93,6 @@ def get_tests_by_category_id(
 
 def get_all_tests(
     db: Session,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
@@ -120,8 +102,6 @@ def get_all_tests(
 
     Args:
         db: Database session
-        search_key: Field to search (name)
-        search_value: Value to search for
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
@@ -146,23 +126,14 @@ def get_all_tests(
     }
 
     # Apply search filter and pagination
-    if request_params:
-        paginated_query, total = paginate_query_with_multiple_filters(
-            query,
-            request_params=request_params,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
-    else:
-        paginated_query, total = paginate_query(
-            query,
-            search_key=search_key,
-            search_value=search_value,
-            search_config=search_config,
-            page=page,
-            page_size=page_size,
-        )
+    # Apply search filter and pagination
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
 
     # Execute query
     tests = paginated_query.all()

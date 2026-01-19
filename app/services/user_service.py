@@ -18,15 +18,13 @@ from app.constants import (
 
 def list_users(
     db: Session,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all users with optional filtering and pagination."""
     return user_repo.get_all_users(
-        db, search_key, search_value, page, page_size, request_params
+        db, page=page, page_size=page_size, request_params=request_params
     )
 
 

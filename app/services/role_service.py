@@ -30,15 +30,13 @@ def get_all_roles(db: Session):
 
 def get_all_roles_with_search(
     db: Session,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ):
     """Get all roles with optional filtering and pagination."""
     return role_repo.get_all_roles_with_search(
-        db, search_key, search_value, page, page_size, request_params
+        db, page=page, page_size=page_size, request_params=request_params
     )
 
 

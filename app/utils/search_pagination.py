@@ -585,49 +585,91 @@ class PaginationHandler:
         }
 
 
-def paginate_query(
+
+
+def parse_multiple_filters(
+    request_params: Dict[str, Any],
+    search_config: Optional[Dict[str, Dict[str, Any]]] = None
+) -> List[Tuple[str, str]]:
+    """
+    Parse multiple filter parameters from request query params.
+
+    Supports format: key=value
+    Also supports comma-separated values (e.g., id=id1,id2,id3 -> OR condition)
+
+    Args:
+        request_params: Dictionary of request parameters (from FastAPI Query params)
+        search_config: Optional search configuration to validate keys against
+
+    Returns:
+        List of (search_key, search_value) tuples
+    """
+    filters = []
+    
+    # keys to ignore
+    ignore_keys = ["page", "page_size"]
+    
+    for key, value in request_params.items():
+        if key in ignore_keys:
+            continue
+            
+        # If search_config is provided, only accept keys present in config
+        if search_config and key not in search_config:
+            continue
+            
+        if value:
+            filters.append((key, str(value)))
+
+    return filters
+
+
+def paginate_query_with_multiple_filters(
     query: Query,
-    search_key: Optional[str] = None,
-    search_value: Optional[str] = None,
+    request_params: Dict[str, Any],
     search_config: Optional[Dict[str, Dict[str, Any]]] = None,
-    page: int = 1,
-    page_size: int = 10,
+    page: Optional[int] = None,
+    page_size: Optional[int] = None,
 ) -> Tuple[Query, int]:
     """
-    Apply search filter and pagination to a query.
+    Apply multiple search filters and pagination to a query.
 
-    This is a convenience function that combines SearchFilter and PaginationHandler.
+    This function parses multiple filter parameters from request_params and applies them.
+    Supports format: key=value (e.g., ?name=John&status=active)
 
     Args:
         query: SQLAlchemy query object
-        search_key: Key indicating which field to search
-        search_value: Value to search for
+        request_params: Dictionary of request parameters (from FastAPI Query params)
         search_config: Search configuration dictionary
-        page: Page number (1-indexed)
-        page_size: Number of items per page
+        page: Page number (1-indexed). If None, will try to get from request_params
+        page_size: Number of items per page. If None, will try to get from request_params
 
     Returns:
         Tuple of (paginated query, total count)
-
-    Example:
-        ```python
-        search_config = {
-            "content": {
-                "column": Model.content,
-                "type": "text",
-                "case_sensitive": False
-            }
-        }
-        paginated_query, total = paginate_query(
-            query, search_key="content", search_value="test",
-            search_config=search_config, page=1, page_size=10
-        )
-        ```
     """
-    # Apply search filter if provided
+    # Get page and page_size from request_params if not provided
+    if page is None:
+        page = request_params.get("page", 1)
+        try:
+            page = int(page)
+        except (ValueError, TypeError):
+            page = 1
+
+    if page_size is None:
+        page_size = request_params.get("page_size", 10)
+        try:
+            page_size = int(page_size)
+        except (ValueError, TypeError):
+            page_size = 10
+
     if search_config:
         search_filter = SearchFilter(search_config)
-        query = search_filter.apply(query, search_key, search_value)
+
+        # Parse filters directly from params
+        filters = parse_multiple_filters(request_params, search_config)
+
+        if filters:
+            # Apply multiple filters
+            query = search_filter.apply_multiple(query, filters)
 
     # Apply pagination
     return PaginationHandler.apply(query, page, page_size)
@@ -648,147 +690,3 @@ def get_pagination_meta(total: int, page: int, page_size: int) -> Dict[str, Any]
         Dictionary with pagination metadata
     """
     return PaginationHandler.get_meta(total, page, page_size)
-
-
-def apply_search_filter(
-    query: Query,
-    search_key: Optional[str],
-    search_value: Optional[str],
-    search_config: Dict[str, Dict[str, Any]],
-) -> Query:
-    """
-    Apply search filter based on search_key and search_value using a configuration.
-
-    Convenience function that delegates to SearchFilter.
-
-    Args:
-        query: SQLAlchemy query object
-        search_key: Key indicating which field to search
-        search_value: Value to search for
-        search_config: Dictionary mapping search_key to search configuration
-
-    Returns:
-        Modified query with search filter applied
-    """
-    search_filter = SearchFilter(search_config)
-    return search_filter.apply(query, search_key, search_value)
-
-
-def parse_multiple_filters(request_params: Dict[str, Any]) -> List[Tuple[str, str]]:
-    """
-    Parse multiple filter parameters from request query params.
-
-    Supports format: filter-key-1, filter-value-1, filter-key-2, filter-value-2, ...
-    Also supports comma-separated values in filter-value (e.g., id1,id2,id3 -> OR condition)
-
-    Args:
-        request_params: Dictionary of request parameters (from FastAPI Query params)
-
-    Returns:
-        List of (search_key, search_value) tuples
-
-    Example:
-        If params: filter-key-1=name&filter-value-1=C02&filter-key-2=status&filter-value-2=on&filter-key-3=id&filter-value-3=id1,id2,id3
-        Returns: [("name", "C02"), ("status", "on"), ("id", "id1,id2,id3")]
-    """
-    filters = []
-    i = 1
-
-    while True:
-        key_param = f"filter-key-{i}"
-        value_param = f"filter-value-{i}"
-
-        search_key = request_params.get(key_param)
-        search_value = request_params.get(value_param)
-
-        # Stop if we don't have both key and value for this index
-        if not search_key or not search_value:
-            break
-
-        filters.append((search_key, search_value))
-        i += 1
-
-    return filters
-
-
-def paginate_query_with_multiple_filters(
-    query: Query,
-    request_params: Dict[str, Any],
-    search_config: Optional[Dict[str, Dict[str, Any]]] = None,
-    page: Optional[int] = None,
-    page_size: Optional[int] = None,
-) -> Tuple[Query, int]:
-    """
-    Apply multiple search filters and pagination to a query.
-
-    This function parses multiple filter parameters from request_params and applies them.
-    Supports both old format (key, value) and new format (filter-key-1, filter-value-1, ...).
-
-    Args:
-        query: SQLAlchemy query object
-        request_params: Dictionary of request parameters (from FastAPI Query params)
-        search_config: Search configuration dictionary
-        page: Page number (1-indexed). If None, will try to get from request_params
-        page_size: Number of items per page. If None, will try to get from request_params
-
-    Returns:
-        Tuple of (paginated query, total count)
-
-    Example:
-        ```python
-        search_config = {
-            "name": {
-                "column": Model.name,
-                "type": "text",
-                "case_sensitive": False
-            },
-            "status": {
-                "column": Model.status,
-                "type": "exact"
-            },
-            "id": {
-                "column": Model.id,
-                "type": "exact"
-            }
-        }
-        # Supports: filter-key-1=name&filter-value-1=C02&filter-key-2=status&filter-value-2=on&filter-key-3=id&filter-value-3=id1,id2,id3
-        paginated_query, total = paginate_query_with_multiple_filters(
-            query, request_params, search_config
-        )
-        ```
-    """
-    # Get page and page_size from request_params if not provided
-    if page is None:
-        page = request_params.get("page", 1)
-        try:
-            page = int(page)
-        except (ValueError, TypeError):
-            page = 1
-
-    if page_size is None:
-        page_size = request_params.get("page_size", 10)
-        try:
-            page_size = int(page_size)
-        except (ValueError, TypeError):
-            page_size = 10
-
-    if search_config:
-        search_filter = SearchFilter(search_config)
-
-        # Try to parse multiple filters first
-        filters = parse_multiple_filters(request_params)
-
-        if filters:
-            # Apply multiple filters
-            query = search_filter.apply_multiple(query, filters)
-        else:
-            # Fallback to old format (key, value)
-            search_key = request_params.get("key") or request_params.get("search_key")
-            search_value = request_params.get("value") or request_params.get(
-                "search_value"
-            )
-            if search_key and search_value:
-                query = search_filter.apply(query, search_key, search_value)
-
-    # Apply pagination
-    return PaginationHandler.apply(query, page, page_size)

@@ -138,15 +138,13 @@ def get_user_permissions(db: Session, user: User) -> list[str]:
 
 def get_all_permissions(
     db: Session,
-    search_key: str = None,
-    search_value: str = None,
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
 ) -> Tuple[list, int]:
     """Get all permissions with optional filtering and pagination."""
     return permission_repo.get_all_permissions(
-        db, search_key, search_value, page, page_size, request_params
+        db, page=page, page_size=page_size, request_params=request_params
     )
 
 

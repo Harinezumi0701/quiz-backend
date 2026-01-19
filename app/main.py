@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, category, test, answer, me
+from app.api.v1 import user, auth, question, category, test, answer, me, upload
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response
 from app.constants import (
@@ -22,6 +22,7 @@ from app.constants import (
     CATEGORIES_PREFIX,
     TESTS_PREFIX,
     ANSWERS_PREFIX,
+    UPLOADS_PREFIX,
     HEALTH_CHECK_PATH,
     ROOT_PATH,
 )
@@ -71,6 +72,10 @@ tags_metadata = [
         "name": "answers",
         "description": "Answer management. Get all answers with search and pagination.",
     },
+    {
+        "name": "uploads",
+        "description": "File upload management. Generate presigned URLs for uploading files to S3.",
+    },
 ]
 
 app = FastAPI(
@@ -119,6 +124,7 @@ app.include_router(question.router, prefix=QUESTIONS_PREFIX, tags=["questions"])
 app.include_router(category.router, prefix=CATEGORIES_PREFIX, tags=["categories"])
 app.include_router(test.router, prefix=TESTS_PREFIX, tags=["tests"])
 app.include_router(answer.router, prefix=ANSWERS_PREFIX, tags=["answers"])
+app.include_router(upload.router, prefix=UPLOADS_PREFIX, tags=["uploads"])
 
 
 def custom_openapi():

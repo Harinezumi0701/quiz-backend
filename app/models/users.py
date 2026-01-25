@@ -9,9 +9,9 @@ class User(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, server_default=text("uuidv7()"))
     user_id = Column(String(125), unique=True, nullable=False, index=True)
-    user_email = Column(String(255), unique=True, nullable=False)
+    user_email = Column("email", String(255), unique=True, nullable=False)
     full_name = Column(String(255), nullable=False)
-    user_password = Column(String(255), nullable=False)
+    user_password = Column("password", String(255), nullable=False)
     phone = Column(String(20), nullable=True)
     birthday = Column(Date, nullable=True)
     address = Column(String(500), nullable=True)

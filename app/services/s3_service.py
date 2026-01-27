@@ -37,19 +37,19 @@ def generate_presigned_url(
     prefix: str = "uploads",
     content_type: Optional[str] = None,
     expires_in: int = DEFAULT_EXPIRES_IN
-) -> tuple[str, str]:
+) -> tuple[str, str, str]:
     """
     Generate a presigned URL for uploading a file to S3 Storage.
-    
+
     Args:
         filename: Original filename
         prefix: Prefix path for the file in S3 storage (default: "uploads")
         content_type: Content type of the file (e.g., 'image/jpeg')
         expires_in: URL expiration time in seconds (default: 3600, max: 604800)
-    
+
     Returns:
-        tuple: (presigned_url, file_key)
-    
+        tuple: (presigned_url, file_key, public_url)
+
     Raises:
         ValueError: If S3 configuration is incomplete
         ClientError: If presigned URL generation fails
@@ -83,7 +83,12 @@ def generate_presigned_url(
             ExpiresIn=expires_in
         )
         
-        return presigned_url, file_key
+        if CLOUDFRONT_DOMAIN:
+            public_url = f"https://{CLOUDFRONT_DOMAIN}/{file_key}"
+        else:
+            public_url = f"https://{S3_BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{file_key}"
+
+        return presigned_url, file_key, public_url
     
     except ClientError as e:
         raise Exception(f"Failed to generate presigned URL: {str(e)}")

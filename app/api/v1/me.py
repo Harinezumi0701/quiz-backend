@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.schemas.user import UserResponse, UserUpdateRequest, ChangePasswordRequest
-from app.schemas.submission import DashboardResponse
+from app.schemas.submission import DashboardResponse, SubmissionHistoryGroupedByTestResponse
 from app.schemas.http_response import ErrorResponse
 from app.services import submission_service, user_service, permission_service
 from app.db.session import get_db
@@ -124,7 +124,7 @@ def update_current_user(
     "/dashboard",
     response_model=DashboardResponse,
     summary="Get dashboard data",
-    description="Get user statistics and recent activity (requires authentication)",
+    description="Get user statistics (requires authentication)",
     responses={
         200: {
             "description": "Dashboard data",
@@ -140,16 +140,31 @@ def get_dashboard(
     db: Session = Depends(get_db)
 ):
     """
-    Get user dashboard data including:
-    
-    - **overall**: Overall statistics (total submitted, correct, wrong, accuracy rate)
-    - **by_category**: Statistics by category
-    - **recent_activity**: Recent activity (most recently submitted questions)
-    
+    Get user dashboard data including overall statistics, by category and by test.
+
     Requires authentication token in header: `Authorization: Bearer <token>`
     """
     dashboard_data = submission_service.get_user_dashboard_data(db, current_user.id)
     return DashboardResponse(data=dashboard_data, meta={})
+
+
+@router.get(
+    "/submission-history",
+    response_model=SubmissionHistoryGroupedByTestResponse,
+    summary="Get submission history grouped by test",
+    description="Get all submission history of the current user grouped by test_id (requires authentication)",
+    responses={
+        200: {"description": "Submission history grouped by test"},
+        401: {"description": "Unauthorized access", "model": ErrorResponse},
+    },
+)
+def get_submission_history(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get all submission history of the current user grouped by test_id."""
+    data = submission_service.get_user_submission_history_grouped_by_test(db, current_user.id)
+    return SubmissionHistoryGroupedByTestResponse(data=data, meta={})
 
 
 @router.put(

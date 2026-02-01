@@ -52,6 +52,7 @@ class SubmissionOut(BaseModel):
     answer_id: UUID = Field(..., description="Selected answer option ID", example="550e8400-e29b-41d4-a716-446655440003")
     is_correct: bool = Field(..., description="Whether the submission is correct", example=True)
     answered_at: int | None = Field(None, description="Submission Unix timestamp", example=1704067200)
+    created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
 
     class Config:
         from_attributes = True
@@ -62,7 +63,8 @@ class SubmissionOut(BaseModel):
                 "question_id": "550e8400-e29b-41d4-a716-446655440002",
                 "answer_id": "550e8400-e29b-41d4-a716-446655440003",
                 "is_correct": True,
-                "answered_at": 1704067200
+                "answered_at": 1704067200,
+                "created_at": 1704067200
             }
         }
 
@@ -94,16 +96,6 @@ class TestStatistics(BaseModel):
     last_attempt: int | None = Field(None, description="Last attempt Unix timestamp", example=1704067200)
 
 
-class RecentActivity(BaseModel):
-    """Schema for recent activity"""
-    id: UUID = Field(..., description="Submission ID", example="550e8400-e29b-41d4-a716-446655440000")
-    category: str = Field(..., description="Question category", example="DVA-C02")
-    test_name: str = Field(..., description="Test name", example="Practice Test 1")
-    question_preview: str = Field(..., description="Question content preview", example="What is AWS Lambda?")
-    is_correct: bool = Field(..., description="Whether the submission is correct", example=True)
-    answered_at: int | None = Field(None, description="Submission Unix timestamp", example=1704067200)
-
-
 class OverallStatistics(BaseModel):
     """Schema for overall statistics"""
     total_answered: int = Field(..., description="Total questions answered", example=150)
@@ -118,11 +110,26 @@ class DashboardData(BaseModel):
     overall: OverallStatistics = Field(..., description="Overall statistics")
     by_category: List[CategoryStatistics] = Field(..., description="Statistics by category")
     by_test: dict[str, List[TestStatistics]] = Field(..., description="Statistics by test grouped by category")
-    recent_activity: List[RecentActivity] = Field(..., description="Recent activity")
 
 
 class SubmissionResponse(SuccessResponse[SubmissionOut]):
     """Response schema for single submission"""
+    pass
+
+
+class SubmissionHistoryDetail(BaseModel):
+    """Schema for full submission history (one submit session)"""
+    id: UUID = Field(..., description="Submission history ID")
+    user_id: UUID = Field(..., description="User ID")
+    submitted_at: int | None = Field(None, description="Submitted at Unix timestamp")
+    submission_count: int = Field(..., description="Total submissions in this session")
+    created_at: int | None = Field(None, description="Created at Unix timestamp")
+    updated_at: int | None = Field(None, description="Updated at Unix timestamp")
+    submissions: List[SubmissionOut] = Field(..., description="Submissions for this test in this session")
+
+
+class SubmissionHistoryDetailResponse(SuccessResponse[SubmissionHistoryDetail]):
+    """Response schema for submission history detail"""
     pass
 
 
@@ -133,5 +140,24 @@ class SubmissionListResponse(SuccessResponse[List[SubmissionOut]]):
 
 class DashboardResponse(SuccessResponse[DashboardData]):
     """Response schema for dashboard data"""
+    pass
+
+
+class SubmissionHistoryEntry(BaseModel):
+    """Schema for one submission history (one submit session)"""
+    submission_history_id: str | None = Field(None, description="Submission history ID")
+    submitted_at: int | None = Field(None, description="Submitted at Unix timestamp")
+    submissions: List[SubmissionOut] = Field(..., description="Submissions in this session")
+
+
+class SubmissionHistoryByTestGroup(BaseModel):
+    """Schema for submission history grouped by test then by history"""
+    test_id: str | None = Field(None, description="Test ID")
+    test_name: str = Field(..., description="Test name")
+    histories: List[SubmissionHistoryEntry] = Field(..., description="Submission histories (sessions) for this test")
+
+
+class SubmissionHistoryGroupedByTestResponse(SuccessResponse[List[SubmissionHistoryByTestGroup]]):
+    """Response schema for submission history grouped by test"""
     pass
 

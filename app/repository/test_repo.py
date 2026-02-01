@@ -373,7 +373,7 @@ def update_test(
 
 def delete_test(db: Session, test_id: str):
     """
-    Soft delete a test.
+    Soft delete a test and cascade soft-delete all its questions.
 
     Args:
         db: Database session
@@ -389,6 +389,10 @@ def delete_test(db: Session, test_id: str):
     if not test:
         return False
 
-    test.deleted_at = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc)
+    db.query(Question).filter(
+        Question.test_id == test_id, Question.deleted_at.is_(None)
+    ).update({"deleted_at": now}, synchronize_session=False)
+    test.deleted_at = now
     db.commit()
     return True

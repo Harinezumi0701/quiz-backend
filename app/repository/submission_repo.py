@@ -1,17 +1,119 @@
 # app/repository/submission_repo.py
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import List
+from typing import Dict, Any, List, Tuple
 from uuid import UUID
 from app.models.submissions import Submission
 from app.models.questions import Question
 from app.models.categories import Category
 from app.models.tests import Test
-from app.models.users import User
 from app.models.submission_history import SubmissionHistory
 from app.schemas.submission import SubmissionCreate
 from app.utils.datetime_utils import datetime_to_timestamp
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 from app.constants import UNCATEGORIZED_CATEGORY_NAME, UNCATEGORIZED_TEST_NAME_NAME
+
+
+def get_submissions_by_test_id(
+    db: Session,
+    test_id: str,
+    page: int = 1,
+    page_size: int = 10,
+    request_params: Dict[str, Any] | None = None,
+) -> Tuple[List[dict], int]:
+    """
+    Get submissions for a test with pagination and optional filters.
+
+    Args:
+        db: Database session
+        test_id: Test UUID
+        page: Page number (1-indexed)
+        page_size: Items per page
+        request_params: Query params for search (user_id, is_correct, answered_at)
+
+    Returns:
+        Tuple of (list of submission dicts, total count)
+    """
+    query = (
+        db.query(Submission)
+        .join(Question, Submission.question_id == Question.id)
+        .filter(
+            Question.test_id == test_id,
+            Question.deleted_at.is_(None),
+        )
+        .order_by(Submission.answered_at.desc())
+    )
+    search_config = {
+        "user_id": {"column": Submission.user_id, "type": "exact"},
+        "is_correct": {"column": Submission.is_correct, "type": "boolean"},
+        "answered_at": {"column": Submission.answered_at, "type": "date"},
+    }
+    paginated_query, total = paginate_query_with_multiple_filters(
+        query,
+        request_params=request_params or {},
+        search_config=search_config,
+        page=page,
+        page_size=page_size,
+    )
+    rows = paginated_query.all()
+    result = [
+        {
+            "id": s.id,
+            "user_id": s.user_id,
+            "question_id": s.question_id,
+            "answer_id": s.answer_id,
+            "is_correct": s.is_correct,
+            "answered_at": datetime_to_timestamp(s.answered_at),
+            "created_at": datetime_to_timestamp(s.answered_at),
+        }
+        for s in rows
+    ]
+    return result, total
+
+
+def get_submission_history_by_id_for_test(
+    db: Session, test_id: str, submission_history_id: str
+) -> dict | None:
+    """Get submission history by id with all submissions for the given test."""
+    history = (
+        db.query(SubmissionHistory)
+        .filter(SubmissionHistory.id == submission_history_id)
+        .first()
+    )
+    if not history:
+        return None
+    rows = (
+        db.query(Submission)
+        .join(Question, Submission.question_id == Question.id)
+        .filter(
+            Submission.submission_history_id == submission_history_id,
+            Question.test_id == test_id,
+            Question.deleted_at.is_(None),
+        )
+        .order_by(Submission.answered_at.asc())
+        .all()
+    )
+    submissions = [
+        {
+            "id": s.id,
+            "user_id": s.user_id,
+            "question_id": s.question_id,
+            "answer_id": s.answer_id,
+            "is_correct": s.is_correct,
+            "answered_at": datetime_to_timestamp(s.answered_at),
+            "created_at": datetime_to_timestamp(s.answered_at),
+        }
+        for s in rows
+    ]
+    return {
+        "id": history.id,
+        "user_id": history.user_id,
+        "submitted_at": datetime_to_timestamp(history.submitted_at),
+        "submission_count": history.submission_count,
+        "created_at": datetime_to_timestamp(history.created_at),
+        "updated_at": datetime_to_timestamp(history.updated_at),
+        "submissions": submissions,
+    }
 
 
 def create_submission(
@@ -168,39 +270,50 @@ def get_user_statistics_by_test(db: Session, user_id: UUID):
     return result
 
 
-def get_user_recent_activity(db: Session, user_id: UUID, limit: int = 10):
-    """Get user's recent quiz activity."""
-    activities = (
-        db.query(
-            Submission.id,
-            Category.name.label("category_name"),
-            Test.name.label("test_name"),
-            Question.content,
-            Submission.is_correct,
-            Submission.answered_at,
-        )
+def get_user_submission_history_grouped_by_test(db: Session, user_id: UUID) -> List[dict]:
+    """Get all submissions for a user grouped by test_id then by submission_history."""
+    rows = (
+        db.query(Submission, Question.test_id, Test.name, SubmissionHistory.submitted_at)
         .join(Question, Submission.question_id == Question.id)
-        .outerjoin(Category, Question.category_id == Category.id)
         .outerjoin(Test, Question.test_id == Test.id)
+        .outerjoin(SubmissionHistory, Submission.submission_history_id == SubmissionHistory.id)
         .filter(
             Submission.user_id == user_id,
             Question.deleted_at.is_(None),
-            (Category.deleted_at.is_(None) | (Category.id.is_(None))),
-            (Test.deleted_at.is_(None) | (Test.id.is_(None)))
+            (Test.deleted_at.is_(None) | (Test.id.is_(None))),
         )
-        .order_by(Submission.answered_at.desc())
-        .limit(limit)
+        .order_by(SubmissionHistory.submitted_at.desc().nulls_last(), Submission.answered_at.desc())
         .all()
     )
-
-    return [
-        {
-            "id": activity[0],
-            "category": activity[1] or UNCATEGORIZED_CATEGORY_NAME,
-            "test_name": activity[2] or UNCATEGORIZED_TEST_NAME_NAME,
-            "question_preview": activity[3],
-            "is_correct": activity[4],
-            "answered_at": datetime_to_timestamp(activity[5]),
-        }
-        for activity in activities
-    ]
+    grouped: Dict[Any, dict] = {}
+    for submission, test_id, test_name, submitted_at in rows:
+        tid = str(test_id) if test_id else None
+        if tid not in grouped:
+            grouped[tid] = {
+                "test_id": tid,
+                "test_name": test_name or UNCATEGORIZED_TEST_NAME_NAME,
+                "histories": {},
+            }
+        hist_id = str(submission.submission_history_id) if submission.submission_history_id else None
+        if hist_id not in grouped[tid]["histories"]:
+            grouped[tid]["histories"][hist_id] = {
+                "submission_history_id": hist_id,
+                "submitted_at": datetime_to_timestamp(submitted_at) if submitted_at else datetime_to_timestamp(submission.answered_at),
+                "submissions": [],
+            }
+        grouped[tid]["histories"][hist_id]["submissions"].append({
+            "id": submission.id,
+            "user_id": submission.user_id,
+            "question_id": submission.question_id,
+            "answer_id": submission.answer_id,
+            "is_correct": submission.is_correct,
+            "answered_at": datetime_to_timestamp(submission.answered_at),
+            "created_at": datetime_to_timestamp(submission.answered_at),
+        })
+    result = []
+    for g in grouped.values():
+        histories = list(g["histories"].values())
+        histories.sort(key=lambda h: h["submitted_at"] or 0, reverse=True)
+        g["histories"] = histories
+        result.append(g)
+    return result

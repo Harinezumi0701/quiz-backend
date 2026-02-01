@@ -17,7 +17,11 @@ from app.schemas.test import (
     TestCreateRequest,
     TestUpdateRequest,
 )
-from app.schemas.submission import SubmissionBulkCreate, SubmissionListResponse
+from app.schemas.submission import (
+    SubmissionBulkCreate,
+    SubmissionHistoryDetailResponse,
+    SubmissionListResponse,
+)
 from app.schemas.http_response import ErrorResponse
 from app.services import category_service, submission_service
 from app.db.session import get_db
@@ -130,6 +134,50 @@ def get_test_by_id(
         )
 
     return TestDetailResponse(data=test, meta={})
+
+
+@router.get(
+    "/{test_id}/submit/{submission_history_id}",
+    response_model=SubmissionHistoryDetailResponse,
+    summary="Get submission history by ID for a test",
+    description="Get all information about a submission history for a test (requires permission)",
+    responses={
+        200: {"description": "Submission history details"},
+        404: {"description": "Test or submission history not found", "model": ErrorResponse},
+        403: {"description": "Permission denied", "model": ErrorResponse},
+    },
+)
+def get_test_submission_history_by_id(
+    test_id: str = Path(
+        ...,
+        description="Test ID",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    submission_history_id: str = Path(
+        ...,
+        description="Submission history ID",
+        example="550e8400-e29b-41d4-a716-446655440000",
+    ),
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_TESTS, "GET")
+    ),
+):
+    """
+    Get submission history by ID for a test (all info about the submit session).
+
+    Requires permission: tests::read
+    """
+    test = category_service.get_test_by_id_only(db, test_id)
+    if not test:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Test with ID {test_id} not found",
+        )
+    data = submission_service.get_submission_history_by_id_for_test(
+        db, test_id, submission_history_id
+    )
+    return SubmissionHistoryDetailResponse(data=data, meta={})
 
 
 @router.post(

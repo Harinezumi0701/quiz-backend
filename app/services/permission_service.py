@@ -11,6 +11,7 @@ from app.constants.permissions import (
     PERMISSION_NAMESPACE_CATEGORIES,
     PERMISSION_ACTION_READ,
     PERMISSION_WILDCARD_ALL,
+    DEFAULT_USER_PERMISSIONS,
 )
 
 
@@ -29,8 +30,11 @@ def check_permission(db: Session, user: User, required_permission: str) -> bool:
     Returns:
         bool: True if user has permission, False otherwise
     """
-    # If user has no role_id, they have no permissions
+    # If user has no role_id, check against default permissions
     if not user.role_id:
+        for default_perm in DEFAULT_USER_PERMISSIONS:
+            if _permission_matches(default_perm, required_permission):
+                return True
         return False
 
     # Get role with permissions
@@ -121,6 +125,7 @@ def has_any_permission(
 def get_user_permissions(db: Session, user: User) -> list[str]:
     """
     Get all permissions for a user based on their role.
+    Users without a role get default permissions.
 
     Args:
         db: Database session
@@ -130,7 +135,7 @@ def get_user_permissions(db: Session, user: User) -> list[str]:
         list[str]: List of permission strings (e.g., [f"{PERMISSION_NAMESPACE_CATEGORIES}::{PERMISSION_ACTION_READ}", PERMISSION_WILDCARD_ALL])
     """
     if not user.role_id:
-        return []
+        return DEFAULT_USER_PERMISSIONS.copy()
 
     role_permissions = role_repo.get_role_permissions(db, user.role_id)
     return [perm.permission for perm in role_permissions]

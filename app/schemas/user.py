@@ -40,6 +40,9 @@ class UserOut(BaseModel):
     role_id: Optional[UUID] = Field(
         None, description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
     )
+    role_name: Optional[str] = Field(
+        None, description="Role name", example="user"
+    )
     permissions: List[str] = Field(
         default_factory=list,
         description="List of user permissions",

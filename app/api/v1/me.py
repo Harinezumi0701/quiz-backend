@@ -51,9 +51,11 @@ def read_current_user(
         "job_title": current_user.job_title,
         "company": current_user.company,
         "join_date": current_user.join_date,
+        "role_id": current_user.role_id,
+        "role_name": current_user.role_obj.name if current_user.role_obj else None,
         "permissions": permissions,
     }
-    
+
     return UserResponse(data=user_data, meta={})
 
 
@@ -114,6 +116,7 @@ def update_current_user(
         "company": updated_user.company,
         "join_date": updated_user.join_date,
         "role_id": updated_user.role_id,
+        "role_name": updated_user.role_obj.name if updated_user.role_obj else None,
         "permissions": permissions,
     }
     

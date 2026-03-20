@@ -18,43 +18,57 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def _role_exists(conn, name: str) -> bool:
+def _upsert_role_with_permissions(conn, name: str, description: str, default: bool, permissions: list[str]) -> None:
+    """
+    Idempotent upsert: create the role if it doesn't exist, then ensure each
+    required permission exists as an individual row. Pre-existing permissions
+    (including any malformed comma-joined ones) are left untouched — only the
+    missing individual permissions are inserted.
+    """
+    # Get existing role or create it
     result = conn.execute(
         sa.text("SELECT id FROM roles WHERE name = :name AND deleted_at IS NULL LIMIT 1"),
         {"name": name},
     )
-    return result.fetchone() is not None
+    row = result.fetchone()
 
-
-def _insert_role_with_permissions(conn, name: str, description: str, default: bool, permissions: list[str]) -> None:
-    if _role_exists(conn, name):
-        return
-
-    result = conn.execute(
-        sa.text("""
-            INSERT INTO roles (id, name, description, "default", created_at, updated_at)
-            VALUES (uuidv7(), :name, :description, :default, NOW(), NOW())
-            RETURNING id
-        """),
-        {"name": name, "description": description, "default": default},
-    )
-    role_id = result.scalar()
-
-    for permission in permissions:
-        conn.execute(
+    if row:
+        role_id = row[0]
+    else:
+        result = conn.execute(
             sa.text("""
-                INSERT INTO role_permissions (id, role_id, permission, created_at)
-                VALUES (uuidv7(), :role_id, :permission, NOW())
+                INSERT INTO roles (id, name, description, "default", created_at, updated_at)
+                VALUES (uuidv7(), :name, :description, :default, NOW(), NOW())
+                RETURNING id
             """),
-            {"role_id": role_id, "permission": permission},
+            {"name": name, "description": description, "default": default},
         )
+        role_id = result.scalar()
+
+    # Fetch already-stored permission strings for this role
+    existing = conn.execute(
+        sa.text("SELECT permission FROM role_permissions WHERE role_id = :role_id"),
+        {"role_id": role_id},
+    ).fetchall()
+    existing_perms = {row[0] for row in existing}
+
+    # Insert only the individual permissions that are not yet present
+    for permission in permissions:
+        if permission not in existing_perms:
+            conn.execute(
+                sa.text("""
+                    INSERT INTO role_permissions (id, role_id, permission, created_at)
+                    VALUES (uuidv7(), :role_id, :permission, NOW())
+                """),
+                {"role_id": role_id, "permission": permission},
+            )
 
 
 def upgrade() -> None:
     conn = op.get_bind()
 
     # Admin role — full access
-    _insert_role_with_permissions(
+    _upsert_role_with_permissions(
         conn,
         name="admin",
         description="Administrator with full permissions",
@@ -63,7 +77,7 @@ def upgrade() -> None:
     )
 
     # Editor role — manages content
-    _insert_role_with_permissions(
+    _upsert_role_with_permissions(
         conn,
         name="editor",
         description="Editor with access to tests, categories, questions, and answers",
@@ -77,7 +91,7 @@ def upgrade() -> None:
     )
 
     # User role — read-only learner access (default role)
-    _insert_role_with_permissions(
+    _upsert_role_with_permissions(
         conn,
         name="user",
         description="Standard user with read access to learning content",

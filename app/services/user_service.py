@@ -4,7 +4,7 @@ from uuid import UUID
 from typing import Dict, Any, Optional, Tuple
 import re
 from fastapi import HTTPException, status
-from app.repository import user_repo
+from app.repository import user_repo, submission_repo
 from app.utils.security import verify_password, get_password_hash
 from app.constants import (
     ERROR_USER_NOT_FOUND,
@@ -163,7 +163,8 @@ def create_user(db: Session, user_data: dict):
 
 
 def delete_user(db: Session, user_id: UUID):
-    """Delete a user by UUID (soft delete)."""
+    """Delete a user by UUID (soft delete). Hard deletes submission data first."""
+    submission_repo.delete_user_submissions(db, user_id)
     deleted = user_repo.delete_user(db, user_id)
     if not deleted:
         raise HTTPException(
@@ -173,7 +174,13 @@ def delete_user(db: Session, user_id: UUID):
 
 
 def delete_user_by_user_id(db: Session, user_id: str):
-    """Delete a user by user_id (editable identifier) (soft delete)."""
+    """Delete a user by user_id (editable identifier) (soft delete). Hard deletes submission data first."""
+    user = user_repo.get_user_by_user_id(db, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=ERROR_USER_NOT_FOUND
+        )
+    submission_repo.delete_user_submissions(db, user.id)
     deleted = user_repo.delete_user_by_user_id(db, user_id)
     if not deleted:
         raise HTTPException(

@@ -168,6 +168,12 @@ def get_user_statistics_by_test(db: Session, user_id: UUID):
     return result
 
 
+def delete_user_submissions(db: Session, user_id: UUID) -> None:
+    """Hard delete all submissions and submission_history records for a user."""
+    db.query(Submission).filter(Submission.user_id == user_id).delete(synchronize_session=False)
+    db.query(SubmissionHistory).filter(SubmissionHistory.user_id == user_id).delete(synchronize_session=False)
+
+
 def get_user_recent_activity(db: Session, user_id: UUID, limit: int = 10):
     """Get user's recent quiz activity."""
     activities = (

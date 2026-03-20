@@ -33,3 +33,4 @@ class Test(Base):
     # Relationships
     category = relationship("Category", back_populates="tests")
     questions = relationship("Question", back_populates="test_obj")
+    user_assignments = relationship("UserTestAssignment", back_populates="test", cascade="all, delete-orphan")

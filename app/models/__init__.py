@@ -9,3 +9,5 @@ from .tests import Test
 from .refresh_tokens import RefreshToken
 from .roles import Role, RolePermission
 from .namespaces import Namespace
+from .user_test_assignments import UserTestAssignment
+from .user_category_access import UserCategoryAccess

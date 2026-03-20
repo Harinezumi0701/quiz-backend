@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, category, test, answer, me, role, permission, namespace, upload
+from app.api.v1 import user, auth, question, category, test, answer, me, role, permission, namespace, upload, user_tests, test_assignments
 from app.utils.exceptions import http_exception_handler, general_exception_handler
 from app.utils.response import success_response
 from app.constants import (
@@ -26,6 +26,8 @@ from app.constants import (
     PERMISSIONS_PREFIX,
     NAMESPACES_PREFIX,
     UPLOADS_PREFIX,
+    USER_TESTS_PREFIX,
+    TEST_ASSIGNMENTS_PREFIX,
     HEALTH_CHECK_PATH,
     ROOT_PATH,
 )
@@ -91,6 +93,14 @@ tags_metadata = [
         "name": "uploads",
         "description": "File upload management. Generate presigned URLs for uploading files to S3 Storage.",
     },
+    {
+        "name": "user-tests",
+        "description": "User test assignments. Get assigned tests and access test questions.",
+    },
+    {
+        "name": "test-assignments",
+        "description": "Test assignment management (Admin). Assign tests to users and manage assignments.",
+    },
 ]
 
 app = FastAPI(
@@ -143,6 +153,8 @@ app.include_router(role.router, prefix=ROLES_PREFIX, tags=["roles"])
 app.include_router(permission.router, prefix=PERMISSIONS_PREFIX, tags=["permissions"])
 app.include_router(namespace.router, prefix=NAMESPACES_PREFIX, tags=["namespaces"])
 app.include_router(upload.router, prefix=UPLOADS_PREFIX, tags=["uploads"])
+app.include_router(user_tests.router, prefix=USER_TESTS_PREFIX, tags=["user-tests"])
+app.include_router(test_assignments.router, prefix=TEST_ASSIGNMENTS_PREFIX, tags=["test-assignments"])
 
 
 def custom_openapi():

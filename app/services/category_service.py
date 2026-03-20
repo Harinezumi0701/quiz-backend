@@ -44,10 +44,15 @@ def get_all_tests(
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
+    allowed_category_ids: Optional[list] = None,
 ) -> Tuple[list, int]:
     """Get all tests with optional filtering and pagination."""
     return test_repo.get_all_tests(
-        db, page=page, page_size=page_size, request_params=request_params
+        db,
+        page=page,
+        page_size=page_size,
+        request_params=request_params,
+        allowed_category_ids=allowed_category_ids,
     )
 
 

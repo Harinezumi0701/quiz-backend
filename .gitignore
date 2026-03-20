@@ -45,3 +45,5 @@ htmlcov/
 data*
 instructions.md
 scripts
+
+*.md

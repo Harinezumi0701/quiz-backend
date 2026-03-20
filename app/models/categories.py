@@ -17,6 +17,7 @@ class Category(Base):
     # Relationships
     questions = relationship("Question", back_populates="category_obj")
     tests = relationship("Test", back_populates="category")
+    user_access = relationship("UserCategoryAccess", back_populates="category", cascade="all, delete-orphan")
 
     @property
     def category(self):

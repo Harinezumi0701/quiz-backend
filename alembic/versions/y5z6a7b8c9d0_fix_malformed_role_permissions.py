@@ -32,6 +32,8 @@ ROLE_PERMISSIONS = {
         "categories::read",
         "tests::read",
         "questions::read",
+        "answers::read",
+        "submissions::create",
         "user_tests::read",
         "profile::read",
         "profile::update",

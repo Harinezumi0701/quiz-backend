@@ -197,8 +197,8 @@ def get_user_submission_history(db: Session, user_id: UUID, page: int = 1, page_
                 "answer_id": sub.answer_id,
                 "is_correct": sub.is_correct,
                 "answered_at": datetime_to_timestamp(sub.answered_at),
-                "category": question.category.name if question and question.category else None,
-                "test_name": question.test.name if question and question.test else None,
+                "category": question.category if question else None,
+                "test_name": question.test if question else None,
                 "question_preview": question.content if question else None,
             })
 

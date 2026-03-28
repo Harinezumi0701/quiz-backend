@@ -168,6 +168,52 @@ def get_user_statistics_by_test(db: Session, user_id: UUID):
     return result
 
 
+def get_user_submission_history(db: Session, user_id: UUID, page: int = 1, page_size: int = 10):
+    """Get paginated submission history for a user with submission details."""
+    offset = (page - 1) * page_size
+
+    total = db.query(SubmissionHistory).filter(SubmissionHistory.user_id == user_id).count()
+
+    history_records = (
+        db.query(SubmissionHistory)
+        .filter(SubmissionHistory.user_id == user_id)
+        .order_by(SubmissionHistory.submitted_at.desc())
+        .offset(offset)
+        .limit(page_size)
+        .all()
+    )
+
+    result = []
+    for record in history_records:
+        submissions_data = []
+        correct_count = 0
+        for sub in record.submissions:
+            if sub.is_correct:
+                correct_count += 1
+            question = sub.question
+            submissions_data.append({
+                "id": sub.id,
+                "question_id": sub.question_id,
+                "answer_id": sub.answer_id,
+                "is_correct": sub.is_correct,
+                "answered_at": datetime_to_timestamp(sub.answered_at),
+                "category": question.category.name if question and question.category else None,
+                "test_name": question.test.name if question and question.test else None,
+                "question_preview": question.content if question else None,
+            })
+
+        result.append({
+            "id": record.id,
+            "submitted_at": datetime_to_timestamp(record.submitted_at),
+            "submission_count": record.submission_count,
+            "correct_count": correct_count,
+            "wrong_count": record.submission_count - correct_count,
+            "submissions": submissions_data,
+        })
+
+    return result, total
+
+
 def delete_user_submissions(db: Session, user_id: UUID) -> None:
     """Hard delete all submissions and submission_history records for a user."""
     db.query(Submission).filter(Submission.user_id == user_id).delete(synchronize_session=False)

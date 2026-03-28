@@ -154,6 +154,11 @@ class SubmissionHistoryListResponse(SuccessResponse[List[SubmissionHistoryOut]])
     pass
 
 
+class SubmissionHistoryResponse(SuccessResponse[SubmissionHistoryOut]):
+    """Response schema for single submission history record"""
+    pass
+
+
 class SubmissionResponse(SuccessResponse[SubmissionOut]):
     """Response schema for single submission"""
     pass

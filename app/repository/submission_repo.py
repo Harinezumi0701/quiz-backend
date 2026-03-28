@@ -168,6 +168,46 @@ def get_user_statistics_by_test(db: Session, user_id: UUID):
     return result
 
 
+def get_submission_history_by_id(db: Session, submission_history_id: UUID, user_id: UUID):
+    """Get a single submission history record with full details, verified to belong to user."""
+    record = (
+        db.query(SubmissionHistory)
+        .filter(
+            SubmissionHistory.id == submission_history_id,
+            SubmissionHistory.user_id == user_id,
+        )
+        .first()
+    )
+    if not record:
+        return None
+
+    submissions_data = []
+    correct_count = 0
+    for sub in record.submissions:
+        if sub.is_correct:
+            correct_count += 1
+        question = sub.question
+        submissions_data.append({
+            "id": sub.id,
+            "question_id": sub.question_id,
+            "answer_id": sub.answer_id,
+            "is_correct": sub.is_correct,
+            "answered_at": datetime_to_timestamp(sub.answered_at),
+            "category": question.category if question else None,
+            "test_name": question.test if question else None,
+            "question_preview": question.content if question else None,
+        })
+
+    return {
+        "id": record.id,
+        "submitted_at": datetime_to_timestamp(record.submitted_at),
+        "submission_count": record.submission_count,
+        "correct_count": correct_count,
+        "wrong_count": record.submission_count - correct_count,
+        "submissions": submissions_data,
+    }
+
+
 def get_user_submission_history(db: Session, user_id: UUID, page: int = 1, page_size: int = 10):
     """Get paginated submission history for a user with submission details."""
     offset = (page - 1) * page_size

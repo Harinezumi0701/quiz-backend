@@ -85,7 +85,10 @@ def get_all_tests(
     allowed_category_ids = None
     if not is_elevated:
         access_records = user_category_access_repo.get_categories_for_user(db, user.id)
-        allowed_category_ids = [str(a.category_id) for a in access_records]
+        # Only restrict by category if the user has explicit access records.
+        # If none exist, fall through with allowed_category_ids=None (show all tests).
+        if access_records:
+            allowed_category_ids = [str(a.category_id) for a in access_records]
 
     tests, total = category_service.get_all_tests(
         db,

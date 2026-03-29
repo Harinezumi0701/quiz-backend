@@ -1,0 +1,77 @@
+Step-by-Step: Push CI/CD to GitHub
+Step 1 — Commit your changes locally
+Open a terminal in your project folder and run:
+
+
+# Stage only the CI/CD-related files (not all modified files)
+git add pyproject.toml poetry.lock
+git add app/api/v1/health.py
+git add app/main.py
+git add app/models/tests.py
+git add ci/docker/Dockerfile
+git add .dockerignore
+git add .github/
+git add ci/docker-compose.app.yml
+git add tests/conftest.py tests/test_health.py
+
+# Commit
+git commit -m "feat: add CI/CD pipeline with health endpoint and smoke tests"
+Why stage specific files? The modified list includes many files that were changed by ruff --fix (linting auto-fix). You can choose to commit those too or leave them for a separate commit.
+
+Step 2 — Push the branch to GitHub
+
+git push origin feature/setting-cicd
+This will automatically trigger the CI workflow (.github/workflows/ci-be.yml) because it pushes to a feature/** branch.
+
+Step 3 — Watch the CI workflow run
+Go to your repo on GitHub: https://github.com/Nhim0701/quiz-backend
+Click the Actions tab
+You should see a workflow called "CI — Backend" running
+Click into it to watch each step: lint → test → docker build
+If everything is green ✅ — CI is working!
+
+Step 4 — Set up GitHub Secrets (required for CD/deployment)
+The CD workflow needs 5 secrets. Go to:
+
+GitHub repo → Settings → Secrets and variables → Actions → New repository secret
+
+Add these one by one:
+
+Secret name	What to put
+SSH_PRIVATE_KEY	Your SSH private key (the ~/.ssh/id_rsa or similar, the full content starting with -----BEGIN)
+SSH_HOST	IP address or hostname of your production server
+SSH_USER	The Linux username on your server (e.g. ubuntu, deploy)
+SSH_PORT	SSH port, usually 22
+GHCR_TOKEN	A GitHub Personal Access Token with write:packages scope
+To create a GHCR_TOKEN:
+
+GitHub → Your avatar (top right) → Settings → Developer settings → Personal access tokens → Tokens (classic)
+Click "Generate new token (classic)"
+Check: write:packages, read:packages, delete:packages
+Copy the token and save it as the GHCR_TOKEN secret
+Step 5 — Make sure your production server is ready
+SSH into your server and verify:
+
+Docker is installed: docker --version
+Docker Compose plugin is installed: docker compose version
+The file ~/ci/docker-compose.app.yml exists (or wherever you deploy to)
+Your server user can run docker commands without sudo
+Step 6 — Trigger a production deployment
+When you're ready to deploy:
+
+
+# On your local machine
+git checkout production        # switch to production branch
+git merge feature/setting-cicd # merge your CI/CD work
+git push origin production     # this triggers the CD workflow
+The CD workflow will:
+
+Run lint + tests (same as CI)
+Build and push Docker image to GitHub Container Registry
+SSH into your server and deploy the new image
+Run alembic upgrade head for any pending migrations
+Check GET /health to confirm the app is running
+Summary of what triggers what
+Action	Workflow triggered
+Push to feature/**	CI only (lint + test + build)
+Push to production	CD (lint + test + build + push image + SSH deploy)

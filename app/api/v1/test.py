@@ -22,8 +22,6 @@ from app.schemas.submission import SubmissionBulkCreate, SubmissionListResponse,
 from app.schemas.http_response import ErrorResponse
 from app.services import category_service, submission_service
 from app.repository import submission_repo
-from app.services import permission_service
-from app.repository import user_category_access_repo, user_test_assignment_repo
 from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
 from app.api.dependencies.auth import get_current_user
@@ -77,25 +75,12 @@ def get_all_tests(
     """
     request_params = dict(request.query_params)
 
-    # Determine if user has elevated access (Admin or Editor — has tests::* or *::*)
-    is_elevated = permission_service.check_permission(
-        db, user, "tests::*"
-    ) or permission_service.check_permission(db, user, "*::*")
-
-    allowed_category_ids = None
-    if not is_elevated:
-        access_records = user_category_access_repo.get_categories_for_user(db, user.id)
-        # Only restrict by category if the user has explicit access records.
-        # If none exist, fall through with allowed_category_ids=None (show all tests).
-        if access_records:
-            allowed_category_ids = [str(a.category_id) for a in access_records]
-
     tests, total = category_service.get_all_tests(
         db,
         page=page,
         page_size=page_size,
         request_params=request_params,
-        allowed_category_ids=allowed_category_ids,
+        allowed_category_ids=None,
     )
 
     meta = get_pagination_meta(total, page, page_size)
@@ -200,21 +185,6 @@ def submit_test_submissions(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Test with ID {test_id} not found",
         )
-
-    # Enforce assignment check for non-elevated users (not Admin or Editor)
-    is_elevated = permission_service.check_permission(
-        db, current_user, "tests::*"
-    ) or permission_service.check_permission(db, current_user, "*::*")
-
-    if not is_elevated:
-        has_assignment = user_test_assignment_repo.check_user_has_access(
-            db, current_user.id, UUID(test_id)
-        )
-        if not has_assignment:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You do not have an active assignment for this test",
-            )
 
     submissions = submission_service.submit_submissions_bulk(
         db, current_user.id, bulk_data.submissions

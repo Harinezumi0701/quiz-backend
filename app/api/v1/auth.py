@@ -1,7 +1,7 @@
 # app/api/v1/auth.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, TokenData, RefreshTokenRequest, RevokeTokenRequest
+from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, TokenData, RefreshTokenRequest, RevokeTokenRequest, ActivateAccountRequest
 from app.schemas.http_response import ErrorResponse
 from app.services import auth_service
 from app.db.session import get_db
@@ -15,10 +15,10 @@ router = APIRouter()
     response_model=TokenResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Register new user",
-    description="Create a new account and return access token",
+    description="Create a new account. An activation email will be sent to the provided address.",
     responses={
         201: {
-            "description": "Registration successful",
+            "description": "Registration successful — activation email sent",
         },
         400: {
             "description": "Email already registered",
@@ -34,10 +34,41 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     - **full_name**: Full name
     - **password**: Password (minimum 6 characters)
 
-    After successful registration, you will receive an access token to use for other APIs.
+    An activation email is sent. The account must be activated before logging in.
+    The returned access token belongs to an inactive account and will be rejected on protected endpoints.
     """
     token_data = auth_service.register_user(db, request)
     return TokenResponse(data=token_data, meta={})
+
+
+@router.post(
+    "/activate",
+    status_code=status.HTTP_200_OK,
+    summary="Activate account",
+    description="Activate a user account using the token received by email",
+    responses={
+        200: {
+            "description": "Account activated successfully",
+        },
+        400: {
+            "description": "Token expired or account already activated",
+            "model": ErrorResponse,
+        },
+        404: {
+            "description": "Invalid activation token",
+            "model": ErrorResponse,
+        },
+    }
+)
+def activate(request: ActivateAccountRequest, db: Session = Depends(get_db)):
+    """
+    Activate a user account.
+
+    - **token**: Activation token received by email
+
+    After activation the user can log in normally.
+    """
+    return success_response(data=auth_service.activate_account(db, request.token), meta={})
 
 
 @router.post(

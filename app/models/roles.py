@@ -30,5 +30,7 @@ class RolePermission(Base):
     name = Column(String(200), nullable=True)
     description = Column(String(500), nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+    deleted_at = Column(TIMESTAMP, nullable=True)
 
     role = relationship("Role", back_populates="permissions")

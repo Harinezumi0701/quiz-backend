@@ -1,5 +1,7 @@
 # app/services/auth_service.py
-from datetime import datetime, timezone
+import os
+import secrets
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from app.repository import auth_repo
 from app.utils.security import (
@@ -10,6 +12,7 @@ from app.utils.security import (
     get_refresh_token_expires_delta,
 )
 from app.utils.datetime_utils import normalize_to_utc
+from app.utils.email_service import send_activation_email
 from app.schemas.auth import (
     RegisterRequest,
     LoginRequest,
@@ -20,38 +23,74 @@ from app.schemas.auth import (
 from app.constants import (
     ERROR_EMAIL_ALREADY_REGISTERED,
     ERROR_INCORRECT_EMAIL_OR_PASSWORD,
+    ERROR_INVALID_REFRESH_TOKEN,
     ERROR_REFRESH_TOKEN_NOT_FOUND,
     ERROR_REFRESH_TOKEN_EXPIRED,
     ERROR_USER_NOT_FOUND,
+    ERROR_ACCOUNT_NOT_ACTIVATED,
+    ERROR_INVALID_ACTIVATION_TOKEN,
+    ERROR_ACTIVATION_TOKEN_EXPIRED,
+    ERROR_ACCOUNT_ALREADY_ACTIVATED,
     JWT_SUBJECT_KEY,
 )
 from fastapi import HTTPException, status
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 
 def register_user(db: Session, request: RegisterRequest) -> TokenData:
-    """Register a new user and return access token (no refresh token)."""
-    # Check if email already exists
+    """Register a new user. Sends activation email; account inactive until confirmed."""
     if auth_repo.email_exists(db, request.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=ERROR_EMAIL_ALREADY_REGISTERED,
         )
 
-    # Hash the password
     hashed_password = get_password_hash(request.password)
+    activation_token = secrets.token_urlsafe(32)
+    activation_expires_at = datetime.now(timezone.utc) + timedelta(hours=2)
 
-    # Create the user
     user = auth_repo.create_user(
         db=db,
         email=request.email,
         full_name=request.full_name,
         hashed_password=hashed_password,
+        is_active=False,
+        activation_token=activation_token,
+        activation_expires_at=activation_expires_at,
     )
 
-    # Generate access token
-    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.email})
+    activation_url = f"{FRONTEND_URL}/activate?token={activation_token}"
+    send_activation_email(user.email, activation_url)
 
+    access_token = create_access_token(data={JWT_SUBJECT_KEY: user.email})
     return TokenData(access_token=access_token, refresh_token=None, token_type="bearer")
+
+
+def activate_account(db: Session, token: str) -> dict:
+    """Activate a user account using the emailed token."""
+    user = auth_repo.get_user_by_activation_token(db, token)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ERROR_INVALID_ACTIVATION_TOKEN,
+        )
+
+    expires_at = normalize_to_utc(user.activation_expires_at)
+    if expires_at and expires_at < datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ERROR_ACTIVATION_TOKEN_EXPIRED,
+        )
+
+    if user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ERROR_ACCOUNT_ALREADY_ACTIVATED,
+        )
+
+    auth_repo.activate_user(db, user)
+    return {"message": "Account activated successfully."}
 
 
 def login_user(db: Session, request: LoginRequest) -> TokenData:
@@ -64,6 +103,12 @@ def login_user(db: Session, request: LoginRequest) -> TokenData:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ERROR_INCORRECT_EMAIL_OR_PASSWORD,
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=ERROR_ACCOUNT_NOT_ACTIVATED,
         )
 
     # Generate access token

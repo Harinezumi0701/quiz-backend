@@ -22,3 +22,7 @@ ERROR_NEW_PASSWORD_SAME_AS_OLD = "New password must be different from old passwo
 ERROR_PERMISSION_DENIED = "Permission denied"
 ERROR_ROLE_NOT_FOUND = "Role not found"
 ERROR_ROLE_ALREADY_EXISTS = "Role already exists"
+ERROR_ACCOUNT_NOT_ACTIVATED = "Account is not activated. Please check your email."
+ERROR_INVALID_ACTIVATION_TOKEN = "Invalid activation token."
+ERROR_ACTIVATION_TOKEN_EXPIRED = "Activation link has expired."
+ERROR_ACCOUNT_ALREADY_ACTIVATED = "Account is already active."

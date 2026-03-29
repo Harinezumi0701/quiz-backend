@@ -22,12 +22,7 @@ from app.schemas.user import (
     AssignRoleRequest,
 )
 from app.schemas.http_response import ErrorResponse
-from app.schemas.user_category_access import (
-    CategoryAccessGrantRequest,
-    CategoryAccessResponse,
-    CategoryAccessListResponse,
-)
-from app.services import user_service, permission_service, category_access_service
+from app.services import user_service, permission_service
 from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
 from app.constants import ERROR_USER_NOT_FOUND
@@ -506,66 +501,3 @@ def assign_role(
     }
 
     return UserResponse(data=user_response_data, meta={})
-
-
-# ---------------------------------------------------------------------------
-# Category access management (admin only)
-# ---------------------------------------------------------------------------
-
-@router.get(
-    "/{user_id}/category-access",
-    response_model=CategoryAccessListResponse,
-    summary="List categories a user has access to",
-    responses={
-        404: {"description": "User not found", "model": ErrorResponse},
-        403: {"description": "Permission denied", "model": ErrorResponse},
-    },
-)
-def list_user_category_access(
-    user_id: UUID = Path(..., description="User UUID"),
-    db: Session = Depends(get_db),
-    _: User = Depends(require_namespace_permission(PERMISSION_NAMESPACE_USERS, "GET")),
-):
-    """List all categories the user has been granted access to. Requires users::read permission."""
-    access_records = category_access_service.list_user_category_access(db, user_id)
-    return CategoryAccessListResponse(data=access_records, meta={})
-
-
-@router.post(
-    "/{user_id}/category-access",
-    response_model=CategoryAccessResponse,
-    status_code=status.HTTP_201_CREATED,
-    summary="Grant a user access to a category",
-    responses={
-        404: {"description": "User or category not found", "model": ErrorResponse},
-        409: {"description": "Access already granted", "model": ErrorResponse},
-        403: {"description": "Permission denied", "model": ErrorResponse},
-    },
-)
-def grant_user_category_access(
-    user_id: UUID = Path(..., description="User UUID"),
-    body: CategoryAccessGrantRequest = Body(...),
-    db: Session = Depends(get_db),
-    _: User = Depends(require_namespace_permission(PERMISSION_NAMESPACE_USERS, "PUT")),
-):
-    """Grant a user access to a category. Requires users::update permission."""
-    return category_access_service.grant_category_access(db, user_id, body.category_id)
-
-
-@router.delete(
-    "/{user_id}/category-access/{category_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Revoke a user's access to a category",
-    responses={
-        404: {"description": "Access record not found", "model": ErrorResponse},
-        403: {"description": "Permission denied", "model": ErrorResponse},
-    },
-)
-def revoke_user_category_access(
-    user_id: UUID = Path(..., description="User UUID"),
-    category_id: UUID = Path(..., description="Category UUID"),
-    db: Session = Depends(get_db),
-    _: User = Depends(require_namespace_permission(PERMISSION_NAMESPACE_USERS, "DELETE")),
-):
-    """Revoke a user's access to a category. Requires users::delete permission."""
-    category_access_service.revoke_category_access(db, user_id, category_id)

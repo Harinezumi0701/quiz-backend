@@ -1,6 +1,5 @@
 from app.services import answer_service
 from app.services import auth_service
-from app.services import category_access_service
 from app.services import category_service
 from app.services import namespace_service
 from app.services import permission_service
@@ -13,7 +12,6 @@ from app.services import user_service
 __all__ = [
     "answer_service",
     "auth_service",
-    "category_access_service",
     "category_service",
     "namespace_service",
     "permission_service",

@@ -1,12 +1,14 @@
 # app/repository/test_repo.py
+from datetime import UTC
+from typing import Any
+
 from sqlalchemy.orm import Session
-from typing import Optional, Tuple
+
 from app.models.categories import Category
 from app.models.questions import Question
 from app.models.tests import Test
 from app.utils.datetime_utils import datetime_to_timestamp
 from app.utils.search_pagination import paginate_query_with_multiple_filters
-from typing import Dict, Any
 
 
 def get_tests_by_category_id(
@@ -14,8 +16,8 @@ def get_tests_by_category_id(
     category_id: str,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all tests for a specific category with optional filtering and pagination.
 
@@ -95,9 +97,9 @@ def get_all_tests(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-    allowed_category_ids: Optional[list] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+    allowed_category_ids: list | None = None,
+) -> tuple[list, int]:
     """
     Get all tests with optional filtering and pagination.
 
@@ -390,13 +392,13 @@ def delete_test(db: Session, test_id: str):
     Returns:
         bool: True if deleted, False if not found
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     test = db.query(Test).filter(Test.id == test_id, Test.deleted_at.is_(None)).first()
 
     if not test:
         return False
 
-    test.deleted_at = datetime.now(timezone.utc)
+    test.deleted_at = datetime.now(UTC)
     db.commit()
     return True

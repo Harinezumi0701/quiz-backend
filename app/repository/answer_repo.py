@@ -1,11 +1,14 @@
 # app/repository/answer_repo.py
+from datetime import UTC
+from typing import Any
 from uuid import UUID
+
 from sqlalchemy.orm import Session
-from typing import Optional, Tuple, Dict, Any
+
 from app.models.answer_options import AnswerOption
 from app.models.questions import Question
-from app.utils.search_pagination import paginate_query_with_multiple_filters
 from app.utils.datetime_utils import datetime_to_timestamp
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 
 
 def get_answers_by_question_id(
@@ -13,8 +16,8 @@ def get_answers_by_question_id(
     question_id: str,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all answers for a specific question with optional filtering and pagination.
 
@@ -143,8 +146,8 @@ def get_all_answers(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all answers with optional filtering and pagination.
 
@@ -271,10 +274,10 @@ def answer_exists_for_question(db: Session, question_id: UUID, answer_id: UUID) 
 def create_answer(
     db: Session,
     question_id: str,
-    content: Optional[str] = None,
-    image_url: Optional[str] = None,
+    content: str | None = None,
+    image_url: str | None = None,
     is_correct: bool = False,
-    explanation: Optional[str] = None,
+    explanation: str | None = None,
 ):
     """
     Create a new answer.
@@ -325,10 +328,10 @@ def create_answer(
 def update_answer(
     db: Session,
     answer_id: str,
-    content: Optional[str] = None,
-    image_url: Optional[str] = None,
-    is_correct: Optional[bool] = None,
-    explanation: Optional[str] = None,
+    content: str | None = None,
+    image_url: str | None = None,
+    is_correct: bool | None = None,
+    explanation: str | None = None,
 ):
     """
     Update an answer.
@@ -389,7 +392,7 @@ def delete_answer(db: Session, answer_id: str):
     Returns:
         bool: True if deleted, False if not found
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     answer = (
         db.query(AnswerOption)
@@ -400,6 +403,6 @@ def delete_answer(db: Session, answer_id: str):
     if not answer:
         return False
 
-    answer.deleted_at = datetime.now(timezone.utc)
+    answer.deleted_at = datetime.now(UTC)
     db.commit()
     return True

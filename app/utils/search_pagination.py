@@ -3,13 +3,14 @@
 Utility functions for search and pagination functionality in GET endpoints.
 Uses Strategy Pattern for search types and Builder Pattern for configuration.
 """
-from abc import ABC, abstractmethod
-from sqlalchemy.orm import Query
-from sqlalchemy import func, or_
-from typing import Optional, Tuple, Dict, Any, List
-from datetime import datetime
-import unicodedata
 import re
+import unicodedata
+from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import Any
+
+from sqlalchemy import func, or_
+from sqlalchemy.orm import Query
 
 
 def remove_vietnamese_accents(text: str) -> str:
@@ -163,7 +164,7 @@ class DateSearchStrategy(SearchStrategy):
         query: Query,
         column: Any,
         search_value: str,
-        date_format: Optional[str] = None,
+        date_format: str | None = None,
         **kwargs,
     ) -> Query:
         """Apply date search filter."""
@@ -251,7 +252,7 @@ class MultipleValueSearchStrategy(SearchStrategy):
         query: Query,
         column: Any,
         search_value: str,
-        base_strategy: Optional[str] = "exact",
+        base_strategy: str | None = "exact",
         **kwargs,
     ) -> Query:
         """
@@ -335,7 +336,7 @@ class MultipleValueSearchStrategy(SearchStrategy):
 class SearchStrategyFactory:
     """Factory for creating search strategies."""
 
-    _strategies: Dict[str, SearchStrategy] = {
+    _strategies: dict[str, SearchStrategy] = {
         "text": TextSearchStrategy(),
         "date": DateSearchStrategy(),
         "exact": ExactSearchStrategy(),
@@ -345,7 +346,7 @@ class SearchStrategyFactory:
     }
 
     @classmethod
-    def get_strategy(cls, search_type: str) -> Optional[SearchStrategy]:
+    def get_strategy(cls, search_type: str) -> SearchStrategy | None:
         """
         Get search strategy by type.
 
@@ -373,7 +374,7 @@ class SearchConfigBuilder:
     """Builder for creating search configuration dictionaries."""
 
     def __init__(self):
-        self._config: Dict[str, Dict[str, Any]] = {}
+        self._config: dict[str, dict[str, Any]] = {}
 
     def add_text_search(
         self, key: str, column: Any, case_sensitive: bool = False
@@ -397,7 +398,7 @@ class SearchConfigBuilder:
         return self
 
     def add_date_search(
-        self, key: str, column: Any, date_format: Optional[str] = None
+        self, key: str, column: Any, date_format: str | None = None
     ) -> "SearchConfigBuilder":
         """
         Add date search configuration.
@@ -452,7 +453,7 @@ class SearchConfigBuilder:
         self._config[key] = {"column": column, "type": "null"}
         return self
 
-    def build(self) -> Dict[str, Dict[str, Any]]:
+    def build(self) -> dict[str, dict[str, Any]]:
         """
         Build and return the search configuration.
 
@@ -465,7 +466,7 @@ class SearchConfigBuilder:
 class SearchFilter:
     """Context class that uses search strategies."""
 
-    def __init__(self, search_config: Dict[str, Dict[str, Any]]):
+    def __init__(self, search_config: dict[str, dict[str, Any]]):
         """
         Initialize search filter with configuration.
 
@@ -475,7 +476,7 @@ class SearchFilter:
         self.search_config = search_config
 
     def apply(
-        self, query: Query, search_key: Optional[str], search_value: Optional[str]
+        self, query: Query, search_key: str | None, search_value: str | None
     ) -> Query:
         """
         Apply search filter to query using appropriate strategy.
@@ -522,7 +523,7 @@ class SearchFilter:
         # Apply strategy
         return strategy.apply(query, column, search_value, **strategy_params)
 
-    def apply_multiple(self, query: Query, filters: List[Tuple[str, str]]) -> Query:
+    def apply_multiple(self, query: Query, filters: list[tuple[str, str]]) -> Query:
         """
         Apply multiple search filters to query.
 
@@ -543,7 +544,7 @@ class PaginationHandler:
     """Handler for pagination operations."""
 
     @staticmethod
-    def apply(query: Query, page: int = 1, page_size: int = 10) -> Tuple[Query, int]:
+    def apply(query: Query, page: int = 1, page_size: int = 10) -> tuple[Query, int]:
         """
         Apply pagination to a query and get total count.
 
@@ -565,7 +566,7 @@ class PaginationHandler:
         return paginated_query, total
 
     @staticmethod
-    def get_meta(total: int, page: int, page_size: int) -> Dict[str, Any]:
+    def get_meta(total: int, page: int, page_size: int) -> dict[str, Any]:
         """
         Generate pagination metadata.
 
@@ -588,9 +589,9 @@ class PaginationHandler:
 
 
 def parse_multiple_filters(
-    request_params: Dict[str, Any],
-    search_config: Optional[Dict[str, Dict[str, Any]]] = None
-) -> List[Tuple[str, str]]:
+    request_params: dict[str, Any],
+    search_config: dict[str, dict[str, Any]] | None = None
+) -> list[tuple[str, str]]:
     """
     Parse multiple filter parameters from request query params.
 
@@ -625,11 +626,11 @@ def parse_multiple_filters(
 
 def paginate_query_with_multiple_filters(
     query: Query,
-    request_params: Dict[str, Any],
-    search_config: Optional[Dict[str, Dict[str, Any]]] = None,
-    page: Optional[int] = None,
-    page_size: Optional[int] = None,
-) -> Tuple[Query, int]:
+    request_params: dict[str, Any],
+    search_config: dict[str, dict[str, Any]] | None = None,
+    page: int | None = None,
+    page_size: int | None = None,
+) -> tuple[Query, int]:
     """
     Apply multiple search filters and pagination to a query.
 
@@ -675,7 +676,7 @@ def paginate_query_with_multiple_filters(
     return PaginationHandler.apply(query, page, page_size)
 
 
-def get_pagination_meta(total: int, page: int, page_size: int) -> Dict[str, Any]:
+def get_pagination_meta(total: int, page: int, page_size: int) -> dict[str, Any]:
     """
     Generate pagination metadata.
 

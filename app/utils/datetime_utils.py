@@ -1,9 +1,8 @@
 # app/utils/datetime_utils.py
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 
-def normalize_to_utc(dt: Optional[datetime]) -> Optional[datetime]:
+def normalize_to_utc(dt: datetime | None) -> datetime | None:
     """
     Normalize datetime to UTC timezone-aware datetime.
     
@@ -21,13 +20,13 @@ def normalize_to_utc(dt: Optional[datetime]) -> Optional[datetime]:
     
     # If already timezone-aware, convert to UTC
     if dt.tzinfo is not None:
-        return dt.astimezone(timezone.utc)
+        return dt.astimezone(UTC)
     
     # If timezone-naive, assume UTC and add timezone
-    return dt.replace(tzinfo=timezone.utc)
+    return dt.replace(tzinfo=UTC)
 
 
-def datetime_to_timestamp(dt: Optional[datetime]) -> Optional[int]:
+def datetime_to_timestamp(dt: datetime | None) -> int | None:
     """
     Convert datetime to Unix timestamp (seconds since epoch).
     

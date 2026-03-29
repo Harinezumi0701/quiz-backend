@@ -1,7 +1,9 @@
 # app/utils/user_id_generator.py
 import random
 import string
+
 from sqlalchemy.orm import Session
+
 from app.models.users import User
 
 

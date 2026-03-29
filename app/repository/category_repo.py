@@ -1,19 +1,21 @@
 # app/repository/category_repo.py
+from datetime import UTC
+from typing import Any
+
 from sqlalchemy.orm import Session
-from typing import Optional, Tuple
+
 from app.models.categories import Category
 from app.models.questions import Question
 from app.utils.datetime_utils import datetime_to_timestamp
 from app.utils.search_pagination import paginate_query_with_multiple_filters
-from typing import Dict, Any
 
 
 def get_all_categories_with_search(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """Get all categories with optional name search and pagination."""
     query = db.query(Category).filter(Category.deleted_at.is_(None)).order_by(Category.created_at.desc())
 
@@ -166,7 +168,7 @@ def delete_category(db: Session, category_id: str):
     Returns:
         bool: True if deleted, False if not found
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     category = (
         db.query(Category)
@@ -177,6 +179,6 @@ def delete_category(db: Session, category_id: str):
     if not category:
         return False
 
-    category.deleted_at = datetime.now(timezone.utc)
+    category.deleted_at = datetime.now(UTC)
     db.commit()
     return True

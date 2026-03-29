@@ -1,7 +1,8 @@
 # app/schemas/submission.py
-from pydantic import BaseModel, Field
-from typing import List, Optional
 from uuid import UUID
+
+from pydantic import BaseModel, Field
+
 from app.schemas.http_response import SuccessResponse
 
 
@@ -23,7 +24,7 @@ class SubmissionCreate(BaseModel):
 
 class SubmissionBulkCreate(BaseModel):
     """Schema for creating multiple submissions at once"""
-    submissions: List[SubmissionCreate] = Field(..., description="List of submissions", min_length=1)
+    submissions: list[SubmissionCreate] = Field(..., description="List of submissions", min_length=1)
 
     class Config:
         json_schema_extra = {
@@ -116,9 +117,9 @@ class OverallStatistics(BaseModel):
 class DashboardData(BaseModel):
     """Schema for dashboard data"""
     overall: OverallStatistics = Field(..., description="Overall statistics")
-    by_category: List[CategoryStatistics] = Field(..., description="Statistics by category")
-    by_test: dict[str, List[TestStatistics]] = Field(..., description="Statistics by test grouped by category")
-    recent_activity: List[RecentActivity] = Field(..., description="Recent activity")
+    by_category: list[CategoryStatistics] = Field(..., description="Statistics by category")
+    by_test: dict[str, list[TestStatistics]] = Field(..., description="Statistics by test grouped by category")
+    recent_activity: list[RecentActivity] = Field(..., description="Recent activity")
 
 
 class SubmissionHistoryItem(BaseModel):
@@ -127,10 +128,10 @@ class SubmissionHistoryItem(BaseModel):
     question_id: UUID
     answer_id: UUID
     is_correct: bool
-    answered_at: Optional[int] = None
-    category: Optional[str] = None
-    test_name: Optional[str] = None
-    question_preview: Optional[str] = None
+    answered_at: int | None = None
+    category: str | None = None
+    test_name: str | None = None
+    question_preview: str | None = None
 
     class Config:
         from_attributes = True
@@ -139,17 +140,17 @@ class SubmissionHistoryItem(BaseModel):
 class SubmissionHistoryOut(BaseModel):
     """Schema for a submission history record"""
     id: UUID
-    submitted_at: Optional[int] = None
+    submitted_at: int | None = None
     submission_count: int
     correct_count: int
     wrong_count: int
-    submissions: List[SubmissionHistoryItem]
+    submissions: list[SubmissionHistoryItem]
 
     class Config:
         from_attributes = True
 
 
-class SubmissionHistoryListResponse(SuccessResponse[List[SubmissionHistoryOut]]):
+class SubmissionHistoryListResponse(SuccessResponse[list[SubmissionHistoryOut]]):
     """Response schema for submission history list"""
     pass
 
@@ -164,7 +165,7 @@ class SubmissionResponse(SuccessResponse[SubmissionOut]):
     pass
 
 
-class SubmissionListResponse(SuccessResponse[List[SubmissionOut]]):
+class SubmissionListResponse(SuccessResponse[list[SubmissionOut]]):
     """Response schema for list of submissions"""
     pass
 

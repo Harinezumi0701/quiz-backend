@@ -4,6 +4,7 @@ Test dashboard endpoint with empty responses.
 from app.db.session import SessionLocal
 from app.services import response_service
 
+
 def test_dashboard_empty():
     db = SessionLocal()
 

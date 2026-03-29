@@ -1,13 +1,15 @@
 # app/repository/permission_repo.py
-from sqlalchemy.orm import Session
+from typing import Any
 from uuid import UUID
-from typing import Optional, Tuple, Dict, Any
-from app.models.roles import RolePermission, Role
-from app.utils.search_pagination import paginate_query_with_multiple_filters
+
+from sqlalchemy.orm import Session
+
+from app.models.roles import Role, RolePermission
 from app.utils.datetime_utils import datetime_to_timestamp
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 
 
-def get_permission_by_id(db: Session, permission_id: UUID) -> Optional[RolePermission]:
+def get_permission_by_id(db: Session, permission_id: UUID) -> RolePermission | None:
     """Get permission by ID."""
     return db.query(RolePermission).filter(RolePermission.id == permission_id).first()
 
@@ -16,8 +18,8 @@ def get_all_permissions(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all permissions with optional filtering and pagination.
     
@@ -102,7 +104,7 @@ def update_permission(
     permission: str = None,
     name: str = None,
     description: str = None,
-) -> Optional[RolePermission]:
+) -> RolePermission | None:
     """Update a permission."""
     permission_obj = get_permission_by_id(db, permission_id)
     if not permission_obj:

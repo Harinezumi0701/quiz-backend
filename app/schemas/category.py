@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import List
 from uuid import UUID
+
+from pydantic import BaseModel, Field
+
 from app.schemas.http_response import SuccessResponse
 
 
@@ -21,7 +22,7 @@ class CategoryDetailResponse(SuccessResponse[CategoryDetailOut]):
     pass
 
 
-class CategoryDetailListResponse(SuccessResponse[List[CategoryDetailOut]]):
+class CategoryDetailListResponse(SuccessResponse[list[CategoryDetailOut]]):
     """Response schema for list of categories with details"""
     pass
 

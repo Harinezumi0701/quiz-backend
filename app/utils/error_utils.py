@@ -4,11 +4,6 @@ Error utility functions for mapping error messages to error codes.
 """
 from app.constants.error_codes import (
     EMAIL_ALREADY_REGISTERED,
-    INCORRECT_EMAIL_OR_PASSWORD,
-    PERMISSION_DENIED,
-    UNAUTHORIZED,
-    USER_NOT_FOUND,
-    QUESTIONS_NOT_FOUND,
     HTTP_400,
     HTTP_401,
     HTTP_403,
@@ -17,8 +12,12 @@ from app.constants.error_codes import (
     HTTP_422,
     HTTP_500,
     HTTP_503,
+    INCORRECT_EMAIL_OR_PASSWORD,
+    PERMISSION_DENIED,
+    QUESTIONS_NOT_FOUND,
+    UNAUTHORIZED,
+    USER_NOT_FOUND,
 )
-
 
 # Mapping from error messages to error codes
 ERROR_MESSAGE_TO_CODE = {

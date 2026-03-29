@@ -1,7 +1,10 @@
 # app/repository/role_repo.py
-from sqlalchemy.orm import Session
+from datetime import UTC
+from typing import Any
 from uuid import UUID
-from typing import Optional, Tuple, Dict, Any
+
+from sqlalchemy.orm import Session
+
 from app.models.roles import Role, RolePermission
 from app.utils.search_pagination import paginate_query_with_multiple_filters
 
@@ -25,8 +28,8 @@ def get_all_roles_with_search(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all roles with optional filtering and pagination.
     
@@ -137,18 +140,18 @@ def update_role(db: Session, role_id: UUID, name: str = None, description: str =
 
 def delete_role(db: Session, role_id: UUID) -> bool:
     """Soft delete a role."""
-    from datetime import datetime, timezone
+    from datetime import datetime
     
     role = get_role_by_id(db, role_id)
     if not role:
         return False
     
-    role.deleted_at = datetime.now(timezone.utc)
+    role.deleted_at = datetime.now(UTC)
     db.commit()
     return True
 
 
-def get_default_role(db: Session) -> Optional[Role]:
+def get_default_role(db: Session) -> Role | None:
     """Get the default role for new users."""
     return db.query(Role).filter(
         Role.default == True,

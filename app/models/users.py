@@ -1,8 +1,10 @@
-from sqlalchemy import Column, String, TIMESTAMP, Date, ForeignKey, text
+from sqlalchemy import TIMESTAMP, Column, Date, ForeignKey, String, text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
-from app.db.base import Base
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
+from app.db.base import Base
+
 
 class User(Base):
     __tablename__ = "users"

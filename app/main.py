@@ -2,35 +2,51 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.api.v1 import user, auth, question, category, test, answer, me, role, permission, namespace, upload, user_tests, test_assignments
-from app.utils.exceptions import http_exception_handler, general_exception_handler
-from app.utils.response import success_response
+
+from app.api.v1 import (
+    answer,
+    auth,
+    category,
+    health,
+    me,
+    namespace,
+    permission,
+    question,
+    role,
+    test,
+    test_assignments,
+    upload,
+    user,
+    user_tests,
+)
 from app.constants import (
+    ANSWERS_PREFIX,
     APP_TITLE,
     APP_VERSION,
-    SERVICE_NAME,
-    HEALTH_STATUS,
-    WELCOME_MESSAGE,
-    CORS_ALLOW_ORIGINS,
-    CORS_ALLOW_CREDENTIALS,
-    CORS_ALLOW_METHODS,
-    CORS_ALLOW_HEADERS,
     AUTH_PREFIX,
-    USERS_PREFIX,
-    ME_PREFIX,
-    QUESTIONS_PREFIX,
     CATEGORIES_PREFIX,
-    TESTS_PREFIX,
-    ANSWERS_PREFIX,
-    ROLES_PREFIX,
-    PERMISSIONS_PREFIX,
+    CORS_ALLOW_CREDENTIALS,
+    CORS_ALLOW_HEADERS,
+    CORS_ALLOW_METHODS,
+    CORS_ALLOW_ORIGINS,
+    HEALTH_CHECK_PATH,
+    HEALTH_STATUS,
+    ME_PREFIX,
     NAMESPACES_PREFIX,
+    PERMISSIONS_PREFIX,
+    QUESTIONS_PREFIX,
+    ROLES_PREFIX,
+    ROOT_PATH,
+    SERVICE_NAME,
+    TEST_ASSIGNMENTS_PREFIX,
+    TESTS_PREFIX,
     UPLOADS_PREFIX,
     USER_TESTS_PREFIX,
-    TEST_ASSIGNMENTS_PREFIX,
-    HEALTH_CHECK_PATH,
-    ROOT_PATH,
+    USERS_PREFIX,
+    WELCOME_MESSAGE,
 )
+from app.utils.exceptions import general_exception_handler, http_exception_handler
+from app.utils.response import success_response
 
 description = """
 ## Quiz Backend API
@@ -155,6 +171,7 @@ app.include_router(namespace.router, prefix=NAMESPACES_PREFIX, tags=["namespaces
 app.include_router(upload.router, prefix=UPLOADS_PREFIX, tags=["uploads"])
 app.include_router(user_tests.router, prefix=USER_TESTS_PREFIX, tags=["user-tests"])
 app.include_router(test_assignments.router, prefix=TEST_ASSIGNMENTS_PREFIX, tags=["test-assignments"])
+app.include_router(health.router)
 
 
 def custom_openapi():

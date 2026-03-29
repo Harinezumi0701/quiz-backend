@@ -1,19 +1,18 @@
 # app/api/v1/user_tests.py
-from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Path, Query, Request
 from sqlalchemy.orm import Session
+
+from app.api.dependencies.permissions import require_namespace_permission
+from app.constants.permissions import PERMISSION_NAMESPACE_USER_TESTS
+from app.db.session import get_db
+from app.models.users import User
+from app.schemas.http_response import ErrorResponse
+from app.schemas.question import QuestionWithAnswersListResponse
 from app.schemas.user_test_assignment import (
     UserTestAssignmentListResponse,
 )
-from app.schemas.question import QuestionWithAnswersListResponse
-from app.schemas.http_response import ErrorResponse
 from app.services import user_test_assignment_service
-from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
-from app.api.dependencies.auth import get_current_user
-from app.api.dependencies.permissions import require_namespace_permission
-from app.models.users import User
-from app.constants.permissions import PERMISSION_NAMESPACE_USER_TESTS
 
 router = APIRouter()
 

@@ -1,14 +1,15 @@
 # app/api/v1/me.py
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
-from app.schemas.user import UserResponse, UserUpdateRequest, ChangePasswordRequest
-from app.schemas.submission import DashboardResponse, SubmissionHistoryListResponse
-from app.schemas.http_response import ErrorResponse
-from app.services import submission_service, user_service, permission_service
-from app.repository import submission_repo
-from app.db.session import get_db
+
 from app.api.dependencies.auth import get_current_user
+from app.db.session import get_db
 from app.models.users import User
+from app.repository import submission_repo
+from app.schemas.http_response import ErrorResponse
+from app.schemas.submission import DashboardResponse, SubmissionHistoryListResponse
+from app.schemas.user import ChangePasswordRequest, UserResponse, UserUpdateRequest
+from app.services import permission_service, submission_service, user_service
 from app.utils.search_pagination import get_pagination_meta
 
 router = APIRouter()

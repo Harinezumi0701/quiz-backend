@@ -1,22 +1,24 @@
 # app/api/v1/test_assignments.py
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from uuid import UUID
+
 from fastapi import APIRouter, Body, Depends, Path, Query, Request, status
 from sqlalchemy.orm import Session
-from uuid import UUID
+
+from app.api.dependencies.permissions import require_namespace_permission
+from app.constants.permissions import PERMISSION_NAMESPACE_USER_TESTS
+from app.db.session import get_db
+from app.models.users import User
+from app.schemas.http_response import ErrorResponse
 from app.schemas.user_test_assignment import (
-    UserTestAssignmentAdminListResponse,
-    UserTestAssignmentResponse,
-    UserTestAssignmentCreateRequest,
     BulkAssignmentCreateRequest,
     BulkAssignmentCreateResponse,
+    UserTestAssignmentAdminListResponse,
+    UserTestAssignmentCreateRequest,
+    UserTestAssignmentResponse,
 )
-from app.schemas.http_response import ErrorResponse
 from app.services import user_test_assignment_service
-from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
-from app.api.dependencies.permissions import require_namespace_permission
-from app.models.users import User
-from app.constants.permissions import PERMISSION_NAMESPACE_USER_TESTS
 
 router = APIRouter()
 
@@ -90,7 +92,7 @@ def create_assignment(
     """
     expires_at = None
     if assignment_data.expires_at:
-        expires_at = datetime.fromtimestamp(assignment_data.expires_at, tz=timezone.utc)
+        expires_at = datetime.fromtimestamp(assignment_data.expires_at, tz=UTC)
 
     assignment = user_test_assignment_service.create_assignment(
         db,
@@ -132,7 +134,7 @@ def create_bulk_assignments(
     """
     expires_at = None
     if bulk_data.expires_at:
-        expires_at = datetime.fromtimestamp(bulk_data.expires_at, tz=timezone.utc)
+        expires_at = datetime.fromtimestamp(bulk_data.expires_at, tz=UTC)
 
     result = user_test_assignment_service.create_bulk_assignments(
         db,

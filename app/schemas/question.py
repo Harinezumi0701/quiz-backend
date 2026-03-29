@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import List
 from uuid import UUID
-from app.schemas.http_response import SuccessResponse
+
+from pydantic import BaseModel, Field
+
 from app.schemas.answer import AnswerOut
+from app.schemas.http_response import SuccessResponse
 
 
 class Question(BaseModel):
@@ -30,18 +31,18 @@ class QuestionWithAnswers(BaseModel):
     is_multiple_choice: bool = Field(False, description="Whether this question has multiple correct answers", example=False)
     created_at: int | None = Field(None, description="Created at Unix timestamp", example=1704067200)
     updated_at: int | None = Field(None, description="Updated at Unix timestamp", example=1704067200)
-    answers: List[AnswerOut] = Field(..., description="List of answers")
+    answers: list[AnswerOut] = Field(..., description="List of answers")
 
     class Config:
         from_attributes = True
 
 
-class QuestionListResponse(SuccessResponse[List[Question]]):
+class QuestionListResponse(SuccessResponse[list[Question]]):
     """Response schema for list of questions (with answer_count, no full answers)"""
     pass
 
 
-class QuestionWithAnswersListResponse(SuccessResponse[List[QuestionWithAnswers]]):
+class QuestionWithAnswersListResponse(SuccessResponse[list[QuestionWithAnswers]]):
     """Response schema for list of questions with full answers"""
     pass
 

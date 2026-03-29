@@ -1,14 +1,16 @@
 # app/utils/exceptions.py
+import logging
+import uuid
+
 from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
-from app.utils.response import error_response
+
+from app.constants.error_codes import INTERNAL_SERVER_ERROR
 from app.utils.error_utils import (
     get_error_code_from_message,
     get_error_code_from_status_code,
 )
-from app.constants.error_codes import INTERNAL_SERVER_ERROR
-import uuid
-import logging
+from app.utils.response import error_response
 
 logger = logging.getLogger(__name__)
 

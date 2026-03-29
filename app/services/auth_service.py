@@ -1,31 +1,33 @@
 # app/services/auth_service.py
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from app.repository import auth_repo
-from app.utils.security import (
-    verify_password,
-    get_password_hash,
-    create_access_token,
-    create_refresh_token,
-    get_refresh_token_expires_delta,
-)
-from app.utils.datetime_utils import normalize_to_utc
-from app.schemas.auth import (
-    RegisterRequest,
-    LoginRequest,
-    TokenData,
-    RefreshTokenRequest,
-    RevokeTokenRequest,
-)
+
 from app.constants import (
     ERROR_EMAIL_ALREADY_REGISTERED,
     ERROR_INCORRECT_EMAIL_OR_PASSWORD,
-    ERROR_REFRESH_TOKEN_NOT_FOUND,
     ERROR_REFRESH_TOKEN_EXPIRED,
+    ERROR_REFRESH_TOKEN_NOT_FOUND,
     ERROR_USER_NOT_FOUND,
     JWT_SUBJECT_KEY,
 )
-from fastapi import HTTPException, status
+from app.repository import auth_repo
+from app.schemas.auth import (
+    LoginRequest,
+    RefreshTokenRequest,
+    RegisterRequest,
+    RevokeTokenRequest,
+    TokenData,
+)
+from app.utils.datetime_utils import normalize_to_utc
+from app.utils.security import (
+    create_access_token,
+    create_refresh_token,
+    get_password_hash,
+    get_refresh_token_expires_delta,
+    verify_password,
+)
 
 
 def register_user(db: Session, request: RegisterRequest) -> TokenData:
@@ -73,7 +75,7 @@ def login_user(db: Session, request: LoginRequest) -> TokenData:
     refresh_token_str = None
     if request.remember_me:
         refresh_token_str = create_refresh_token()
-        expires_at = datetime.now(timezone.utc) + get_refresh_token_expires_delta()
+        expires_at = datetime.now(UTC) + get_refresh_token_expires_delta()
         auth_repo.create_refresh_token(
             db=db, user_id=user.id, token=refresh_token_str, expires_at=expires_at
         )
@@ -101,7 +103,7 @@ def refresh_access_token(db: Session, request: RefreshTokenRequest) -> TokenData
 
     # Check if refresh token is expired
     expires_at_utc = normalize_to_utc(refresh_token.expires_at)
-    if expires_at_utc and expires_at_utc < datetime.now(timezone.utc):
+    if expires_at_utc and expires_at_utc < datetime.now(UTC):
         # Delete expired token
         auth_repo.delete_refresh_token(db, request.refresh_token)
         raise HTTPException(
@@ -123,7 +125,7 @@ def refresh_access_token(db: Session, request: RefreshTokenRequest) -> TokenData
 
     # Generate and save new refresh token
     new_refresh_token_str = create_refresh_token()
-    expires_at = datetime.now(timezone.utc) + get_refresh_token_expires_delta()
+    expires_at = datetime.now(UTC) + get_refresh_token_expires_delta()
     auth_repo.create_refresh_token(
         db=db, user_id=user.id, token=new_refresh_token_str, expires_at=expires_at
     )

@@ -1,7 +1,8 @@
 # app/models/namespaces.py
-from sqlalchemy import Column, String, TIMESTAMP, text
+from sqlalchemy import TIMESTAMP, Column, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+
 from app.db.base import Base
 
 

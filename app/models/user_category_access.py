@@ -1,8 +1,9 @@
 # app/models/user_category_access.py
-from sqlalchemy import Column, TIMESTAMP, ForeignKey, text, UniqueConstraint
+from sqlalchemy import TIMESTAMP, Column, ForeignKey, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
 from app.db.base import Base
 
 

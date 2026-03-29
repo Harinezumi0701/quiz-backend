@@ -1,22 +1,25 @@
 # app/repository/question_repo.py
+from datetime import UTC
+from typing import Any
 from uuid import UUID
-from sqlalchemy.orm import Session, joinedload
+
 from sqlalchemy import func
-from typing import Optional, Tuple, Dict, Any
-from app.models.questions import Question
+from sqlalchemy.orm import Session, joinedload
+
 from app.models.answer_options import AnswerOption
 from app.models.categories import Category
+from app.models.questions import Question
 from app.models.tests import Test
-from app.utils.search_pagination import paginate_query_with_multiple_filters
 from app.utils.datetime_utils import datetime_to_timestamp
+from app.utils.search_pagination import paginate_query_with_multiple_filters
 
 
 def get_all_questions(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all questions with optional filtering and pagination.
 
@@ -121,8 +124,8 @@ def get_questions_by_category_and_test_id(
     test_id: str,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all questions for a specific category and test with optional filtering and pagination.
 
@@ -240,8 +243,8 @@ def get_questions_by_test_id(
     test_id: str,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all questions for a specific test with optional filtering and pagination.
 
@@ -468,9 +471,9 @@ def question_exists(db: Session, question_id: UUID) -> bool:
 def create_question(
     db: Session,
     content: str,
-    image_url: Optional[str] = None,
-    category_id: Optional[str] = None,
-    test_id: Optional[str] = None,
+    image_url: str | None = None,
+    category_id: str | None = None,
+    test_id: str | None = None,
     is_multiple_choice: bool = False,
 ):
     """
@@ -557,11 +560,11 @@ def create_question(
 def update_question(
     db: Session,
     question_id: str,
-    content: Optional[str] = None,
-    image_url: Optional[str] = None,
-    category_id: Optional[str] = None,
-    test_id: Optional[str] = None,
-    is_multiple_choice: Optional[bool] = None,
+    content: str | None = None,
+    image_url: str | None = None,
+    category_id: str | None = None,
+    test_id: str | None = None,
+    is_multiple_choice: bool | None = None,
 ):
     """
     Update a question.
@@ -667,7 +670,7 @@ def delete_question(db: Session, question_id: str):
     Returns:
         bool: True if deleted, False if not found
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     question = (
         db.query(Question)
@@ -678,6 +681,6 @@ def delete_question(db: Session, question_id: str):
     if not question:
         return False
 
-    question.deleted_at = datetime.now(timezone.utc)
+    question.deleted_at = datetime.now(UTC)
     db.commit()
     return True

@@ -1,6 +1,8 @@
 # app/services/question_service.py
+from typing import Any
+
 from sqlalchemy.orm import Session
-from typing import Dict, Any, Optional
+
 from app.repository import question_repo
 
 
@@ -8,7 +10,7 @@ def get_all_questions(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None
+    request_params: dict[str, Any] | None = None
 ):
     """Get all questions with optional filtering and pagination."""
     return question_repo.get_all_questions(db, page=page, page_size=page_size, request_params=request_params)
@@ -25,7 +27,7 @@ def get_questions_by_category_and_test_id(
     test_id: str,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
+    request_params: dict[str, Any] | None = None,
 ):
     """Get all questions for a specific category and test with optional filtering and pagination."""
     return question_repo.get_questions_by_category_and_test_id(
@@ -38,7 +40,7 @@ def get_questions_by_test_id(
     test_id: str,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
+    request_params: dict[str, Any] | None = None,
 ):
     """Get all questions for a specific test with optional filtering and pagination."""
     return question_repo.get_questions_by_test_id(
@@ -60,9 +62,9 @@ def get_question_by_test_and_id(
 def create_question(
     db: Session,
     content: str,
-    image_url: Optional[str] = None,
-    category_id: Optional[str] = None,
-    test_id: Optional[str] = None,
+    image_url: str | None = None,
+    category_id: str | None = None,
+    test_id: str | None = None,
     is_multiple_choice: bool = False,
 ):
     """Create a new question."""
@@ -74,11 +76,11 @@ def create_question(
 def update_question(
     db: Session,
     question_id: str,
-    content: Optional[str] = None,
-    image_url: Optional[str] = None,
-    category_id: Optional[str] = None,
-    test_id: Optional[str] = None,
-    is_multiple_choice: Optional[bool] = None,
+    content: str | None = None,
+    image_url: str | None = None,
+    category_id: str | None = None,
+    test_id: str | None = None,
+    is_multiple_choice: bool | None = None,
 ):
     """Update a question."""
     return question_repo.update_question(

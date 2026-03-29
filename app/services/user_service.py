@@ -1,27 +1,29 @@
 # app/services/user_service.py
-from sqlalchemy.orm import Session
-from uuid import UUID
-from typing import Dict, Any, Optional, Tuple
 import re
+from typing import Any
+from uuid import UUID
+
 from fastapi import HTTPException, status
-from app.repository import user_repo, submission_repo
-from app.utils.security import verify_password, get_password_hash
+from sqlalchemy.orm import Session
+
 from app.constants import (
-    ERROR_USER_NOT_FOUND,
-    ERROR_USER_ID_ALREADY_EXISTS,
-    ERROR_INVALID_USER_ID_FORMAT,
-    ERROR_INCORRECT_OLD_PASSWORD,
-    ERROR_NEW_PASSWORD_SAME_AS_OLD,
     ERROR_EMAIL_ALREADY_REGISTERED,
+    ERROR_INCORRECT_OLD_PASSWORD,
+    ERROR_INVALID_USER_ID_FORMAT,
+    ERROR_NEW_PASSWORD_SAME_AS_OLD,
+    ERROR_USER_ID_ALREADY_EXISTS,
+    ERROR_USER_NOT_FOUND,
 )
+from app.repository import submission_repo, user_repo
+from app.utils.security import get_password_hash, verify_password
 
 
 def list_users(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """Get all users with optional filtering and pagination."""
     return user_repo.get_all_users(
         db, page=page, page_size=page_size, request_params=request_params

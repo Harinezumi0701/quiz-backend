@@ -1,10 +1,11 @@
 # app/utils/permission_utils.py
 from typing import Literal
+
 from app.constants.permissions import (
-    PERMISSION_ACTION_READ,
     PERMISSION_ACTION_CREATE,
-    PERMISSION_ACTION_UPDATE,
     PERMISSION_ACTION_DELETE,
+    PERMISSION_ACTION_READ,
+    PERMISSION_ACTION_UPDATE,
 )
 
 HTTPMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE"]

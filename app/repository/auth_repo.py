@@ -1,10 +1,12 @@
 # app/repository/auth_repo.py
-from datetime import datetime, timezone
+from datetime import datetime
+
 from sqlalchemy.orm import Session
-from app.models.users import User
+
 from app.models.refresh_tokens import RefreshToken
-from app.utils.user_id_generator import generate_unique_user_id
+from app.models.users import User
 from app.repository.role_repo import get_default_role
+from app.utils.user_id_generator import generate_unique_user_id
 
 
 def get_user_by_email(db: Session, email: str) -> User | None:

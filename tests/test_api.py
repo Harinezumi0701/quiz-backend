@@ -4,6 +4,7 @@ Test script to verify API endpoints work correctly.
 from app.db.session import SessionLocal
 from app.services import question_service
 
+
 def test_categories_api():
     db = SessionLocal()
 

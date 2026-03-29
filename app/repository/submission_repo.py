@@ -1,18 +1,18 @@
 # app/repository/submission_repo.py
-from datetime import datetime, timezone
-from sqlalchemy.orm import Session
-from sqlalchemy import func, asc, desc, select
-from typing import List, Optional
+from datetime import UTC, datetime
 from uuid import UUID
-from app.models.submissions import Submission
-from app.models.questions import Question
+
+from sqlalchemy import asc, desc, func, select
+from sqlalchemy.orm import Session
+
+from app.constants import UNCATEGORIZED_CATEGORY_NAME, UNCATEGORIZED_TEST_NAME_NAME
 from app.models.categories import Category
-from app.models.tests import Test
-from app.models.users import User
+from app.models.questions import Question
 from app.models.submission_history import SubmissionHistory
+from app.models.submissions import Submission
+from app.models.tests import Test
 from app.schemas.submission import SubmissionCreate
 from app.utils.datetime_utils import datetime_to_timestamp
-from app.constants import UNCATEGORIZED_CATEGORY_NAME, UNCATEGORIZED_TEST_NAME_NAME
 
 
 def create_submission(
@@ -38,8 +38,8 @@ def create_submission(
 
 
 def create_submissions_bulk(
-    db: Session, user_id: UUID, submissions: List[SubmissionCreate]
-) -> List[Submission]:
+    db: Session, user_id: UUID, submissions: list[SubmissionCreate]
+) -> list[Submission]:
     """Create multiple submission records at once with submission history tracking."""
     # Create a single submission history for this bulk submission
     submission_history = SubmissionHistory(
@@ -67,7 +67,8 @@ def create_submissions_bulk(
 
 def get_user_statistics(db: Session, user_id: UUID):
     """Get user's quiz statistics grouped by category."""
-    from sqlalchemy import Integer, case, func as sql_func
+    from sqlalchemy import case
+    from sqlalchemy import func as sql_func
 
     stats = (
         db.query(
@@ -109,7 +110,8 @@ def get_user_statistics(db: Session, user_id: UUID):
 
 def get_user_statistics_by_test(db: Session, user_id: UUID):
     """Get user's quiz statistics grouped by category and test."""
-    from sqlalchemy import Integer, case, func as sql_func
+    from sqlalchemy import case
+    from sqlalchemy import func as sql_func
 
     stats = (
         db.query(
@@ -214,12 +216,12 @@ def get_user_submission_history(
     user_id: UUID,
     page: int = 1,
     page_size: int = 10,
-    search: Optional[str] = None,
+    search: str | None = None,
     sort_by: str = "submitted_at",
     sort_order: str = "desc",
-    date_from: Optional[int] = None,
-    date_to: Optional[int] = None,
-    category: Optional[str] = None,
+    date_from: int | None = None,
+    date_to: int | None = None,
+    category: str | None = None,
 ):
     """Get paginated, filterable, sortable submission history for a user."""
     offset = (page - 1) * page_size
@@ -228,10 +230,10 @@ def get_user_submission_history(
 
     # Filter by date range (Unix timestamps)
     if date_from is not None:
-        dt_from = datetime.fromtimestamp(date_from, tz=timezone.utc).replace(tzinfo=None)
+        dt_from = datetime.fromtimestamp(date_from, tz=UTC).replace(tzinfo=None)
         query = query.filter(SubmissionHistory.submitted_at >= dt_from)
     if date_to is not None:
-        dt_to = datetime.fromtimestamp(date_to, tz=timezone.utc).replace(tzinfo=None)
+        dt_to = datetime.fromtimestamp(date_to, tz=UTC).replace(tzinfo=None)
         query = query.filter(SubmissionHistory.submitted_at <= dt_to)
 
     # Filter by test name (search)

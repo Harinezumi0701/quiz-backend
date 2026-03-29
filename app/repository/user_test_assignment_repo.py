@@ -1,12 +1,14 @@
 # app/repository/user_test_assignment_repo.py
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
+
 from sqlalchemy.orm import Session, joinedload
-from typing import Optional, Tuple, Dict, Any
-from app.models.user_test_assignments import UserTestAssignment
-from app.models.tests import Test
-from app.models.users import User
+
 from app.models.questions import Question
+from app.models.tests import Test
+from app.models.user_test_assignments import UserTestAssignment
+from app.models.users import User
 from app.utils.datetime_utils import datetime_to_timestamp
 from app.utils.search_pagination import paginate_query_with_multiple_filters
 
@@ -16,8 +18,8 @@ def get_user_assignments(
     user_id: UUID,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all test assignments for a specific user.
 
@@ -88,7 +90,7 @@ def get_assignment_by_user_and_test(
     db: Session,
     user_id: UUID,
     test_id: UUID,
-) -> Optional[dict]:
+) -> dict | None:
     """
     Get a specific assignment for a user and test.
 
@@ -157,7 +159,7 @@ def check_user_has_access(
         return False
 
     # Check if assignment has expired
-    if assignment.expires_at and assignment.expires_at < datetime.now(timezone.utc):
+    if assignment.expires_at and assignment.expires_at < datetime.now(UTC):
         return False
 
     return True
@@ -167,8 +169,8 @@ def get_all_assignments(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """
     Get all test assignments with optional filtering and pagination.
 
@@ -237,8 +239,8 @@ def create_assignment(
     db: Session,
     user_id: UUID,
     test_id: UUID,
-    expires_at: Optional[datetime] = None,
-) -> Optional[dict]:
+    expires_at: datetime | None = None,
+) -> dict | None:
     """
     Create a new test assignment for a user.
 
@@ -296,8 +298,8 @@ def create_bulk_assignments(
     db: Session,
     user_ids: list[UUID],
     test_id: UUID,
-    expires_at: Optional[datetime] = None,
-) -> Tuple[int, int]:
+    expires_at: datetime | None = None,
+) -> tuple[int, int]:
     """
     Create test assignments for multiple users.
 
@@ -377,7 +379,7 @@ def delete_assignment(
     if not assignment:
         return False
 
-    assignment.deleted_at = datetime.now(timezone.utc)
+    assignment.deleted_at = datetime.now(UTC)
     db.commit()
     return True
 
@@ -411,6 +413,6 @@ def delete_assignment_by_user_and_test(
     if not assignment:
         return False
 
-    assignment.deleted_at = datetime.now(timezone.utc)
+    assignment.deleted_at = datetime.now(UTC)
     db.commit()
     return True

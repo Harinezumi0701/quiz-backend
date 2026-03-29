@@ -1,8 +1,9 @@
 # app/models/roles.py
-from sqlalchemy import Column, String, ForeignKey, TIMESTAMP, Boolean, text
+from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, String, text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
 from app.db.base import Base
 
 

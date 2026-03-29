@@ -1,4 +1,6 @@
 # app/api/v1/user.py
+from uuid import UUID
+
 from fastapi import (
     APIRouter,
     Body,
@@ -10,31 +12,28 @@ from fastapi import (
     status,
 )
 from sqlalchemy.orm import Session
-from typing import Optional
-from uuid import UUID
+
+from app.api.dependencies.permissions import require_namespace_permission
+from app.constants import ERROR_USER_NOT_FOUND
+from app.constants.permissions import PERMISSION_NAMESPACE_USERS
+from app.db.session import get_db
+from app.models.users import User
+from app.schemas.http_response import ErrorResponse
 from app.schemas.user import (
-    UserOut,
-    UserListResponse,
-    UserResponse,
-    UserCreateRequest,
-    UserUpdateRequest,
     AdminChangePasswordRequest,
     AssignRoleRequest,
+    UserCreateRequest,
+    UserListResponse,
+    UserResponse,
+    UserUpdateRequest,
 )
-from app.schemas.http_response import ErrorResponse
 from app.schemas.user_category_access import (
     CategoryAccessGrantRequest,
-    CategoryAccessResponse,
     CategoryAccessListResponse,
+    CategoryAccessResponse,
 )
-from app.services import user_service, permission_service, category_access_service
-from app.db.session import get_db
+from app.services import category_access_service, permission_service, user_service
 from app.utils.search_pagination import get_pagination_meta
-from app.constants import ERROR_USER_NOT_FOUND
-from app.api.dependencies.auth import get_current_user
-from app.api.dependencies.permissions import require_namespace_permission
-from app.models.users import User
-from app.constants.permissions import PERMISSION_NAMESPACE_USERS
 
 router = APIRouter()
 

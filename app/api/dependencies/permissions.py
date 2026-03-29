@@ -1,15 +1,14 @@
 # app/api/dependencies/permissions.py
+
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import Union
-from app.db.session import get_db
+
 from app.api.dependencies.auth import get_current_user
+from app.constants.error_messages import ERROR_PERMISSION_DENIED
+from app.db.session import get_db
 from app.models.users import User
 from app.services import permission_service
-from app.utils.permission_utils import get_action_from_method, build_permission
-from app.constants.error_codes import FORBIDDEN
-from app.constants.error_messages import ERROR_PERMISSION_DENIED
-from app.constants.permissions import PERMISSION_NAMESPACE_CATEGORIES
+from app.utils.permission_utils import build_permission, get_action_from_method
 
 
 def require_permission(permission: str):

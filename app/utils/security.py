@@ -1,17 +1,18 @@
 # app/utils/security.py
 import os
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
+
+from dotenv import load_dotenv
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from dotenv import load_dotenv
+
 from app.constants import (
-    PASSWORD_SCHEME,
-    JWT_ALGORITHM,
-    JWT_SUBJECT_KEY,
-    DEFAULT_SECRET_KEY,
     DEFAULT_ACCESS_TOKEN_EXPIRE_MINUTES,
     DEFAULT_REFRESH_TOKEN_EXPIRE_DAYS,
+    DEFAULT_SECRET_KEY,
+    JWT_ALGORITHM,
+    JWT_SUBJECT_KEY,
+    PASSWORD_SCHEME,
 )
 
 load_dotenv()
@@ -36,20 +37,20 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """Create a JWT access token."""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def decode_access_token(token: str) -> Optional[str]:
+def decode_access_token(token: str) -> str | None:
     """Decode and verify a JWT token, returning the user email."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

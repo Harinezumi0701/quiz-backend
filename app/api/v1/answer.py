@@ -1,20 +1,21 @@
 # app/api/v1/answer.py
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.orm import Session
-from typing import Optional
+
+from app.api.dependencies.permissions import require_namespace_permission
+from app.constants.permissions import PERMISSION_NAMESPACE_ANSWERS
+from app.db.session import get_db
+from app.models.users import User
 from app.schemas.answer import (
+    AnswerCreateRequest,
     AnswerListResponse,
     AnswerResponse,
-    AnswerCreateRequest,
     AnswerUpdateRequest,
 )
 from app.schemas.http_response import ErrorResponse
 from app.services import answer_service
-from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
-from app.api.dependencies.permissions import require_namespace_permission
-from app.models.users import User
-from app.constants.permissions import PERMISSION_NAMESPACE_ANSWERS
 
 router = APIRouter()
 

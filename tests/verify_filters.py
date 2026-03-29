@@ -1,18 +1,20 @@
 
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-from fastapi.testclient import TestClient
 from uuid import uuid4
+
+from fastapi.testclient import TestClient
 
 # Add project root to python path
 sys.path.append(os.getcwd())
 
-from app.main import app
 from app.api.dependencies.auth import get_current_user
-from app.models.users import User
 from app.db.session import get_db
+from app.main import app
+from app.models.users import User
+
 
 class TestFilterMigration(unittest.TestCase):
     

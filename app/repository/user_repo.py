@@ -1,8 +1,10 @@
 # app/repository/user_repo.py
-from sqlalchemy.orm import Session
+from datetime import UTC, date
+from typing import Any
 from uuid import UUID
-from typing import Optional, Tuple, Dict, Any
-from datetime import date
+
+from sqlalchemy.orm import Session
+
 from app.models.users import User
 from app.utils.search_pagination import paginate_query_with_multiple_filters
 
@@ -11,8 +13,8 @@ def get_all_users(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """Get all users with optional filtering and pagination."""
     query = (
         db.query(User)
@@ -97,8 +99,8 @@ def create_user(
     join_date: date = None,
 ) -> User:
     """Create a new user."""
-    from app.utils.user_id_generator import generate_unique_user_id
     from app.repository.role_repo import get_default_role
+    from app.utils.user_id_generator import generate_unique_user_id
 
     # Generate user_id if not provided
     if not user_id:
@@ -150,14 +152,14 @@ def delete_user(db: Session, user_id: UUID) -> bool:
     Returns:
         bool: True if deleted, False if not found
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     user = db.query(User).filter(User.id == user_id, User.deleted_at.is_(None)).first()
 
     if not user:
         return False
 
-    user.deleted_at = datetime.now(timezone.utc)
+    user.deleted_at = datetime.now(UTC)
     db.commit()
     return True
 
@@ -173,7 +175,7 @@ def delete_user_by_user_id(db: Session, user_id: str) -> bool:
     Returns:
         bool: True if deleted, False if not found
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     user = (
         db.query(User)
@@ -184,6 +186,6 @@ def delete_user_by_user_id(db: Session, user_id: str) -> bool:
     if not user:
         return False
 
-    user.deleted_at = datetime.now(timezone.utc)
+    user.deleted_at = datetime.now(UTC)
     db.commit()
     return True

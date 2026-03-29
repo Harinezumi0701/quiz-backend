@@ -1,16 +1,17 @@
 # app/api/dependencies/auth.py
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.utils.security import decode_access_token
-from app.services import auth_service
-from app.models.users import User
+
 from app.constants import (
     ERROR_COULD_NOT_VALIDATE_CREDENTIALS,
     ERROR_USER_NOT_FOUND,
     JWT_TOKEN_TYPE,
 )
+from app.db.session import get_db
+from app.models.users import User
+from app.services import auth_service
+from app.utils.security import decode_access_token
 
 security = HTTPBearer(auto_error=False)
 

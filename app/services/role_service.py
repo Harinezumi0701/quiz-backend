@@ -1,10 +1,12 @@
 # app/services/role_service.py
-from sqlalchemy.orm import Session
+from typing import Any
 from uuid import UUID
-from typing import Dict, Any, Optional
+
 from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.constants.error_messages import ERROR_ROLE_ALREADY_EXISTS, ERROR_ROLE_NOT_FOUND
 from app.repository import role_repo
-from app.constants.error_messages import ERROR_ROLE_NOT_FOUND, ERROR_ROLE_ALREADY_EXISTS
 
 
 def get_role_by_name(db: Session, name: str):
@@ -32,7 +34,7 @@ def get_all_roles_with_search(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
+    request_params: dict[str, Any] | None = None,
 ):
     """Get all roles with optional filtering and pagination."""
     return role_repo.get_all_roles_with_search(

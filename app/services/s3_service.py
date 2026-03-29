@@ -1,10 +1,10 @@
 import os
 import uuid
-from typing import Optional
-from dotenv import load_dotenv
+
 import boto3
 from botocore.config import Config
 from botocore.exceptions import ClientError
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -35,7 +35,7 @@ def get_s3_client():
 def generate_presigned_url(
     filename: str,
     prefix: str = "uploads",
-    content_type: Optional[str] = None,
+    content_type: str | None = None,
     expires_in: int = DEFAULT_EXPIRES_IN
 ) -> tuple[str, str, str]:
     """

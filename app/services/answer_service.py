@@ -1,6 +1,8 @@
 # app/services/answer_service.py
+from typing import Any
+
 from sqlalchemy.orm import Session
-from typing import Dict, Any, Optional
+
 from app.repository import answer_repo
 
 
@@ -9,7 +11,7 @@ def get_answers_by_question_id(
     question_id: str,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
+    request_params: dict[str, Any] | None = None,
 ):
     """Get all answers for a specific question with optional filtering and pagination."""
     return answer_repo.get_answers_by_question_id(
@@ -26,7 +28,7 @@ def get_all_answers(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
+    request_params: dict[str, Any] | None = None,
 ):
     """Get all answers with optional filtering and pagination."""
     return answer_repo.get_all_answers(
@@ -42,10 +44,10 @@ def get_answer_by_id_only(db: Session, answer_id: str):
 def create_answer(
     db: Session,
     question_id: str,
-    content: Optional[str] = None,
-    image_url: Optional[str] = None,
+    content: str | None = None,
+    image_url: str | None = None,
     is_correct: bool = False,
-    explanation: Optional[str] = None,
+    explanation: str | None = None,
 ):
     """Create a new answer."""
     return answer_repo.create_answer(
@@ -56,10 +58,10 @@ def create_answer(
 def update_answer(
     db: Session,
     answer_id: str,
-    content: Optional[str] = None,
-    image_url: Optional[str] = None,
-    is_correct: Optional[bool] = None,
-    explanation: Optional[str] = None,
+    content: str | None = None,
+    image_url: str | None = None,
+    is_correct: bool | None = None,
+    explanation: str | None = None,
 ):
     """Update an answer."""
     return answer_repo.update_answer(

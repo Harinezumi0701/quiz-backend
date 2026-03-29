@@ -1,6 +1,8 @@
 # app/services/category_service.py
+from typing import Any
+
 from sqlalchemy.orm import Session
-from typing import Tuple, Dict, Any, Optional
+
 from app.repository import category_repo, test_repo
 
 
@@ -8,8 +10,8 @@ def get_all_categories_with_search(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """Get all categories with optional name search and pagination."""
     return category_repo.get_all_categories_with_search(
         db, page=page, page_size=page_size, request_params=request_params
@@ -26,8 +28,8 @@ def get_tests_by_category_id(
     category_id: str,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """Get all tests for a specific category with optional filtering and pagination."""
     return test_repo.get_tests_by_category_id(
         db, category_id, page=page, page_size=page_size, request_params=request_params
@@ -43,9 +45,9 @@ def get_all_tests(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-    allowed_category_ids: Optional[list] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+    allowed_category_ids: list | None = None,
+) -> tuple[list, int]:
     """Get all tests with optional filtering and pagination."""
     return test_repo.get_all_tests(
         db,

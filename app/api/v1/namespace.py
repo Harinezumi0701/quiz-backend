@@ -1,4 +1,5 @@
 # app/api/v1/namespace.py
+
 from fastapi import (
     APIRouter,
     Body,
@@ -10,20 +11,20 @@ from fastapi import (
     status,
 )
 from sqlalchemy.orm import Session
-from typing import Optional
+
+from app.api.dependencies.permissions import require_namespace_permission
+from app.constants.permissions import PERMISSION_NAMESPACE_NAMESPACES
+from app.db.session import get_db
+from app.models.users import User
+from app.schemas.http_response import ErrorResponse
 from app.schemas.namespace import (
+    NamespaceCreateRequest,
     NamespaceListResponse,
     NamespaceResponse,
-    NamespaceCreateRequest,
     NamespaceUpdateRequest,
 )
-from app.schemas.http_response import ErrorResponse
 from app.services import namespace_service
-from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
-from app.api.dependencies.permissions import require_namespace_permission
-from app.models.users import User
-from app.constants.permissions import PERMISSION_NAMESPACE_NAMESPACES
 
 router = APIRouter()
 

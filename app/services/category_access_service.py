@@ -1,9 +1,11 @@
 # app/services/category_access_service.py
 from uuid import UUID
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from app.repository import user_category_access_repo, category_repo, user_repo
+
 from app.models.user_category_access import UserCategoryAccess
+from app.repository import category_repo, user_category_access_repo, user_repo
 
 
 def list_user_category_access(db: Session, user_id: UUID) -> list[UserCategoryAccess]:

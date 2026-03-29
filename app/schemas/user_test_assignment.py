@@ -1,7 +1,8 @@
 # app/schemas/user_test_assignment.py
-from pydantic import BaseModel, Field
-from typing import List, Optional
 from uuid import UUID
+
+from pydantic import BaseModel, Field
+
 from app.schemas.http_response import SuccessResponse
 
 
@@ -48,12 +49,12 @@ class UserTestAssignmentAdmin(BaseModel):
         from_attributes = True
 
 
-class UserTestAssignmentListResponse(SuccessResponse[List[UserTestAssignmentWithDetails]]):
+class UserTestAssignmentListResponse(SuccessResponse[list[UserTestAssignmentWithDetails]]):
     """Response schema for list of user test assignments"""
     pass
 
 
-class UserTestAssignmentAdminListResponse(SuccessResponse[List[UserTestAssignmentAdmin]]):
+class UserTestAssignmentAdminListResponse(SuccessResponse[list[UserTestAssignmentAdmin]]):
     """Response schema for admin list of test assignments"""
     pass
 
@@ -81,7 +82,7 @@ class UserTestAssignmentCreateRequest(BaseModel):
 
 class BulkAssignmentCreateRequest(BaseModel):
     """Request schema for creating bulk test assignments"""
-    user_ids: List[UUID] = Field(..., min_length=1, description="List of User IDs to assign the test to")
+    user_ids: list[UUID] = Field(..., min_length=1, description="List of User IDs to assign the test to")
     test_id: UUID = Field(..., description="Test ID to assign")
     expires_at: int | None = Field(None, description="Expiration Unix timestamp (null = never expires)")
 

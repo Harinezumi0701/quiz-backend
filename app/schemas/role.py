@@ -1,13 +1,14 @@
 # app/schemas/role.py
-from pydantic import BaseModel, Field
-from typing import List, Optional
-from uuid import UUID
 from datetime import datetime
-from app.schemas.http_response import SuccessResponse
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
 from app.constants.permissions import (
-    PERMISSION_NAMESPACE_CATEGORIES,
     PERMISSION_ACTION_READ,
+    PERMISSION_NAMESPACE_CATEGORIES,
 )
+from app.schemas.http_response import SuccessResponse
 
 
 class PermissionOut(BaseModel):
@@ -21,10 +22,10 @@ class PermissionOut(BaseModel):
         description="Permission string",
         example=f"{PERMISSION_NAMESPACE_CATEGORIES}::{PERMISSION_ACTION_READ}",
     )
-    name: Optional[str] = Field(
+    name: str | None = Field(
         None, description="Permission name", example="Read Categories"
     )
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, description="Permission description", example="Allow reading category information"
     )
     created_at: datetime = Field(..., description="Created at timestamp")
@@ -40,7 +41,7 @@ class RoleOut(BaseModel):
         ..., description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
     )
     name: str = Field(..., description="Role name", example="admin")
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None,
         description="Role description",
         example="Administrator with full permissions",
@@ -50,7 +51,7 @@ class RoleOut(BaseModel):
         description="Whether this is the default role for new users",
         example=False,
     )
-    permissions: List[PermissionOut] = Field(
+    permissions: list[PermissionOut] = Field(
         default_factory=list, description="List of permissions for this role"
     )
     created_at: datetime = Field(..., description="Created at timestamp")
@@ -77,7 +78,7 @@ class RoleOut(BaseModel):
         }
 
 
-class RoleListResponse(SuccessResponse[List[RoleOut]]):
+class RoleListResponse(SuccessResponse[list[RoleOut]]):
     """Response schema for list of roles"""
 
     pass
@@ -99,7 +100,7 @@ class RoleCreateRequest(BaseModel):
         description="Role name",
         example="admin",
     )
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None,
         max_length=500,
         description="Role description",
@@ -118,14 +119,14 @@ class RoleCreateRequest(BaseModel):
 class RoleUpdateRequest(BaseModel):
     """Request schema for updating a role"""
 
-    name: Optional[str] = Field(
+    name: str | None = Field(
         None,
         min_length=1,
         max_length=100,
         description="Role name",
         example="admin",
     )
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None,
         max_length=500,
         description="Role description",

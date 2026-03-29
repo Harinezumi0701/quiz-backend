@@ -1,8 +1,9 @@
 # app/schemas/user_category_access.py
-from uuid import UUID
 from datetime import datetime
-from pydantic import BaseModel
 from typing import Any
+from uuid import UUID
+
+from pydantic import BaseModel
 
 
 class CategoryAccessGrantRequest(BaseModel):

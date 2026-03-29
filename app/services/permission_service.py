@@ -1,18 +1,16 @@
 # app/services/permission_service.py
 import fnmatch
-from sqlalchemy.orm import Session
+from typing import Any
 from uuid import UUID
-from typing import Dict, Any, Optional, Tuple
+
 from fastapi import HTTPException, status
-from app.models.users import User
-from app.repository import role_repo
-from app.repository import permission_repo
+from sqlalchemy.orm import Session
+
 from app.constants.permissions import (
-    PERMISSION_NAMESPACE_CATEGORIES,
-    PERMISSION_ACTION_READ,
-    PERMISSION_WILDCARD_ALL,
     DEFAULT_USER_PERMISSIONS,
 )
+from app.models.users import User
+from app.repository import permission_repo, role_repo
 
 
 def check_permission(db: Session, user: User, required_permission: str) -> bool:
@@ -145,8 +143,8 @@ def get_all_permissions(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """Get all permissions with optional filtering and pagination."""
     return permission_repo.get_all_permissions(
         db, page=page, page_size=page_size, request_params=request_params

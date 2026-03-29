@@ -1,6 +1,5 @@
 from sqlalchemy.orm import declarative_base
 
-
 Base = declarative_base()
 
 # Ensure all models are imported so SQLAlchemy can locate them when configuring mappers

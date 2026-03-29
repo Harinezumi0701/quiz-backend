@@ -1,7 +1,8 @@
 # app/schemas/namespace.py
-from pydantic import BaseModel, Field
-from typing import List, Optional
 from uuid import UUID
+
+from pydantic import BaseModel, Field
+
 from app.schemas.http_response import SuccessResponse
 
 
@@ -12,7 +13,7 @@ class NamespaceOut(BaseModel):
         ..., description="Namespace ID", example="550e8400-e29b-41d4-a716-446655440000"
     )
     name: str = Field(..., description="Namespace name", example="categories")
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, description="Namespace description", example="Category management"
     )
     prefix: str = Field(
@@ -39,7 +40,7 @@ class NamespaceOut(BaseModel):
         }
 
 
-class NamespaceListResponse(SuccessResponse[List[NamespaceOut]]):
+class NamespaceListResponse(SuccessResponse[list[NamespaceOut]]):
     """Response schema for list of namespaces"""
 
     pass
@@ -57,7 +58,7 @@ class NamespaceCreateRequest(BaseModel):
     name: str = Field(
         ..., min_length=1, max_length=100, description="Namespace name", example="categories"
     )
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, max_length=500, description="Namespace description", example="Category management"
     )
     prefix: str = Field(
@@ -77,13 +78,13 @@ class NamespaceCreateRequest(BaseModel):
 class NamespaceUpdateRequest(BaseModel):
     """Request schema for updating a namespace"""
 
-    name: Optional[str] = Field(
+    name: str | None = Field(
         None, min_length=1, max_length=100, description="Namespace name", example="categories"
     )
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, max_length=500, description="Namespace description", example="Category management"
     )
-    prefix: Optional[str] = Field(
+    prefix: str | None = Field(
         None, min_length=1, max_length=100, description="Namespace prefix", example="categories"
     )
 

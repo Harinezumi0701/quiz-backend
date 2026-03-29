@@ -1,11 +1,17 @@
 # app/api/v1/auth.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, TokenData, RefreshTokenRequest, RevokeTokenRequest
+
+from app.db.session import get_db
+from app.schemas.auth import (
+    LoginRequest,
+    RefreshTokenRequest,
+    RegisterRequest,
+    RevokeTokenRequest,
+    TokenResponse,
+)
 from app.schemas.http_response import ErrorResponse
 from app.services import auth_service
-from app.db.session import get_db
-from app.utils.response import success_response
 
 router = APIRouter()
 

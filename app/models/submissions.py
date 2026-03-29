@@ -1,11 +1,12 @@
-from datetime import datetime
 
 
-from sqlalchemy import Column, Boolean, ForeignKey, DateTime, text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
 from app.db.base import Base
+
 
 class Submission(Base):
     """Model for user submissions - each submission is an answer to a question"""

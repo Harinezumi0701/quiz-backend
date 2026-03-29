@@ -1,5 +1,6 @@
 # app/schemas/auth.py
 from pydantic import BaseModel, EmailStr, Field
+
 from app.schemas.http_response import SuccessResponse
 
 

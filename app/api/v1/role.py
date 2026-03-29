@@ -1,16 +1,17 @@
 # app/api/v1/role.py
+from uuid import UUID
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.orm import Session
-from typing import Optional
-from uuid import UUID
-from app.schemas.role import RoleListResponse, RoleResponse, RoleCreateRequest, RoleUpdateRequest
-from app.schemas.http_response import ErrorResponse
-from app.services import role_service
-from app.db.session import get_db
-from app.utils.search_pagination import get_pagination_meta
+
 from app.api.dependencies.permissions import require_namespace_permission
-from app.models.users import User
 from app.constants.permissions import PERMISSION_NAMESPACE_ROLES
+from app.db.session import get_db
+from app.models.users import User
+from app.schemas.http_response import ErrorResponse
+from app.schemas.role import RoleCreateRequest, RoleListResponse, RoleResponse, RoleUpdateRequest
+from app.services import role_service
+from app.utils.search_pagination import get_pagination_meta
 
 router = APIRouter()
 

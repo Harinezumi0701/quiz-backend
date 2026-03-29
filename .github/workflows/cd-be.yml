@@ -1,0 +1,134 @@
+name: CD Backend
+
+on:
+  push:
+    branches:
+      - "production"
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: postgresql+psycopg2://testuser:testpass@localhost:5432/test_db
+      SECRET_KEY: test-secret-key-for-ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Add Poetry to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Lint with ruff
+        run: poetry run ruff check .
+
+      - name: Run tests
+        run: poetry run pytest tests/ -v
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/quiz-be
+          tags: |
+            type=sha
+            type=raw,value=production
+            type=raw,value={{date 'YYYYMMDD'}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ci/docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/quiz-be:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/quiz-be:buildcache,mode=max
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+
+            # Backup database before migration
+            mkdir -p /home/deploy/quiz/be/backups
+            docker exec quiz_db_prod pg_dump -U ${POSTGRES_USER} ${POSTGRES_DB} \
+              > /home/deploy/quiz/be/backups/pre_deploy_$(date +%Y%m%d_%H%M%S).sql
+
+            # Pull new image
+            docker pull ghcr.io/${{ github.repository_owner }}/quiz-be:production
+
+            # Restart API container with new image
+            cd /home/deploy/quiz/be
+            docker compose -f ci/docker-compose.app.yml up -d --no-deps api
+
+            # Wait for container to initialize
+            sleep 15
+
+            # Run Alembic migrations
+            docker exec quiz_api_prod alembic upgrade head
+
+            # Log current migration state for audit trail
+            docker exec quiz_api_prod alembic current
+
+            # Prune images older than 30 days
+            docker image prune -f --filter "until=720h"
+
+      - name: Health check
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            for i in $(seq 1 10); do
+              if curl -sf http://localhost:8000/health; then
+                echo "Health check passed on attempt $i"
+                exit 0
+              fi
+              echo "Attempt $i failed, retrying in 5s..."
+              sleep 5
+            done
+            echo "Health check failed after 10 attempts"
+            exit 1

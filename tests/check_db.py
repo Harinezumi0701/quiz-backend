@@ -1,10 +1,12 @@
 """
 Simple script to check database contents and verify data import.
 """
+from sqlalchemy import func
+
 from app.db.session import SessionLocal
 from app.models.questions import Question
 from app.models.users import User
-from sqlalchemy import func
+
 
 def check_database():
     db = SessionLocal()

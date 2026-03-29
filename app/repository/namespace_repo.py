@@ -1,6 +1,9 @@
 # app/repository/namespace_repo.py
+from datetime import UTC
+from typing import Any
+
 from sqlalchemy.orm import Session
-from typing import Optional, Tuple, Dict, Any
+
 from app.models.namespaces import Namespace
 from app.utils.datetime_utils import datetime_to_timestamp
 from app.utils.search_pagination import paginate_query_with_multiple_filters
@@ -10,8 +13,8 @@ def get_all_namespaces_with_search(
     db: Session,
     page: int = 1,
     page_size: int = 10,
-    request_params: Optional[Dict[str, Any]] = None,
-) -> Tuple[list, int]:
+    request_params: dict[str, Any] | None = None,
+) -> tuple[list, int]:
     """Get all namespaces with optional name search and pagination."""
     query = (
         db.query(Namespace)
@@ -77,7 +80,7 @@ def get_namespace_by_id(db: Session, namespace_id: str):
 
 
 def create_namespace(
-    db: Session, name: str, prefix: str, description: Optional[str] = None
+    db: Session, name: str, prefix: str, description: str | None = None
 ):
     """
     Create a new namespace.
@@ -109,9 +112,9 @@ def create_namespace(
 def update_namespace(
     db: Session,
     namespace_id: str,
-    name: Optional[str] = None,
-    prefix: Optional[str] = None,
-    description: Optional[str] = None,
+    name: str | None = None,
+    prefix: str | None = None,
+    description: str | None = None,
 ):
     """
     Update a namespace.
@@ -166,7 +169,7 @@ def delete_namespace(db: Session, namespace_id: str):
     Returns:
         bool: True if deleted, False if not found
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     namespace = (
         db.query(Namespace)
@@ -177,6 +180,6 @@ def delete_namespace(db: Session, namespace_id: str):
     if not namespace:
         return False
 
-    namespace.deleted_at = datetime.now(timezone.utc)
+    namespace.deleted_at = datetime.now(UTC)
     db.commit()
     return True

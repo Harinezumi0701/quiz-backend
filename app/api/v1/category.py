@@ -1,35 +1,32 @@
 # app/api/v1/category.py
+
 from fastapi import (
     APIRouter,
+    Body,
     Depends,
     HTTPException,
     Path,
     Query,
     Request,
     status,
-    Body,
 )
 from sqlalchemy.orm import Session
-from typing import Optional
+
+from app.api.dependencies.permissions import require_namespace_permission
+from app.constants.permissions import (
+    PERMISSION_NAMESPACE_CATEGORIES,
+)
+from app.db.session import get_db
+from app.models.users import User
 from app.schemas.category import (
+    CategoryCreateRequest,
     CategoryDetailListResponse,
     CategoryDetailResponse,
-    CategoryCreateRequest,
     CategoryUpdateRequest,
 )
 from app.schemas.http_response import ErrorResponse
 from app.services import category_service
-from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
-from app.api.dependencies.permissions import require_namespace_permission
-from app.models.users import User
-from app.constants.permissions import (
-    PERMISSION_NAMESPACE_CATEGORIES,
-    PERMISSION_ACTION_READ,
-    PERMISSION_ACTION_CREATE,
-    PERMISSION_ACTION_UPDATE,
-    PERMISSION_ACTION_DELETE,
-)
 
 router = APIRouter()
 
@@ -79,7 +76,6 @@ def get_all_categories(
         request_params=request_params,
     )
 
-    from app.utils.search_pagination import get_pagination_meta
 
     meta = get_pagination_meta(total, page, page_size)
 

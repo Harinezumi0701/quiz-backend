@@ -1,9 +1,10 @@
 # app/services/submission_service.py
-from sqlalchemy.orm import Session
-from typing import List
 from uuid import UUID
+
 from fastapi import HTTPException, status
-from app.repository import submission_repo, question_repo, answer_repo
+from sqlalchemy.orm import Session
+
+from app.repository import answer_repo, question_repo, submission_repo
 from app.schemas.submission import SubmissionCreate
 from app.utils.datetime_utils import datetime_to_timestamp
 
@@ -38,7 +39,7 @@ def submit_submission(db: Session, user_id: UUID, submission_data: SubmissionCre
     }
 
 
-def submit_submissions_bulk(db: Session, user_id: UUID, submissions: List[SubmissionCreate]) -> List[dict]:
+def submit_submissions_bulk(db: Session, user_id: UUID, submissions: list[SubmissionCreate]) -> list[dict]:
     """Submit multiple quiz submissions at once."""
     # Validate all submissions before creating
     for submission in submissions:

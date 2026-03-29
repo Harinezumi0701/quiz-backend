@@ -1,11 +1,13 @@
 # app/middleware/response_wrapper.py
+import json
+from collections.abc import Callable
+
+from fastapi.responses import JSONResponse as FastAPIJSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response, JSONResponse
-from fastapi.responses import JSONResponse as FastAPIJSONResponse
+from starlette.responses import JSONResponse, Response
+
 from app.utils.response import success_response
-from typing import Callable
-import json
 
 
 class ResponseWrapperMiddleware(BaseHTTPMiddleware):

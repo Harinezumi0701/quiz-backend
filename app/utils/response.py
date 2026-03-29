@@ -1,14 +1,15 @@
 # app/utils/response.py
-from typing import Optional, Union
+import uuid
+
 from fastapi import status
 from fastapi.responses import JSONResponse
-from app.schemas.http_response import SuccessResponse, ErrorResponse, ErrorDetail
-import uuid
+
+from app.schemas.http_response import ErrorDetail, ErrorResponse, SuccessResponse
 
 
 def success_response(
-    data: Union[list, dict],
-    meta: Optional[dict] = None,
+    data: list | dict,
+    meta: dict | None = None,
     status_code: int = status.HTTP_200_OK
 ) -> JSONResponse:
     """
@@ -35,8 +36,8 @@ def success_response(
 def error_response(
     code: str,
     message: str,
-    trace_id: Optional[str] = None,
-    details: Optional[Union[list, dict]] = None,
+    trace_id: str | None = None,
+    details: list | dict | None = None,
     status_code: int = status.HTTP_400_BAD_REQUEST
 ) -> JSONResponse:
     """

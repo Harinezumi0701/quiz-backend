@@ -1,21 +1,22 @@
 # app/api/v1/permission.py
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
-from sqlalchemy.orm import Session
-from typing import Optional
 from uuid import UUID
+
+from fastapi import APIRouter, Body, Depends, Path, Query, Request, status
+from sqlalchemy.orm import Session
+
+from app.api.dependencies.permissions import require_namespace_permission
+from app.constants.permissions import PERMISSION_NAMESPACE_ROLES
+from app.db.session import get_db
+from app.models.users import User
+from app.schemas.http_response import ErrorResponse
 from app.schemas.permission import (
+    PermissionCreateRequest,
     PermissionListResponse,
     PermissionResponse,
-    PermissionCreateRequest,
     PermissionUpdateRequest,
 )
-from app.schemas.http_response import ErrorResponse
 from app.services import permission_service
-from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
-from app.api.dependencies.permissions import require_namespace_permission
-from app.models.users import User
-from app.constants.permissions import PERMISSION_NAMESPACE_ROLES
 
 router = APIRouter()
 
@@ -112,7 +113,6 @@ def get_permission_by_id(
 
     Requires permission: roles::read
     """
-    from app.repository import permission_repo
     from app.utils.datetime_utils import datetime_to_timestamp
 
     permission = permission_service.get_permission_by_id(db, permission_id)

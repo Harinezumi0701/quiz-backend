@@ -170,6 +170,12 @@ def get_dashboard(
 def get_submission_history(
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    search: str = Query(None, description="Search by test name"),
+    sort_by: str = Query("submitted_at", description="Sort field: submitted_at | test_name | category"),
+    sort_order: str = Query("desc", description="Sort order: asc | desc"),
+    date_from: int = Query(None, description="Filter from date (Unix timestamp)"),
+    date_to: int = Query(None, description="Filter to date (Unix timestamp)"),
+    category: str = Query(None, description="Filter by category name"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -181,7 +187,16 @@ def get_submission_history(
     Requires authentication token in header: `Authorization: Bearer <token>`
     """
     history, total = submission_repo.get_user_submission_history(
-        db, current_user.id, page=page, page_size=page_size
+        db,
+        current_user.id,
+        page=page,
+        page_size=page_size,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        date_from=date_from,
+        date_to=date_to,
+        category=category,
     )
     meta = get_pagination_meta(total, page, page_size)
     return SubmissionHistoryListResponse(data=history, meta=meta)

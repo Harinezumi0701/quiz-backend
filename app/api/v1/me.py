@@ -1,10 +1,17 @@
 # app/api/v1/me.py
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
+from uuid import UUID
 from app.schemas.user import UserResponse, UserUpdateRequest, ChangePasswordRequest
 from app.schemas.submission import DashboardResponse
 from app.schemas.http_response import ErrorResponse
-from app.services import submission_service, user_service, permission_service
+from app.schemas.user_category_settings import (
+    UserCategorySettingsOut,
+    UserCategorySettingsResponse,
+    UserCategorySettingsListResponse,
+    UserCategorySettingsUpsertRequest,
+)
+from app.services import submission_service, user_service, permission_service, user_category_settings_service
 from app.db.session import get_db
 from app.api.dependencies.auth import get_current_user
 from app.models.users import User
@@ -191,3 +198,70 @@ def change_password(
         new_password=password_data.new_password
     )
     return {"message": "Password changed successfully"}
+
+
+@router.get(
+    "/settings/categories",
+    response_model=UserCategorySettingsListResponse,
+    summary="List all category settings for current user",
+    tags=["me"],
+)
+def list_category_settings(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """List all category settings for the current user."""
+    data = user_category_settings_service.list_settings(db, current_user.id)
+    return UserCategorySettingsListResponse(data=data, meta={})
+
+
+@router.get(
+    "/settings/categories/{category_id}",
+    response_model=UserCategorySettingsResponse,
+    summary="Get settings for a specific category",
+    tags=["me"],
+)
+def get_category_settings(
+    category_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get settings for a specific category for the current user."""
+    data = user_category_settings_service.get_setting(db, current_user.id, category_id)
+    return UserCategorySettingsResponse(data=data, meta={})
+
+
+@router.put(
+    "/settings/categories/{category_id}",
+    response_model=UserCategorySettingsResponse,
+    summary="Create or update settings for a specific category",
+    tags=["me"],
+)
+def upsert_category_settings(
+    category_id: UUID,
+    body: UserCategorySettingsUpsertRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create or update settings for a specific category."""
+    data = user_category_settings_service.upsert_setting(
+        db, current_user.id, category_id,
+        body.questions_per_day, body.time_limit
+    )
+    return UserCategorySettingsResponse(data=data, meta={})
+
+
+@router.delete(
+    "/settings/categories/{category_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Delete settings for a specific category",
+    tags=["me"],
+)
+def delete_category_settings(
+    category_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete settings for a specific category for the current user."""
+    user_category_settings_service.delete_setting(db, current_user.id, category_id)
+    return {"message": "Settings deleted successfully"}

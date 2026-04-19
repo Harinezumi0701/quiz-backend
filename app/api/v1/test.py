@@ -18,8 +18,9 @@ from app.schemas.test import (
     TestUpdateRequest,
 )
 from app.schemas.submission import SubmissionBulkCreate, SubmissionListResponse
+from app.schemas.question import QuestionListResponse
 from app.schemas.http_response import ErrorResponse
-from app.services import category_service, submission_service
+from app.services import category_service, submission_service, question_service
 from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
 from app.api.dependencies.auth import get_current_user
@@ -130,6 +131,39 @@ def get_test_by_id(
         )
 
     return TestDetailResponse(data=test, meta={})
+
+
+@router.get(
+    "/{test_id}/questions",
+    response_model=QuestionListResponse,
+    summary="Get questions for a test",
+    description="Get all questions belonging to a specific test with pagination.",
+    responses={
+        200: {"description": "List of questions"},
+        404: {"description": "Test not found", "model": ErrorResponse},
+    },
+)
+def get_questions_by_test(
+    test_id: str = Path(..., description="Test ID"),
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(10, ge=1, le=500, description="Number of items per page"),
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_TESTS, "GET")
+    ),
+):
+    """Get questions for a test. Requires permission: tests::read"""
+    test = category_service.get_test_by_id_only(db, test_id)
+    if not test:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Test with ID {test_id} not found",
+        )
+    questions, total = question_service.get_questions_by_test_id(
+        db, test_id, page=page, page_size=page_size
+    )
+    meta = get_pagination_meta(total, page, page_size)
+    return QuestionListResponse(data=questions, meta=meta)
 
 
 @router.post(

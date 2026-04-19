@@ -17,6 +17,7 @@ from app.schemas.category import (
     CategoryCreateRequest,
     CategoryUpdateRequest,
 )
+from app.schemas.test import TestDetailListResponse
 from app.schemas.http_response import ErrorResponse
 from app.services import category_service
 from app.db.session import get_db
@@ -126,6 +127,43 @@ def get_category_by_id(
         )
 
     return CategoryDetailResponse(data=category, meta={})
+
+
+@router.get(
+    "/{category_id}/tests",
+    response_model=TestDetailListResponse,
+    summary="Get tests for a category",
+    description="Get all tests belonging to a specific category with optional filtering and pagination.",
+    responses={
+        200: {"description": "List of tests"},
+        404: {"description": "Category not found", "model": ErrorResponse},
+    },
+)
+def get_tests_by_category(
+    request: Request,
+    category_id: str = Path(..., description="Category ID"),
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    db: Session = Depends(get_db),
+    user: User = Depends(
+        require_namespace_permission(PERMISSION_NAMESPACE_CATEGORIES, "GET")
+    ),
+):
+    """Get all tests for a specific category. Requires permission: categories::read"""
+    category = category_service.get_category_by_id(db, category_id)
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Category with ID {category_id} not found",
+        )
+    request_params = dict(request.query_params)
+    request_params.pop("page", None)
+    request_params.pop("page_size", None)
+    tests, total = category_service.get_tests_by_category_id(
+        db, category_id, page=page, page_size=page_size, request_params=request_params
+    )
+    meta = get_pagination_meta(total, page, page_size)
+    return TestDetailListResponse(data=tests, meta=meta)
 
 
 @router.post(

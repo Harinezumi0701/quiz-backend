@@ -41,6 +41,11 @@ class QuestionListResponse(SuccessResponse[List[Question]]):
     pass
 
 
+class QuestionWithAnswersListResponse(SuccessResponse[List[QuestionWithAnswers]]):
+    """Response schema for list of questions with full answer details"""
+    pass
+
+
 class QuestionResponse(SuccessResponse[QuestionWithAnswers]):
     """Response schema for single question"""
     pass

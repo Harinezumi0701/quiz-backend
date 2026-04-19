@@ -220,6 +220,7 @@ def get_questions_by_category_and_test_id(
                 "test": question.test,
                 "is_multiple_choice": question.is_multiple_choice,
                 "created_at": datetime_to_timestamp(question.created_at),
+                "updated_at": datetime_to_timestamp(question.updated_at),
                 "answers": [
                     {
                         "id": answer.id,
@@ -322,6 +323,7 @@ def get_questions_by_test_id(
                 "test": question.test,
                 "is_multiple_choice": question.is_multiple_choice,
                 "created_at": datetime_to_timestamp(question.created_at),
+                "updated_at": datetime_to_timestamp(question.updated_at),
                 "answers": [
                     {
                         "id": answer.id,

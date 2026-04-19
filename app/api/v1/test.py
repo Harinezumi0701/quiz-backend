@@ -18,7 +18,7 @@ from app.schemas.test import (
     TestUpdateRequest,
 )
 from app.schemas.submission import SubmissionBulkCreate, SubmissionListResponse
-from app.schemas.question import QuestionListResponse
+from app.schemas.question import QuestionWithAnswersListResponse
 from app.schemas.http_response import ErrorResponse
 from app.services import category_service, submission_service, question_service
 from app.db.session import get_db
@@ -135,7 +135,7 @@ def get_test_by_id(
 
 @router.get(
     "/{test_id}/questions",
-    response_model=QuestionListResponse,
+    response_model=QuestionWithAnswersListResponse,
     summary="Get questions for a test",
     description="Get all questions belonging to a specific test with pagination.",
     responses={
@@ -163,7 +163,7 @@ def get_questions_by_test(
         db, test_id, page=page, page_size=page_size
     )
     meta = get_pagination_meta(total, page, page_size)
-    return QuestionListResponse(data=questions, meta=meta)
+    return QuestionWithAnswersListResponse(data=questions, meta=meta)
 
 
 @router.post(

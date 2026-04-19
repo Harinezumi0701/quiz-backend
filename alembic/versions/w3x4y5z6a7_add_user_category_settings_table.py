@@ -35,13 +35,7 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=True),
         sa.UniqueConstraint('user_id', 'category_id', name='uq_user_category_settings'),
     )
-    op.create_index('ix_user_category_settings_id', 'user_category_settings', ['id'], unique=False)
-    op.create_index('ix_user_category_settings_user_id', 'user_category_settings', ['user_id'], unique=False)
-    op.create_index('ix_user_category_settings_category_id', 'user_category_settings', ['category_id'], unique=False)
 
 
 def downgrade() -> None:
-    op.drop_index('ix_user_category_settings_category_id', table_name='user_category_settings')
-    op.drop_index('ix_user_category_settings_user_id', table_name='user_category_settings')
-    op.drop_index('ix_user_category_settings_id', table_name='user_category_settings')
     op.drop_table('user_category_settings')

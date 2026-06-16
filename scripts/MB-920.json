@@ -1,0 +1,823 @@
+[
+  {
+    "categories": [
+      {
+        "name": "Microsoft",
+        "tests": [
+          {
+            "name": "Microsoft MB-920 Actual Exam Questions",
+            "description": "",
+            "time_limit": 65,
+            "questions": [
+              {
+                "content": "Question 1: HOTSPOT - A company plans to implement Dynamics 365 Project Operations.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: You can create end-to-end visibility into customer interactions and buying habits.\n\nStatement 2: You can cleanse and analyze customer data from multiple sources.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/93065.jpg",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": false, "explanation": "Dynamics 365 Project Operations focuses on project management, not customer interaction visibility. This is a Customer Insights capability."},
+                  {"content": "NO - Statement 1", "is_correct": true, "explanation": "Correct. Project Operations does not provide customer interaction visibility - that's Customer Insights."},
+                  {"content": "YES - Statement 2", "is_correct": false, "explanation": "Project Operations does not cleanse and analyze customer data. This is a Customer Insights feature."},
+                  {"content": "NO - Statement 2", "is_correct": true, "explanation": "Correct. Customer data cleansing is handled by Customer Insights, not Project Operations."}
+                ]
+              },
+              {
+                "content": "Question 2: A company plans to implement a manufacturing solution that includes integrated rate shipping costs for distribution.\n\nYou need to recommend a product to the company.\n\nWhat should you recommend?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Dynamics 365 Sales", "is_correct": false, "explanation": "Sales focuses on CRM and sales processes, not manufacturing or shipping."},
+                  {"content": "Dynamics 365 Field Service", "is_correct": false, "explanation": "Field Service manages field operations, not manufacturing with shipping integration."},
+                  {"content": "Dynamics 365 Commerce", "is_correct": false, "explanation": "Commerce is for retail operations, not manufacturing solutions."},
+                  {"content": "Dynamics 365 Supply Chain Management", "is_correct": true, "explanation": "SCM includes manufacturing and transportation management with integrated shipping costs."}
+                ]
+              },
+              {
+                "content": "Question 3: HOTSPOT - A company plans to implement Dynamics 365 Customer Insights and use the audience insights capability.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: You can create end-to-end visibility into customer interactions and buying habits.\n\nStatement 2: You can cleanse and analyze customer data from multiple sources.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/95859.jpg",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Customer Insights provides 360-degree customer visibility including interactions and buying patterns."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Customer Insights is designed for customer visibility."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Customer Insights ingests, cleanses, and analyzes data from multiple sources."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Data cleansing from multiple sources is a core Customer Insights capability."}
+                ]
+              },
+              {
+                "content": "Question 4: Which two modules are included in Dynamics 365 Supply Chain Management?\n\nEach correct answer presents a complete solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Product information management", "is_correct": true, "explanation": "Product information management is a module in SCM for managing product definitions and attributes."},
+                  {"content": "Dynamics 365 Remote Assist", "is_correct": false, "explanation": "Remote Assist is a separate mixed reality application, not an SCM module."},
+                  {"content": "Master planning", "is_correct": true, "explanation": "Master planning is a core SCM module for production and procurement planning."},
+                  {"content": "Service hub", "is_correct": false, "explanation": "Service hub is not a module in Supply Chain Management."},
+                  {"content": "Project management and accounting", "is_correct": false, "explanation": "This is primarily a Finance/Project Operations feature, not a core SCM module."}
+                ]
+              },
+              {
+                "content": "Question 5: HOTSPOT - An oil refinery uses Dynamics 365 Supply Chain Management. They create work orders for their equipment and machinery.\n\nThe refinery needs to perform equipment and machinery maintenance according to internal requests.\n\nWhich maintenance type is performed in enterprise asset management based on internal requests?",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/102770.png",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Corrective", "is_correct": true, "explanation": "Corrective maintenance is performed based on internal requests when equipment needs repair."},
+                  {"content": "Preventive", "is_correct": false, "explanation": "Preventive maintenance is scheduled proactively, not based on internal requests."},
+                  {"content": "Reactive", "is_correct": false, "explanation": "In EAM terminology, corrective maintenance is the term used for internal request-based maintenance."},
+                  {"content": "Predictive", "is_correct": false, "explanation": "Predictive maintenance uses IoT data to forecast failures, not internal requests."}
+                ]
+              },
+              {
+                "content": "Question 6: A company implements Dynamics 365 Supply Chain Management. The company uses external vendors to produce some parts.\n\nYou need to recommend actions to manage vendor operations.\n\nWhich three actions should you recommend?\n\nEach correct answer presents part of the solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Update the status of production order operations that are subcontracted to Completed when the vendor's work is done.", "is_correct": true, "explanation": "Updating status to Completed is necessary when vendor work is finished."},
+                  {"content": "Create an operation for the subcontractor to track the progress of the vendor's work.", "is_correct": true, "explanation": "Creating operations for subcontractors enables progress tracking."},
+                  {"content": "Assign each operation in a production order to multiple vendors.", "is_correct": false, "explanation": "Operations are typically assigned to a single vendor, not multiple."},
+                  {"content": "Ensure that each production order relates to a single vendor.", "is_correct": false, "explanation": "Production orders can involve multiple vendors for different operations."},
+                  {"content": "Automatically generate purchase orders for operations that you subcontract to a vendor.", "is_correct": true, "explanation": "SCM can auto-generate POs for subcontracted operations."}
+                ]
+              },
+              {
+                "content": "Question 7: A company plans to implement Dynamics 365 Supply Chain Management.\n\nWhich three actions can vendors perform?\n\nEach correct answer presents a complete solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Change the inventory cost of items.", "is_correct": false, "explanation": "Vendors cannot change inventory costs; this is managed internally."},
+                  {"content": "Submit invoices electronically.", "is_correct": true, "explanation": "Vendors can submit invoices through the vendor collaboration portal."},
+                  {"content": "Create transfer orders.", "is_correct": false, "explanation": "Transfer orders are internal transactions; vendors cannot create them."},
+                  {"content": "Approve purchase orders.", "is_correct": true, "explanation": "Vendors can confirm/approve POs through vendor collaboration."},
+                  {"content": "Respond to a request for quote (RFQ).", "is_correct": true, "explanation": "Vendors can respond to RFQs through vendor collaboration."}
+                ]
+              },
+              {
+                "content": "Question 8: HOTSPOT - A company is evaluating Dynamics 365 Supply Chain Management.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Dynamics 365 Supply Chain Management has features for batch manufacturing processes.\n\nStatement 2: A company can manage cost accounting by using Dynamics 365 Supply Chain Management.\n\nStatement 3: A company can use Dynamics 365 Supply Chain Management to manage customer order issues through social channels.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/102981.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "SCM includes process manufacturing for batch manufacturing with formulas."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. SCM does support batch manufacturing."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "SCM includes cost accounting capabilities for manufacturing and inventory."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Cost accounting is available in SCM."},
+                  {"content": "YES - Statement 3", "is_correct": false, "explanation": "Social channel management is handled by Customer Service, not SCM."},
+                  {"content": "NO - Statement 3", "is_correct": true, "explanation": "Correct. SCM does not manage customer issues through social channels."}
+                ]
+              },
+              {
+                "content": "Question 9: HOTSPOT - A company plans to implement enterprise asset management by using Dynamics 365 Supply Chain Management.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: You can create work orders from a maintenance schedule.\n\nStatement 2: You can create maintenance requests by using the Schedule maintenance plans feature.\n\nStatement 3: You can assign maintenance workflows that have a specific skill to work orders and maintenance requests.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/102982.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Work orders can be created from maintenance schedules in EAM."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. EAM supports creating work orders from maintenance schedules."},
+                  {"content": "YES - Statement 2", "is_correct": false, "explanation": "Maintenance requests are created manually or from asset failures, not from schedule maintenance plans."},
+                  {"content": "NO - Statement 2", "is_correct": true, "explanation": "Correct. Schedule maintenance plans create work orders, not maintenance requests."},
+                  {"content": "YES - Statement 3", "is_correct": true, "explanation": "EAM allows assigning workers with specific skills to work orders."},
+                  {"content": "NO - Statement 3", "is_correct": false, "explanation": "Incorrect. Skill-based assignment is supported in EAM."}
+                ]
+              },
+              {
+                "content": "Question 10: A company uses Dynamics 365 Supply Chain Management. You run a trace on raw materials.\n\nWhich two types of products can you see in the trace output?\n\nEach correct answer presents a complete solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Finished products", "is_correct": true, "explanation": "Finished products can be traced from raw materials through production."},
+                  {"content": "By-products", "is_correct": false, "explanation": "By-products are secondary outputs but not the primary trace result."},
+                  {"content": "Non-stocked items", "is_correct": false, "explanation": "Non-stocked items are not tracked through inventory tracing."},
+                  {"content": "Co-products", "is_correct": true, "explanation": "Co-products can be traced as they are produced alongside main products."}
+                ]
+              },
+              {
+                "content": "Question 11: HOTSPOT - A company implements Dynamics 365 Supply Chain Management. The company uses Microsoft SharePoint Online for document management.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Only users that use Dynamics 365 Supply Chain Management can contribute to documents on SharePoint.\n\nStatement 2: Document management with SharePoint lets users manage Microsoft Excel and PowerPoint documents.\n\nStatement 3: Users can create documents in SharePoint from Dynamics 365 Supply Chain Management.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/102985.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": false, "explanation": "SharePoint documents can be edited by any user with SharePoint access."},
+                  {"content": "NO - Statement 1", "is_correct": true, "explanation": "Correct. SharePoint is accessible to all users with proper permissions, not just D365 users."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Document management supports various Office documents including Excel and PowerPoint."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. SharePoint integration supports Excel and PowerPoint."},
+                  {"content": "YES - Statement 3", "is_correct": true, "explanation": "Users can create and manage SharePoint documents from within D365 SCM."},
+                  {"content": "NO - Statement 3", "is_correct": false, "explanation": "Incorrect. Document creation in SharePoint from D365 is supported."}
+                ]
+              },
+              {
+                "content": "Question 12: A company uses Dynamics 365 Human Resources. The company establishes a new department and hires employees to staff the department.\n\nThe company wants to manage annual employee reviews.\n\nWhat are two capabilities of Dynamics 365 Human Resources performance management?\n\nEach correct answer presents a part of the solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Performance journals", "is_correct": false, "explanation": "Performance journals track achievements but are not the primary performance management features."},
+                  {"content": "Personnel actions", "is_correct": false, "explanation": "Personnel actions are for HR transactions, not performance reviews."},
+                  {"content": "Competencies", "is_correct": true, "explanation": "Competencies are used to evaluate and track employee skills in performance management."},
+                  {"content": "Goals", "is_correct": true, "explanation": "Goals allow setting and tracking employee objectives for performance reviews."}
+                ]
+              },
+              {
+                "content": "Question 13: A customer owes two vendors $500 each for services performed. The customer wants to post a lump sum of $1,000 to a bank to cover the payments.\n\nYou need to be able to track vendor payments individually.\n\nWhich feature should you recommend?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Ledger setup", "is_correct": false, "explanation": "Ledger setup configures chart of accounts, not payment tracking."},
+                  {"content": "Journal voucher", "is_correct": true, "explanation": "Journal vouchers allow posting a lump sum with multiple lines to track individual vendor payments."},
+                  {"content": "Bank reconciliation", "is_correct": false, "explanation": "Bank reconciliation matches statements, not individual payment tracking."},
+                  {"content": "Payment proposal", "is_correct": false, "explanation": "Payment proposals suggest payments but journal vouchers enable tracking multiple payments in one entry."}
+                ]
+              },
+              {
+                "content": "Question 14: HOTSPOT - A company implements Dynamics 365 Project Operations for the sales quotation process.\n\nA qualified lead requests a quotation for services.\n\nWhich records are used for this stage of the sales process?",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/107713.png",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Project contract", "is_correct": false, "explanation": "Project contracts are created after quotes are approved, not during quotation."},
+                  {"content": "Project quote", "is_correct": true, "explanation": "Project quotes are used to develop proposals and obtain approval for services."},
+                  {"content": "Opportunity", "is_correct": false, "explanation": "Opportunities track potential deals but quotes are used for formal proposals."},
+                  {"content": "Lead", "is_correct": false, "explanation": "Leads are qualified before creating quotes; quotes are for the quotation stage."}
+                ]
+              },
+              {
+                "content": "Question 15: HOTSPOT - A company implements Dynamics 365 Project Operations.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Users can associate one or more price lists with a customer, an opportunity, or a quote.\n\nStatement 2: Revenue recognition can be performed at set project milestones.\n\nStatement 3: A project task can have different prices for two different resources.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/109284.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Multiple price lists can be associated with customers, opportunities, and quotes."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Price list association with multiple entities is supported."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Milestone-based billing and revenue recognition is supported in Project Operations."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Milestone revenue recognition is a key feature."},
+                  {"content": "YES - Statement 3", "is_correct": true, "explanation": "Role-based pricing allows different rates for different resources on the same task."},
+                  {"content": "NO - Statement 3", "is_correct": false, "explanation": "Incorrect. Resource-based pricing is supported."}
+                ]
+              },
+              {
+                "content": "Question 16: HOTSPOT - A company has physical stores and an online shop. The company plans to implement Dynamics 365 Commerce.\n\nYou need to recommend a feature that will help the company improve product availability for stores without carrying excess stock.\n\nWhat should you recommend to optimize distribution of stock?",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/109287.png",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Call center channel", "is_correct": false, "explanation": "Call center is for phone orders, not stock distribution optimization."},
+                  {"content": "Cloud Point of Sale", "is_correct": false, "explanation": "Cloud POS is for transactions, not inventory distribution."},
+                  {"content": "Modern Point of Sale", "is_correct": false, "explanation": "Modern POS is for in-store transactions, not distribution optimization."},
+                  {"content": "Distributed order management", "is_correct": true, "explanation": "Distributed order management configures rules and priorities to optimize stock distribution."}
+                ]
+              },
+              {
+                "content": "Question 17: HOTSPOT - For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Optical character recognition (OCR) processing of expense receipts is a Dynamics 365 Finance expense management capability.\n\nStatement 2: Books are assigned to depreciation profiles in the Dynamics 365 Finance Fixed asset module.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/109312.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "D365 Finance Expense Management includes OCR for receipt processing."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. OCR is available in expense management."},
+                  {"content": "YES - Statement 2", "is_correct": false, "explanation": "Depreciation profiles are assigned to books, not the other way around."},
+                  {"content": "NO - Statement 2", "is_correct": true, "explanation": "Correct. Books are not assigned to depreciation profiles; profiles are assigned to books."}
+                ]
+              },
+              {
+                "content": "Question 18: DRAG DROP - A company plans to implement Dynamics 365 Finance and Dynamics 365 Supply Chain Management.\n\nYou need to recommend tools to meet the company's reporting requirements.\n\nWhat should you recommend?\n\nNOTE: Each correct selection is worth one point.\n\nRequirement 1: Ensure that users can view, edit, and act on business data even if they have intermittent network connectivity.\n\nRequirement 2: Schedule reports to run periodically by using a scheduled batch job.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/109314.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: Mobile workspaces", "is_correct": true, "explanation": "Mobile workspaces provide offline capabilities for intermittent connectivity."},
+                  {"content": "Box 1: Power BI", "is_correct": false, "explanation": "Power BI requires connectivity and doesn't provide offline editing capabilities."},
+                  {"content": "Box 1: SQL Server Reporting Services (SSRS) reports", "is_correct": false, "explanation": "SSRS is for report generation, not offline data interaction."},
+                  {"content": "Box 1: Entity store", "is_correct": false, "explanation": "Entity store is a data warehouse, not for offline data interaction."},
+                  {"content": "Box 2: SQL Server Reporting Services (SSRS) reports", "is_correct": true, "explanation": "SSRS reports can be scheduled to run periodically via batch jobs."},
+                  {"content": "Box 2: Mobile workspaces", "is_correct": false, "explanation": "Mobile workspaces are for mobile access, not scheduled batch reporting."},
+                  {"content": "Box 2: Power BI", "is_correct": false, "explanation": "Power BI dashboards refresh on schedule but aren't batch job reports."},
+                  {"content": "Box 2: Entity store", "is_correct": false, "explanation": "Entity store is for data analytics, not scheduled batch reporting."}
+                ]
+              },
+              {
+                "content": "Question 19: A retailer plans to deploy Dynamics 365 Commerce.\n\nYou need to be able to scan items and collect payments for sales in a store by using a physical credit card device. The solution must run within a browser window.\n\nWhat should you implement?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Cloud point of sale", "is_correct": true, "explanation": "Cloud POS runs in a browser and supports hardware peripherals including credit card devices."},
+                  {"content": "Ecommerce", "is_correct": false, "explanation": "Ecommerce is for online sales, not in-store with physical devices."},
+                  {"content": "Power Apps", "is_correct": false, "explanation": "Power Apps doesn't natively support POS hardware integration."},
+                  {"content": "Modern point of sale", "is_correct": false, "explanation": "Modern POS is a native app, not browser-based."}
+                ]
+              },
+              {
+                "content": "Question 20: HOTSPOT - A company wants to understand the self-service capabilities of Dynamics 365 Human Resources.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Employees can change personal details including their home address and phone number.\n\nStatement 2: Employees can create requests for time off.\n\nStatement 3: Employees can create time sheets to track time and attendance.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/109597.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Employee self-service allows updating personal details like address and phone."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Personal detail updates are available in self-service."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Employees can request time off through self-service."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Time off requests are a core self-service feature."},
+                  {"content": "YES - Statement 3", "is_correct": true, "explanation": "Timesheet entry is available through employee self-service."},
+                  {"content": "NO - Statement 3", "is_correct": false, "explanation": "Incorrect. Time and attendance tracking is supported."}
+                ]
+              },
+              {
+                "content": "Question 21: HOTSPOT - A company implements Dynamics 365 Supply Chain Management. The company enables a warehouse layout.\n\nYou must identify a characteristic required to specify a location's name.\n\nYou need to identify a characteristic.\n\nWhich characteristic should you recommend?",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/111196.png",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Location type", "is_correct": false, "explanation": "Location type categorizes locations but doesn't define the naming structure."},
+                  {"content": "Bin", "is_correct": true, "explanation": "Bin coordinates (aisle, rack, shelf, bin) are used to define location names."},
+                  {"content": "Size", "is_correct": false, "explanation": "Size describes capacity, not location naming."},
+                  {"content": "Tree structure", "is_correct": false, "explanation": "Tree structure is for navigation hierarchy, not location naming."}
+                ]
+              },
+              {
+                "content": "Question 22: DRAG DROP - A company implements Dynamics 365 Supply Chain Management.\n\nThe company needs to use inventory journals to post different types of physical inventory transactions.\n\nMatch each type of inventory journal to its use case.\n\nNOTE: Each correct selection is worth one point.\n\nUse Case 1: Overwrite default posting account to charge an item to a different department.\n\nUse Case 2: Move an item from one warehouse to another in the company.\n\nUse Case 3: Add cost to an item when adding inventory and create a ledger transaction.\n\nUse Case 4: Correct the registered on-hand inventory to match the actual physical count available in the warehouse.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/111197.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: Movement", "is_correct": true, "explanation": "Movement journals allow specifying offset accounts to charge different departments."},
+                  {"content": "Box 1: Inventory adjustment", "is_correct": false, "explanation": "Inventory adjustment adds/removes inventory but doesn't override posting accounts."},
+                  {"content": "Box 1: Counting", "is_correct": false, "explanation": "Counting journals are for physical count adjustments, not account overrides."},
+                  {"content": "Box 1: Transfer", "is_correct": false, "explanation": "Transfer journals move inventory between warehouses, not for account changes."},
+                  {"content": "Box 2: Transfer", "is_correct": true, "explanation": "Transfer journals move items between warehouses within the company."},
+                  {"content": "Box 2: Movement", "is_correct": false, "explanation": "Movement changes accounts, not warehouse locations."},
+                  {"content": "Box 2: Inventory adjustment", "is_correct": false, "explanation": "Inventory adjustment modifies quantities, not locations."},
+                  {"content": "Box 2: BOM", "is_correct": false, "explanation": "BOM journals are for bill of materials transactions."},
+                  {"content": "Box 3: Inventory adjustment", "is_correct": true, "explanation": "Inventory adjustment adds cost when adding inventory and creates ledger transactions."},
+                  {"content": "Box 3: Movement", "is_correct": false, "explanation": "Movement changes accounts but isn't specifically for adding cost."},
+                  {"content": "Box 3: Transfer", "is_correct": false, "explanation": "Transfer moves items without adding cost."},
+                  {"content": "Box 3: Counting", "is_correct": false, "explanation": "Counting adjusts quantities to match physical count."},
+                  {"content": "Box 4: Counting", "is_correct": true, "explanation": "Counting journals correct on-hand inventory to match physical counts."},
+                  {"content": "Box 4: Inventory adjustment", "is_correct": false, "explanation": "Inventory adjustment is for cost adjustments, not physical count corrections."},
+                  {"content": "Box 4: Movement", "is_correct": false, "explanation": "Movement changes accounts, not quantity corrections."},
+                  {"content": "Box 4: Transfer", "is_correct": false, "explanation": "Transfer moves items between locations."}
+                ]
+              },
+              {
+                "content": "Question 23: HOTSPOT - A company plans to use Dynamics 365 Finance.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Item groups define the set of general ledger accounts that apply to product-related transactions.\n\nStatement 2: Item model groups are used to assign a costing method to a product.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/111205.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Item groups define GL accounts for inventory posting."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Item groups do define GL accounts for products."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Item model groups contain the inventory model (costing method) for products."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Item model groups are where costing methods are assigned."}
+                ]
+              },
+              {
+                "content": "Question 24: HOTSPOT - A company uses Dynamics 365 Commerce.\n\nYou need to suggest point of sale (POS) options with offline capabilities for the company's retail locations.\n\nWhich POS options have offline capabilities?\n\nNOTE: Each correct selection is worth one point.\n\nPOS Option 1: MPOS for Windows\n\nPOS Option 2: MPOS for Android\n\nPOS Option 3: MPOS for iOS\n\nPOS Option 4: Cloud POS",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/111989.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "MPOS for Windows: Yes", "is_correct": true, "explanation": "MPOS for Windows supports offline mode with local database."},
+                  {"content": "MPOS for Windows: No", "is_correct": false, "explanation": "Incorrect. Windows MPOS has offline capabilities."},
+                  {"content": "MPOS for Android: Yes", "is_correct": true, "explanation": "MPOS for Android supports offline mode."},
+                  {"content": "MPOS for Android: No", "is_correct": false, "explanation": "Incorrect. Android MPOS has offline capabilities."},
+                  {"content": "MPOS for iOS: Yes", "is_correct": true, "explanation": "MPOS for iOS supports offline mode."},
+                  {"content": "MPOS for iOS: No", "is_correct": false, "explanation": "Incorrect. iOS MPOS has offline capabilities."},
+                  {"content": "Cloud POS: Yes", "is_correct": false, "explanation": "Cloud POS requires internet connectivity and doesn't support offline mode."},
+                  {"content": "Cloud POS: No", "is_correct": true, "explanation": "Correct. Cloud POS is browser-based and requires constant connectivity."}
+                ]
+              },
+              {
+                "content": "Question 25: An international hotel company implements Dynamics 365 Finance.\n\nYou need to help the hotel company identify email integration capabilities.\n\nWhat are two valid use cases for sharing Dynamics 365 Finance documents with customers by using email integration?\n\nEach correct answer presents part of the solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Customers negotiate prices for hotel reservations with company agents by using their personal email addresses.", "is_correct": false, "explanation": "Email integration is for document sharing, not price negotiations."},
+                  {"content": "A customer registers a complaint online regarding their stay at any of the company's hotels.", "is_correct": false, "explanation": "Complaint registration uses customer service, not Finance email integration."},
+                  {"content": "The company sends statements to customers based on request.", "is_correct": true, "explanation": "Email integration can send customer statements."},
+                  {"content": "The company emails invoices to customers after their hotel stay.", "is_correct": true, "explanation": "Email integration supports sending invoices to customers."}
+                ]
+              },
+              {
+                "content": "Question 26: A company implements Dynamics 365 Commerce with Power BI.\n\nThe company needs to use predefined Power BI reports for designing new reports to meet additional requirements.\n\nYou need to identify a feature that can provide the basis for the reports.\n\nWhich feature should you use?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Data packages", "is_correct": false, "explanation": "Data packages are for data migration, not report templates."},
+                  {"content": "Deployable packages", "is_correct": false, "explanation": "Deployable packages are for code deployment, not reports."},
+                  {"content": "Content packs", "is_correct": true, "explanation": "Content packs provide predefined Power BI reports that can be customized."},
+                  {"content": "Entity store", "is_correct": false, "explanation": "Entity store is a data source, not predefined report templates."},
+                  {"content": "Report extensions", "is_correct": false, "explanation": "Report extensions modify existing reports but aren't predefined templates."}
+                ]
+              },
+              {
+                "content": "Question 27: A company uses Dynamics 365 Commerce.\n\nThe company needs to schedule several base Dynamics 365 Commerce reports.\n\nThe reports must print statistics about inventory sales from the previous week every Sunday night to a physical printer.\n\nYou need to identify the right tool.\n\nWhich tool should you use?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Power BI", "is_correct": false, "explanation": "Power BI is for interactive dashboards, not scheduled printing."},
+                  {"content": "Microsoft SQL Server Reporting Services (SSRS)", "is_correct": true, "explanation": "SSRS supports scheduled report generation and printing to physical printers."},
+                  {"content": "Microsoft Excel", "is_correct": false, "explanation": "Excel doesn't support automated scheduled printing from D365."},
+                  {"content": "Management Reporter", "is_correct": false, "explanation": "Management Reporter is for financial reports, not Commerce inventory reports."},
+                  {"content": "Chart controls", "is_correct": false, "explanation": "Chart controls are for visualization, not scheduled printing."}
+                ]
+              },
+              {
+                "content": "Question 28: A company that manufactures bottled and canned beverages implements Dynamics 365 Supply Chain Management.\n\nMost products are packed in quantities of 12 or 24.\n\nYou need to recommend a process to ensure that customers always purchase the products in these predefined package quantities.\n\nWhat should you recommend?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Set up purchase order multiples for the items.", "is_correct": true, "explanation": "Order multiples ensure quantities are ordered in specific multiples (12, 24)."},
+                  {"content": "Configure a standard order quantity for the items.", "is_correct": false, "explanation": "Standard order quantity sets a default, not a required multiple."},
+                  {"content": "Create a purchase order and manually adjust the order quantities.", "is_correct": false, "explanation": "Manual adjustment doesn't enforce the requirement systematically."},
+                  {"content": "Set up a safety stock quantity for the items.", "is_correct": false, "explanation": "Safety stock is for minimum inventory levels, not order multiples."}
+                ]
+              },
+              {
+                "content": "Question 29: A construction services firm plans to standardize financial and payroll functions including the capability of adding timesheets to track work and costs for community improvement projects.\n\nYou need to recommend a solution for the company.\n\nWhat should you recommend?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Power Platform", "is_correct": false, "explanation": "Power Platform is for custom apps, not comprehensive project and financial management."},
+                  {"content": "Dynamics 365 Project Operations", "is_correct": true, "explanation": "Project Operations combines finance, project management, and timesheet tracking."},
+                  {"content": "Dynamics 365 Human Resources", "is_correct": false, "explanation": "HR focuses on employee management, not project cost tracking."},
+                  {"content": "Dynamics 365 Supply Chain Management", "is_correct": false, "explanation": "SCM is for manufacturing and logistics, not construction services."}
+                ]
+              },
+              {
+                "content": "Question 30: DRAG DROP - A company implements Dynamics 365 Finance.\n\nYou need to recommend which account types the company should use for main accounts.\n\nWhat should you recommend?\n\nNOTE: Each correct selection is worth one point.\n\nScenario 1: Record the outstanding balance for a mortgage.\n\nScenario 2: Document expenses for a department.\n\nScenario 3: Map purchase order transactions to specific general ledger accounts.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/121751.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: Main account", "is_correct": true, "explanation": "A main account (liability type) records outstanding balances like mortgages."},
+                  {"content": "Box 1: Dimension", "is_correct": false, "explanation": "Dimensions categorize transactions but don't record balances."},
+                  {"content": "Box 1: Posting group", "is_correct": false, "explanation": "Posting groups map transactions to accounts, not record balances directly."},
+                  {"content": "Box 1: Sub-ledger", "is_correct": false, "explanation": "Sub-ledgers track detailed transactions, not main account balances."},
+                  {"content": "Box 2: Dimension", "is_correct": true, "explanation": "Financial dimensions (like department) categorize expenses."},
+                  {"content": "Box 2: Main account", "is_correct": false, "explanation": "Main accounts record amounts, dimensions categorize by department."},
+                  {"content": "Box 2: Posting group", "is_correct": false, "explanation": "Posting groups automate account selection, not department tracking."},
+                  {"content": "Box 2: Sub-ledger", "is_correct": false, "explanation": "Sub-ledgers are for detailed transaction tracking."},
+                  {"content": "Box 3: Posting group", "is_correct": true, "explanation": "Posting groups map PO transactions to specific GL accounts automatically."},
+                  {"content": "Box 3: Main account", "is_correct": false, "explanation": "Main accounts are the destination, posting groups do the mapping."},
+                  {"content": "Box 3: Dimension", "is_correct": false, "explanation": "Dimensions categorize, posting groups map transactions to accounts."},
+                  {"content": "Box 3: Sub-ledger", "is_correct": false, "explanation": "Sub-ledgers track details, not map transactions."}
+                ]
+              },
+              {
+                "content": "Question 31: A company plans to open stores with different types.\n\nStore type: Brick and mortar - Open Monday through Friday 9:00 AM to 5:00 PM. Accepts cash and limited types of credit cards.\n\nStore type: Online - Open seven days a week and 24 hours a day. Accepts all major credit cards.\n\nYou need to ensure that Dynamics 365 Commerce can receive all needed data from the stores.\n\nWhich feature should you implement?",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/121753.png",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Point of sale (POS)", "is_correct": false, "explanation": "POS handles transactions but doesn't configure multi-channel data integration."},
+                  {"content": "Monitor and analysis", "is_correct": false, "explanation": "Monitor and analysis is for reporting, not data integration."},
+                  {"content": "Channel management", "is_correct": true, "explanation": "Channel management configures different store types and their data integration."},
+                  {"content": "Mobile commerce", "is_correct": false, "explanation": "Mobile commerce is for mobile shopping, not channel configuration."}
+                ]
+              },
+              {
+                "content": "Question 32: DRAG DROP - A trading company is implementing Dynamics 365 Finance. The accounts payable department processes a large volume of invoices daily.\n\nThe accounts payable manager notices discrepancies in invoices for certain types of purchases. The manager must improve invoice processing time and avoid discrepancies based on the purchase type.\n\nYou need to recommend invoice line matching policies that have an acceptable tolerance level.\n\nWhich invoice line matching policies should you recommend?\n\nNOTE: Each correct selection is worth one point.\n\nRequirement 1: Yearly subscriptions of software paid monthly.\n\nRequirement 2: Procurement of items delivered with a variable unit price.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/121844.jpg",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: Two-way matching", "is_correct": true, "explanation": "Two-way matching compares invoice to PO. For services without physical receipt, two-way is appropriate."},
+                  {"content": "Box 1: Three-way matching", "is_correct": false, "explanation": "Three-way matching requires product receipt which services don't have."},
+                  {"content": "Box 1: No matching", "is_correct": false, "explanation": "Invoice matching should be used for proper controls."},
+                  {"content": "Box 1: Price matching only", "is_correct": false, "explanation": "Price matching alone is insufficient for invoice validation."},
+                  {"content": "Box 2: Three-way matching", "is_correct": true, "explanation": "Three-way matching validates invoice against PO and receipt for variable-price items."},
+                  {"content": "Box 2: Two-way matching", "is_correct": false, "explanation": "Two-way matching doesn't validate receipt quantities for variable pricing."},
+                  {"content": "Box 2: No matching", "is_correct": false, "explanation": "Matching is needed for variable-price procurements."},
+                  {"content": "Box 2: Quantity matching only", "is_correct": false, "explanation": "Variable pricing requires price and quantity validation."}
+                ]
+              },
+              {
+                "content": "Question 33: A company uses Dynamics 365 Finance.\n\nThe company wants to configure the ledger entries for importing letters of credit.\n\nYou need to identify which business process to configure.\n\nWhich business process should you use?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Set up settlements.", "is_correct": true, "explanation": "In D365 Finance, letter of credit ledger entries are configured through settlement setup in Cash and bank management, which handles the posting profiles for LC transactions."},
+                  {"content": "Manage letters of guarantee.", "is_correct": false, "explanation": "Letters of guarantee are different instruments from letters of credit."},
+                  {"content": "Reconcile bank accounts.", "is_correct": false, "explanation": "Bank reconciliation matches statements, not configures letter of credit entries."},
+                  {"content": "Deposit bank funds.", "is_correct": false, "explanation": "Deposit funds records deposits. Letters of credit use Cash and bank management import LC process."}
+                ]
+              },
+              {
+                "content": "Question 34: HOTSPOT - For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nStatement 1: The financial period close workspace displays tasks only for the legal entity the user is currently in where they have the proper permissions.\n\nStatement 2: The financial period close workspace displays tasks only for a specific closing schedule period that the user selects.\n\nStatement 3: The financial period close workspace allows users to only view tasks currently assigned to them in a closing schedule.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/121849.jpg",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "The workspace filters tasks by current legal entity and user permissions."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Tasks are filtered by legal entity and permissions."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Users select specific closing periods to view relevant tasks."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Users select the closing period to view."},
+                  {"content": "YES - Statement 3", "is_correct": false, "explanation": "Users with permissions can view all tasks, not just their own."},
+                  {"content": "NO - Statement 3", "is_correct": true, "explanation": "Correct. Users can view all tasks based on permissions, not just assigned ones."}
+                ]
+              },
+              {
+                "content": "Question 35: A company uses Dynamics 365 Finance and Power BI.\n\nThe company wants to use Power BI to create high-volume, near real-time reports.\n\nYou need to identify how the company can meet this requirement.\n\nWhich option should you use?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "SQL Server Reporting Services (SSRS)", "is_correct": false, "explanation": "SSRS is for operational reporting, not near real-time Power BI analytics."},
+                  {"content": "Microsoft Excel", "is_correct": false, "explanation": "Excel isn't designed for high-volume, near real-time reporting."},
+                  {"content": "Power BI tiles", "is_correct": false, "explanation": "Tiles display visualizations but don't address the data source requirement."},
+                  {"content": "Entity store", "is_correct": true, "explanation": "Entity store provides near real-time data for high-volume Power BI reporting."}
+                ]
+              },
+              {
+                "content": "Question 36: HOTSPOT - A company plans to implement Dynamics 365 Finance.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Legal entities are used to segment liabilities for retail channels in a single taxation entity.\n\nStatement 2: Legal entities are used to segment the financial transactions for a company for tax purposes.\n\nStatement 3: Legal entities are used to segment the financial postings of a legal entity, not assist in compliancy audit mitigation.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/122268.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": false, "explanation": "Legal entities represent separate tax/legal structures, not just retail channel liability segmentation."},
+                  {"content": "NO - Statement 1", "is_correct": true, "explanation": "Correct. Legal entities are separate legal/tax entities, not for retail channel segmentation."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Legal entities segment transactions for tax and regulatory purposes."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Tax segmentation is a key purpose of legal entities."},
+                  {"content": "YES - Statement 3", "is_correct": false, "explanation": "Legal entities do assist with compliance and audit requirements."},
+                  {"content": "NO - Statement 3", "is_correct": true, "explanation": "Correct. Legal entities help with compliance and audit mitigation."}
+                ]
+              },
+              {
+                "content": "Question 37: A company implements Dynamics 365 Commerce.\n\nThe company needs to increase customer loyalty by setting up loyalty programs.\n\nYou need to identify customer loyalty options that the company can utilize.\n\nWhich three options are available for loyalty programs?\n\nEach correct answer presents a complete solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Track customer participation in the loyalty program.", "is_correct": true, "explanation": "Loyalty programs track customer participation and point balances."},
+                  {"content": "Store customer data on likes and dislikes and easily retrieve it when required.", "is_correct": false, "explanation": "Customer preferences are handled by Customer Insights, not loyalty programs."},
+                  {"content": "Transfer reward balance from one card to another.", "is_correct": true, "explanation": "Loyalty allows transferring reward balances between cards."},
+                  {"content": "Define refund rules to identify when and how a customer can return items.", "is_correct": false, "explanation": "Refund rules are part of return policies, not loyalty programs."},
+                  {"content": "Define earning rules to outline how a customer can earn points.", "is_correct": true, "explanation": "Earning rules define how customers accumulate loyalty points."}
+                ]
+              },
+              {
+                "content": "Question 38: HOTSPOT - For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: In Dynamics 365 Human Resources, a compensation structure is a matrix that includes pay rate ranges for each job level.\n\nStatement 2: The pay structures for fixed compensation plans in Dynamics 365 Human Resources are defined and maintained by compensation grids.\n\nStatement 3: A company's employees can benefit from flex credit programs in Dynamics 365 Human Resources based on a predetermined number of credits.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/122278.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Compensation structures define pay ranges for job levels."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Compensation structures are matrices of pay ranges."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Compensation grids define and maintain fixed compensation plan structures."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Grids are used for fixed compensation structures."},
+                  {"content": "YES - Statement 3", "is_correct": true, "explanation": "Flex credit programs allocate predetermined credits for benefit selection."},
+                  {"content": "NO - Statement 3", "is_correct": false, "explanation": "Incorrect. Flex credit programs are supported in HR."}
+                ]
+              },
+              {
+                "content": "Question 39: DRAG DROP - A company manufactures and sells chairs. The company uses Dynamics 365 Finance and Dynamics 365 Supply Chain Management for finance and manufacturing operations.\n\nYou need to determine which module to use for each operational need.\n\nWhich module should you use?\n\nNOTE: Each correct selection is worth one point.\n\nScenario 1: Create orders for the bill of material items to manufacture chairs.\n\nScenario 2: Determine the number of chairs sold last month to predict future demand.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/125279.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: Production control", "is_correct": true, "explanation": "Production control handles BOM orders for manufacturing."},
+                  {"content": "Box 1: Accounts payable", "is_correct": false, "explanation": "Accounts payable manages vendor payments, not manufacturing."},
+                  {"content": "Box 1: IoT Intelligence", "is_correct": false, "explanation": "IoT Intelligence monitors equipment, not creates BOM orders."},
+                  {"content": "Box 1: Accounts receivable", "is_correct": false, "explanation": "Accounts receivable manages customer payments, not manufacturing."},
+                  {"content": "Box 2: Accounts receivable", "is_correct": true, "explanation": "Accounts receivable tracks sales data for demand forecasting."},
+                  {"content": "Box 2: Production control", "is_correct": false, "explanation": "Production control manages manufacturing, not sales analysis."},
+                  {"content": "Box 2: Accounts payable", "is_correct": false, "explanation": "Accounts payable manages vendor payments, not sales data."},
+                  {"content": "Box 2: Credit and collections", "is_correct": false, "explanation": "Credit and collections manages customer credit, not sales analysis."}
+                ]
+              },
+              {
+                "content": "Question 40: HOTSPOT - A company implements Dynamics 365 Finance.\n\nYou need to recommend a way for the company to view overdue balances for a group of customers at a point in time.\n\nWhat should you recommend?",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/125642.png",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Customer pool", "is_correct": false, "explanation": "Customer pools group customers but don't display overdue balances."},
+                  {"content": "Aged balances", "is_correct": true, "explanation": "Aged balances report shows overdue amounts for customer groups at a point in time."},
+                  {"content": "Aging period definitions", "is_correct": false, "explanation": "Aging period definitions configure aging buckets, not display balances."},
+                  {"content": "Collection letters", "is_correct": false, "explanation": "Collection letters are for communication, not viewing overdue balances."}
+                ]
+              },
+              {
+                "content": "Question 41: DRAG DROP - A company uses Dynamics 365 Supply Chain Management.\n\nYou need to recommend costing methods for the company.\n\nWhat should you recommend?\n\nNOTE: Each correct selection is worth one point.\n\nScenario 1: Items have a limited shelf life, and cost of items varies significantly.\n\nScenario 2: Cost is critical and is preset based on an estimate.\n\nScenario 3: Product costs change often, and items are mixed together during manufacturing processes.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/127535.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: FIFO", "is_correct": true, "explanation": "FIFO (First In First Out) is ideal for items with limited shelf life and varying costs."},
+                  {"content": "Box 1: Average", "is_correct": false, "explanation": "Average costing doesn't track oldest items first for shelf life."},
+                  {"content": "Box 1: Standard", "is_correct": false, "explanation": "Standard cost doesn't reflect actual varying costs."},
+                  {"content": "Box 1: LIFO", "is_correct": false, "explanation": "LIFO issues newest items first, not suitable for limited shelf life."},
+                  {"content": "Box 2: Standard", "is_correct": true, "explanation": "Standard costing uses preset estimated costs for control."},
+                  {"content": "Box 2: FIFO", "is_correct": false, "explanation": "FIFO tracks actual costs, not preset estimates."},
+                  {"content": "Box 2: Average", "is_correct": false, "explanation": "Average calculates from actual costs, not preset."},
+                  {"content": "Box 2: LIFO", "is_correct": false, "explanation": "LIFO uses actual costs, not preset estimates."},
+                  {"content": "Box 3: Average", "is_correct": true, "explanation": "Average costing is ideal when items are mixed and costs change frequently."},
+                  {"content": "Box 3: FIFO", "is_correct": false, "explanation": "FIFO requires tracking individual items, not suitable for mixed inventory."},
+                  {"content": "Box 3: Standard", "is_correct": false, "explanation": "Standard doesn't adjust for changing costs."},
+                  {"content": "Box 3: LIFO", "is_correct": false, "explanation": "LIFO requires tracking individual items."}
+                ]
+              },
+              {
+                "content": "Question 42: DRAG DROP - A company uses Dynamics 365 Supply Chain Management to manage production facility assets.\n\nA shop floor worker reports that a heating element in a hot water heater has stopped working and needs to be replaced.\n\nThe shop floor recommends that all water heaters be checked for signs of failure.\n\nYou need to check and replace any failing heating elements in the facility.\n\nWhat should you use?\n\nScenario 1: Track replacement parts for a heating element.\n\nScenario 2: The amount of hot water that the heater must be able to generate.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/135359.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: Asset BOM", "is_correct": true, "explanation": "Asset BOM tracks spare parts and components for assets."},
+                  {"content": "Box 1: Asset", "is_correct": false, "explanation": "Asset represents the equipment, not its parts list."},
+                  {"content": "Box 1: Attributes", "is_correct": false, "explanation": "Attributes describe characteristics, not replacement parts."},
+                  {"content": "Box 1: Asset management", "is_correct": false, "explanation": "Asset management is the module, not specific parts tracking."},
+                  {"content": "Box 2: Attributes", "is_correct": true, "explanation": "Attributes define specifications like water generation capacity."},
+                  {"content": "Box 2: Asset BOM", "is_correct": false, "explanation": "Asset BOM tracks parts, not performance specifications."},
+                  {"content": "Box 2: Asset", "is_correct": false, "explanation": "Asset represents the equipment, attributes define its specifications."},
+                  {"content": "Box 2: Asset management", "is_correct": false, "explanation": "Asset management is the module, not specifications."}
+                ]
+              },
+              {
+                "content": "Question 43: A company is evaluating the functionality of Dynamics 365 finance and operations apps.\n\nThe company wants to display multiple master data records to add, delete, and update the data.\n\nYou need to recommend the type of form to use to display the master data.\n\nWhich form type should you recommend?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "List", "is_correct": true, "explanation": "List forms display multiple records for viewing, adding, deleting, and updating."},
+                  {"content": "FastTab", "is_correct": false, "explanation": "FastTabs are sections within a form, not a form type."},
+                  {"content": "Parameters", "is_correct": false, "explanation": "Parameters forms are for configuration settings, not data records."},
+                  {"content": "Details", "is_correct": false, "explanation": "Details forms show single record details, not multiple records."}
+                ]
+              },
+              {
+                "content": "Question 44: A company is implementing Dynamics 365 Project Operations for services operations.\n\nThe company needs to estimate the full-time resources required to complete different tasks for a new project.\n\nYou need to identify which feature should be used for the requirement.\n\nWhich feature should you use?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Project stages", "is_correct": false, "explanation": "Project stages track project phases, not resource estimation."},
+                  {"content": "Scheduling modes", "is_correct": false, "explanation": "Scheduling modes define how tasks are scheduled, not resource needs."},
+                  {"content": "Work breakdown structure (WBS)", "is_correct": true, "explanation": "WBS breaks down project into tasks with resource estimates for each."},
+                  {"content": "Resource utilization", "is_correct": false, "explanation": "Resource utilization shows current usage, not task resource estimation."},
+                  {"content": "Booking allocation method", "is_correct": false, "explanation": "Booking allocation distributes hours, WBS estimates resource needs."}
+                ]
+              },
+              {
+                "content": "Question 45: DRAG DROP - A company is evaluating Dynamics 365 Fraud Protection for various types of transactions.\n\nWhich experience should you use?\n\nNOTE: Each correct selection is worth one point.\n\nScenario 1: Analyze three years of historical customer transaction data and generate reports that provide insights into existing fraud patterns in their business.\n\nScenario 2: Flag an online purchase that is initiated from a geographic region that is far away from the address of the account owner.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/137808.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: Diagnose experience", "is_correct": true, "explanation": "Diagnose experience analyzes historical data to identify fraud patterns."},
+                  {"content": "Box 1: Evaluate the effectiveness", "is_correct": false, "explanation": "Evaluate effectiveness tests fraud protection, not analyzes historical patterns."},
+                  {"content": "Box 1: Protect online purchases", "is_correct": false, "explanation": "Protect is for real-time protection, not historical analysis."},
+                  {"content": "Box 1: Account protection", "is_correct": false, "explanation": "Account protection is for account-level fraud, not historical analysis."},
+                  {"content": "Box 2: Protect online purchases", "is_correct": true, "explanation": "Purchase protection flags suspicious transactions like geographic anomalies."},
+                  {"content": "Box 2: Diagnose experience", "is_correct": false, "explanation": "Diagnose is for analysis, not real-time flagging."},
+                  {"content": "Box 2: Evaluate the effectiveness", "is_correct": false, "explanation": "Evaluate is for testing, not transaction flagging."},
+                  {"content": "Box 2: Account protection", "is_correct": false, "explanation": "Account protection is for account fraud, not purchase flagging."}
+                ]
+              },
+              {
+                "content": "Question 46: A company uses Dynamics 365 Finance and Power BI. The company plans to analyze operational data for retail stores that they operate across the United States.\n\nThe company wants to analyze customer visit data based on the population in the areas where stores are located.\n\nYou need to recommend a Power BI visualization for the company.\n\nWhich Power BI visualization should you recommend?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Basic maps", "is_correct": true, "explanation": "Maps visualize geographic data like store locations and population areas."},
+                  {"content": "Doughnut chart", "is_correct": false, "explanation": "Doughnut charts show proportions, not geographic data."},
+                  {"content": "Bar chart", "is_correct": false, "explanation": "Bar charts compare categories, not geographic locations."},
+                  {"content": "Line chart", "is_correct": false, "explanation": "Line charts show trends over time, not geographic distribution."}
+                ]
+              },
+              {
+                "content": "Question 47: HOTSPOT - For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: The configure to order manufacturing strategy should be used when developing new prototypes of products to bring to market.\n\nStatement 2: The make to stock manufacturing strategy should be used when customers create requests for custom configurations of a highly configurable product.\n\nStatement 3: The make to order manufacturing strategy should be used when manufacturing consistent, formula-based products that are based on a replenishment plan using minimum and maximum levels.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/137821.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": false, "explanation": "Configure to order is for customizing existing products, not developing prototypes."},
+                  {"content": "NO - Statement 1", "is_correct": true, "explanation": "Correct. Prototypes use engineer to order, not configure to order."},
+                  {"content": "YES - Statement 2", "is_correct": false, "explanation": "Make to stock produces standard inventory; configure to order handles customization."},
+                  {"content": "NO - Statement 2", "is_correct": true, "explanation": "Correct. Custom configurations use configure to order, not make to stock."},
+                  {"content": "YES - Statement 3", "is_correct": false, "explanation": "Make to order produces on demand; make to stock uses min/max replenishment."},
+                  {"content": "NO - Statement 3", "is_correct": true, "explanation": "Correct. Formula-based products with replenishment use make to stock."}
+                ]
+              },
+              {
+                "content": "Question 48: HOTSPOT - For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Customer ID can be used as a financial dimension in general ledger transactions.\n\nStatement 2: All entity-backed dimensions are shared across legal entities.\n\nStatement 3: When posting in the general ledger, a financial dimension set always includes the main account with or without other financial dimensions.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/137822.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Customer ID can be configured as a financial dimension for transaction analysis."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Customer-backed dimensions are supported."},
+                  {"content": "YES - Statement 2", "is_correct": false, "explanation": "Entity-backed dimensions can be configured as shared or per legal entity."},
+                  {"content": "NO - Statement 2", "is_correct": true, "explanation": "Correct. Not all entity-backed dimensions are shared across legal entities."},
+                  {"content": "YES - Statement 3", "is_correct": true, "explanation": "Financial dimension sets include the main account plus selected dimensions."},
+                  {"content": "NO - Statement 3", "is_correct": false, "explanation": "Incorrect. Main account is always part of the dimension set."}
+                ]
+              },
+              {
+                "content": "Question 49: A company uses Dynamics 365 Finance to manage financial operations.\n\nThe financial controller needs to present key performance indicators (KPIs) to the executive committee.\n\nYou need to determine the appropriate reporting tool to present this information.\n\nWhich reporting option should you use?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Business documents", "is_correct": false, "explanation": "Business documents are for invoices and statements, not KPI dashboards."},
+                  {"content": "Operational views", "is_correct": false, "explanation": "Operational views are for day-to-day work, not executive KPI presentations."},
+                  {"content": "Electronic reporting", "is_correct": false, "explanation": "Electronic reporting is for regulatory reports, not KPI presentations."},
+                  {"content": "Analytical workspace tab", "is_correct": true, "explanation": "Analytical workspaces display KPIs and metrics for executive reporting."}
+                ]
+              },
+              {
+                "content": "Question 50: A company uses Dynamics 365 Commerce. The company is launching a new product line for select stores.\n\nThe company wants to ensure that stores participating in the launch receive the new products. Stores that are not participating in the launch must not be able to order the products.\n\nYou need to recommend a method to help the company launch the new product line.\n\nWhat should you recommend?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Define products for distribution using product assortment.", "is_correct": true, "explanation": "Product assortments control which products are available at which stores."},
+                  {"content": "Define products for distribution using security roles.", "is_correct": false, "explanation": "Security roles control user access, not product availability."},
+                  {"content": "Control product distribution using purchase agreement.", "is_correct": false, "explanation": "Purchase agreements are for vendor contracts, not store distribution."},
+                  {"content": "Control product distribution using trade agreement.", "is_correct": false, "explanation": "Trade agreements define pricing, not product availability by store."}
+                ]
+              },
+              {
+                "content": "Question 51: HOTSPOT - A company uses Dynamics 365 Supply Chain Management. The company plans to implement asset bill of materials (BOMs) to manage spare parts.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: You can automatically update an asset BOM based on the setup in Asset Management.\n\nStatement 2: You must first register item consumptions before you can track history for spare parts.\n\nStatement 3: You must configure spare parts item groups to use asset BOM functionality.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/137877.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Asset BOMs can auto-update when work orders consume parts."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Automatic BOM updates are supported."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Item consumption must be registered to track spare parts history."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Registration is required for history tracking."},
+                  {"content": "YES - Statement 3", "is_correct": false, "explanation": "Asset BOM functionality doesn't require specific spare parts item groups."},
+                  {"content": "NO - Statement 3", "is_correct": true, "explanation": "Correct. Spare parts item groups are not a prerequisite for asset BOMs."}
+                ]
+              },
+              {
+                "content": "Question 52: HOTSPOT - A company plans to implement Dynamics 365 Supply Chain Management.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: Item groups define the set of general ledger accounts that apply to product-related transactions.\n\nStatement 2: You can delete a main account that has posted transactions.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/139521.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Item groups define GL account postings for inventory transactions."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Item groups do define GL accounts."},
+                  {"content": "YES - Statement 2", "is_correct": false, "explanation": "Main accounts with posted transactions cannot be deleted to maintain audit trail."},
+                  {"content": "NO - Statement 2", "is_correct": true, "explanation": "Correct. Accounts with transactions cannot be deleted."}
+                ]
+              },
+              {
+                "content": "Question 53: A company uses Dynamics 365 Commerce to manage retail stores.\n\nYou need to implement features to help the company prevent fraudulent activity.\n\nWhich two features should you implement?\n\nEach correct answer presents part of the solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Asset management", "is_correct": false, "explanation": "Asset management is for equipment maintenance, not fraud prevention."},
+                  {"content": "Purchase protection", "is_correct": true, "explanation": "Purchase protection in Fraud Protection helps prevent fraudulent purchases."},
+                  {"content": "Cash and bank management", "is_correct": false, "explanation": "Cash and bank management is for treasury, not fraud prevention."},
+                  {"content": "Loss prevention", "is_correct": true, "explanation": "Loss prevention helps identify and prevent fraudulent retail activities."}
+                ]
+              },
+              {
+                "content": "Question 54: A company creates a project plan in Dynamics 365 Project Operations.\n\nThe project plan must allow a project manager to:\n\n- Track profitability\n- Collaborate on the work to be performed\n- Allocate people to perform tasks\n\nYou need to identify the project derivatives that the project plan must track.\n\nWhich three major project derivatives should the plan track?\n\nEach correct answer presents part of the solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Resourcing", "is_correct": true, "explanation": "Resourcing allocates people to perform project tasks."},
+                  {"content": "Schedule updates", "is_correct": true, "explanation": "Schedule updates enable collaboration on work timing and dependencies."},
+                  {"content": "Invoicing", "is_correct": false, "explanation": "Invoicing is billing output, not a tracked project derivative."},
+                  {"content": "Cost", "is_correct": true, "explanation": "Cost tracking enables profitability analysis."},
+                  {"content": "Scope", "is_correct": false, "explanation": "Scope defines boundaries but resourcing, schedule, and cost are key derivatives."}
+                ]
+              },
+              {
+                "content": "Question 55: HOTSPOT - A company is reviewing navigation in finance and operations apps.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: The navigation menu is collapsed by default.\n\nStatement 2: Workspace tiles are displayed based upon a user's assigned security.\n\nStatement 3: The company a user is working with is displayed on the home screen.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/144413.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "The navigation menu is collapsed by default to maximize workspace."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. The navigation menu is collapsed initially."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Workspace tiles visibility depends on user security roles."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Security roles control tile visibility."},
+                  {"content": "YES - Statement 3", "is_correct": true, "explanation": "The current legal entity/company is displayed on the home screen."},
+                  {"content": "NO - Statement 3", "is_correct": false, "explanation": "Incorrect. Company name is shown on the home screen."}
+                ]
+              },
+              {
+                "content": "Question 56: HOTSPOT - A company is evaluating Dynamics 365 deployment options.\n\nFor each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: You can deploy finance and operations apps in the cloud or on-premises.\n\nStatement 2: Cloud deployment infrastructure is managed by Microsoft.\n\nStatement 3: A cloud deployment data trustee is the customer.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/144414.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Finance and operations apps support both cloud and on-premises deployment."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Both deployment options are available."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Microsoft manages cloud infrastructure including updates and security."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Microsoft manages cloud infrastructure."},
+                  {"content": "YES - Statement 3", "is_correct": false, "explanation": "Microsoft is the data trustee for cloud deployments, not the customer."},
+                  {"content": "NO - Statement 3", "is_correct": true, "explanation": "Correct. Microsoft, not the customer, is the cloud data trustee."}
+                ]
+              },
+              {
+                "content": "Question 57: A company uses Dynamics 365 Finance.\n\nYou need to explain the settlement process.\n\nWhich two statements describe the capabilities of the Cash and bank management module?\n\nEach correct answer presents a complete solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Settlement can occur between any transaction types that affect the vendor balance or customer balance.", "is_correct": false, "explanation": "Settlement is between related transactions like invoices and payments."},
+                  {"content": "Payments are only settled after they are posted.", "is_correct": true, "explanation": "Settlement requires transactions to be posted first."},
+                  {"content": "Payments can be settled against a transaction in the same legal entity only.", "is_correct": false, "explanation": "Cross-company settlement is supported between legal entities."},
+                  {"content": "Settlement occurs for the customer and vendor invoices and their payments.", "is_correct": true, "explanation": "Settlement matches invoices with their corresponding payments."}
+                ]
+              },
+              {
+                "content": "Question 58: HOTSPOT - A company uses Dynamics 365 Supply Chain Management for warehousing operations.\n\nUsers need to aggregate and manage inventory across multiple warehouses.\n\nWhich feature should users configure?",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/144416.png",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Product dimensions", "is_correct": false, "explanation": "Product dimensions define product variants, not warehouse aggregation."},
+                  {"content": "Sites", "is_correct": true, "explanation": "Sites aggregate and manage inventory across multiple warehouses."},
+                  {"content": "Locations", "is_correct": false, "explanation": "Locations are within warehouses, not for cross-warehouse aggregation."},
+                  {"content": "Tracking dimensions", "is_correct": false, "explanation": "Tracking dimensions track batches/serials, not warehouse aggregation."}
+                ]
+              },
+              {
+                "content": "Question 59: HOTSPOT - A company is using Dynamics 365 Commerce for its retail brick-and-mortar operations.\n\nThe company plans to implement a Dynamics 365 Commerce e-commerce retail channel to sell only overstock items. The e-commerce site must allow customers to browse specific predefined groups of items that are different than their non-overstock items.\n\nYou need to select the component to use for the e-commerce site.\n\nWhich component should you use?",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/144417.png",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Catalog", "is_correct": false, "explanation": "Catalogs group products for channels but navigation hierarchy is for browsing."},
+                  {"content": "Product hierarchy", "is_correct": false, "explanation": "Product hierarchy categorizes products internally, not for customer navigation."},
+                  {"content": "Navigation hierarchy", "is_correct": true, "explanation": "Navigation hierarchy defines browsable product groups for e-commerce."},
+                  {"content": "Released product attribute", "is_correct": false, "explanation": "Attributes describe products, not browsing structure."}
+                ]
+              },
+              {
+                "content": "Question 60: HOTSPOT - A company is evaluating Dynamics 365 Fraud Protection.\n\nYou need to help the customer understand the features that are available.\n\nInstructions: For each of the following statements, select Yes if the statement is true. Otherwise, select No.\n\nNOTE: Each correct selection is worth one point.\n\nStatement 1: You can create decision rules to determine which accounts are considered safe, which should be watched, and which should be blocked.\n\nStatement 2: You can analyze historical data to create rules that accept or reject customer transactions.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/147478.jpg",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "YES - Statement 1", "is_correct": true, "explanation": "Fraud Protection allows creating rules to classify accounts as safe, watch, or block."},
+                  {"content": "NO - Statement 1", "is_correct": false, "explanation": "Incorrect. Decision rules for account classification are supported."},
+                  {"content": "YES - Statement 2", "is_correct": true, "explanation": "Historical data analysis helps create transaction accept/reject rules."},
+                  {"content": "NO - Statement 2", "is_correct": false, "explanation": "Incorrect. Historical data analysis for rule creation is supported."}
+                ]
+              },
+              {
+                "content": "Question 61: A company implements Dynamics 365 Supply Chain Management.\n\nYou need to determine which feature to use to track inventory.\n\nWhich three types of information does the on-hand list provide?\n\nEach correct answer presents a complete solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "On order", "is_correct": true, "explanation": "On-hand list shows quantities on order from vendors or production."},
+                  {"content": "Physical reserved", "is_correct": true, "explanation": "On-hand list shows physically reserved quantities."},
+                  {"content": "Last reserved", "is_correct": false, "explanation": "Last reserved date is not shown in the on-hand list."},
+                  {"content": "Bin", "is_correct": false, "explanation": "Bin is a location attribute, not on-hand quantity information."},
+                  {"content": "Physical inventory", "is_correct": true, "explanation": "On-hand list shows physical inventory quantities."}
+                ]
+              },
+              {
+                "content": "Question 62: A company plans to purchase Dynamics 365 Finance.\n\nThe company has customers who frequently pay their invoices late or do not pay at all. The company continues to sell to these customers. This creates large write-offs of bad debt.\n\nThe company needs to proactively communicate with customers, collect unpaid accounts receivables, and prevent new sales until past due invoices are paid.\n\nYou need to recommend solutions to facilitate communication and collections.\n\nWhich three options should you recommend?\n\nEach answer represents a complete solution.\n\nNOTE: Each correct selection is worth one point.",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Open sales orders report", "is_correct": false, "explanation": "Open sales orders report shows pending orders, not collection tools."},
+                  {"content": "Payment journals", "is_correct": false, "explanation": "Payment journals record payments, not facilitate collections."},
+                  {"content": "Stop customer", "is_correct": true, "explanation": "Stop customer prevents new sales until past due invoices are resolved."},
+                  {"content": "Customer statements", "is_correct": true, "explanation": "Customer statements communicate outstanding balances to customers."},
+                  {"content": "Collection letter", "is_correct": true, "explanation": "Collection letters proactively communicate about overdue payments."}
+                ]
+              },
+              {
+                "content": "Question 63: DRAG DROP - A company plans to use Dynamics 365 Supply Chain Management.\n\nMatch each inventory management function/technique to its use case.\n\nNOTE: Each correct match is worth one point.\n\nUse Case 1: Hard-allocate an inventory batch to a sales order.\n\nUse Case 2: Combine multiple sales orders into a single work item for an operator.\n\nUse Case 3: Refill a location from another location based upon a set stocking limit.\n\nUse Case 4: Use date of inventory aging to indicate which area of the warehouse the material should be picked from.",
+                "image_url": "https://d2vp1l98shrrp4.cloudfront.net/questions/uploads/155739.png",
+                "is_multiple_choice": true,
+                "answers": [
+                  {"content": "Box 1: Reservation", "is_correct": true, "explanation": "Reservation hard-allocates specific inventory batches to orders."},
+                  {"content": "Box 1: Location directive", "is_correct": false, "explanation": "Location directives guide picking locations, not batch allocation."},
+                  {"content": "Box 1: Wave replenishment", "is_correct": false, "explanation": "Wave replenishment refills locations, not allocates batches."},
+                  {"content": "Box 1: Cluster picking", "is_correct": false, "explanation": "Cluster picking combines orders, not allocates batches."},
+                  {"content": "Box 2: Cluster picking", "is_correct": true, "explanation": "Cluster picking combines multiple orders into single work items."},
+                  {"content": "Box 2: Reservation", "is_correct": false, "explanation": "Reservation allocates inventory, not combines orders."},
+                  {"content": "Box 2: Wave replenishment", "is_correct": false, "explanation": "Wave replenishment refills locations, not combines orders."},
+                  {"content": "Box 2: Location directive", "is_correct": false, "explanation": "Location directives guide locations, not combine orders."},
+                  {"content": "Box 3: Min/max replenishment", "is_correct": true, "explanation": "Min/max replenishment refills locations based on stocking limits."},
+                  {"content": "Box 3: Wave replenishment", "is_correct": false, "explanation": "Wave replenishment is triggered by demand, not stocking limits."},
+                  {"content": "Box 3: Reservation", "is_correct": false, "explanation": "Reservation allocates inventory, not refills locations."},
+                  {"content": "Box 3: Cluster picking", "is_correct": false, "explanation": "Cluster picking combines orders, not refills locations."},
+                  {"content": "Box 4: Location directive", "is_correct": true, "explanation": "Location directives use aging dates to determine pick locations."},
+                  {"content": "Box 4: Reservation", "is_correct": false, "explanation": "Reservation allocates batches, not determines pick areas."},
+                  {"content": "Box 4: Min/max replenishment", "is_correct": false, "explanation": "Min/max manages stocking levels, not pick area selection."},
+                  {"content": "Box 4: Cluster picking", "is_correct": false, "explanation": "Cluster picking combines orders, not selects pick areas."}
+                ]
+              },
+              {
+                "content": "Question 64: A company is evaluating Dynamics 365 Commerce for its retail operations.\n\nThe company has a retail store that sells all company-manufactured products. The company also has an outlet store. The company plans to sell only discontinued items out of the outlet store.\n\nYou need to configure the component that determines which products should be sold to the outlet store.\n\nWhich component should you configure?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {"content": "Catalogs", "is_correct": false, "explanation": "Catalogs group products but assortments control store availability."},
+                  {"content": "Organization hierarchy", "is_correct": false, "explanation": "Organization hierarchy defines structure, not product availability."},
+                  {"content": "Assortments", "is_correct": true, "explanation": "Assortments determine which products are available at specific stores."},
+                  {"content": "Product category", "is_correct": false, "explanation": "Product categories classify products, not control store availability."},
+                  {"content": "Released products", "is_correct": false, "explanation": "Released products are available for sale, assortments control where."}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

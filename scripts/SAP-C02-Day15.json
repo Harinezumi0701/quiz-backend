@@ -1,0 +1,598 @@
+[
+  {
+    "categories": [
+      {
+        "name": "Amazon's AWS Certified Solutions Architect - Professional",
+        "tests": [
+          {
+            "name": "SAP-C02 Day15",
+            "description": "",
+            "time_limit": 60,
+            "questions": [
+              {
+                "content": "A solutions architect needs to define a reference architecture for a solution for three-tier applications with web. application, and NoSQL data layers. The reference architecture must meet the following requirements: • High availability within an AWS Region • Able to fail over in 1 minute to another AWS Region for disaster recovery • Provide the most efficient solution while minimizing the impact on the user experience Which combination of steps will meet these requirements? (Choose three.)",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {
+                    "content": "Use an Amazon Route 53 weighted routing policy set to 100/0 across the two selected Regions. Set Time to Live (TTL) to 1 hour.",
+                    "is_correct": false,
+                    "explanation": "Weighted 100/0 is not failover routing. TTL of 1 hour means DNS won't propagate for ~60 min — violates 1-minute DR requirement "
+                  },
+                  {
+                    "content": "Use an Amazon Route 53 failover routing policy for failover from the primary Region to the disaster recovery Region. Set Time to Live (TTL) to 30 seconds.",
+                    "is_correct": true,
+                    "explanation": "Failover routing policy triggers automatic DNS switch to DR region. TTL 30s ensures propagation within ~1 minute "
+                  },
+                  {
+                    "content": "Use a global table within Amazon DynamoDB so data can be accessed in the two selected Regions.",
+                    "is_correct": true,
+                    "explanation": "DynamoDB Global Tables replicate data across regions in near real-time - perfect for NoSQL layer in multi-region DR  "
+                  },
+                  {
+                    "content": "Back up data from an Amazon DynamoDB table in the primary Region every 60 minutes and then write the data to Amazon S3. Use S3 cross-Region replication to copy the data from the primary Region to the disaster recovery Region. Have a script import the data into DynamoDB in a disaster recovery scenario.",
+                    "is_correct": false,
+                    "explanation": "Backup and restore with S3 replication and manual restore scripts is slower and increases RTO beyond 1 minute."
+                  },
+                  {
+                    "content": "Implement a hot standby model using Auto Scaling groups for the web and application layers across multiple Availability Zones in the Regions. Use zonal Reserved Instances for the minimum number of servers and On-Demand Instances for any additional resources.",
+                    "is_correct": true,
+                    "explanation": "Hot standby model keeps DR region warm. Reserved Instances for baseline efficiency, On-Demand for scale — minimizes user impact "
+                  },
+                  {
+                    "content": "Use Auto Scaling groups for the web and application layers across multiple Availability Zones in the Regions. Use Spot Instances for the required resources.",
+                    "is_correct": false,
+                    "explanation": "Spot Instances can be interrupted with 2-min notice — unreliable for a standby that must be ready at any moment"
+                  }
+                ]
+              },
+              {
+                "content": "A company wants to run a custom network analysis software package to inspect traffic as traffic leaves and enters a VPC. The company has deployed the solution by using AWS CloudFormation on three Amazon EC2 instances in an Auto Scaling group. All network routing has been established to direct traffic to the EC2 instances. Whenever the analysis software stops working, the Auto Scaling group replaces an instancThe network routes are not updated when the instance replacement occurs. Which combination of steps will resolve this issue? (Choose three.)",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {
+                    "content": "Create alarms based on EC2 status check metrics that will cause the Auto Scaling group to replace the failed instance.",
+                    "is_correct": false,
+                    "explanation": "EC2 status checks monitor hardware/hypervisor health — NOT application-level process health. Software can crash while EC2 reports healthy"
+                  },
+                  {
+                    "content": "Update the CloudFormation template to install the Amazon CloudWatch agent on the EC2 instances. Configure the CloudWatch agent to send process metrics for the application.",
+                    "is_correct": true,
+                    "explanation": "CloudWatch Agent can capture process-level metrics (e.g., is the analysis process running?) and push custom metrics to CloudWatch"
+                  },
+                  {
+                    "content": "Update the CloudFormation template to install AWS Systems Manager Agent on the EC2 instances. Configure Systems Manager Agent to send process metrics for the application.",
+                    "is_correct": false,
+                    "explanation": "SSM Agent is for remote command execution and patch management — it does not send process metrics to CloudWatch for alarming"
+                  },
+                  {
+                    "content": "Create an alarm for the custom metric in Amazon CloudWatch for the failure scenarios. Configure the alarm to publish a message to an Amazon Simple Notification Service (Amazon SNS) topic.",
+                    "is_correct": true,
+                    "explanation": "CloudWatch Alarm on the custom metric triggers on failure → publishes to SNS topic, initiating the automated response chain"
+                  },
+                  {
+                    "content": "Create an AWS Lambda function that responds to the Amazon Simple Notification Service (Amazon SNS) message to take the instance out of servicUpdate the network routes to point to the replacement instance.",
+                    "is_correct": true,
+                    "explanation": "Lambda (triggered by SNS) does two things: (1) marks instance unhealthy → ASG replaces it, (2) updates network routes to the new instance "
+                  },
+                  {
+                    "content": "In the CloudFormation template, write a condition that updates the network routes when a replacement instance is launched.",
+                    "is_correct": false,
+                    "explanation": "CloudFormation conditions are evaluated at deploy time, not at runtime.CloudFormation doesn't re-run automatically when ASG swaps an instance"
+                  }
+                ]
+              },
+              {
+                "content": "During an audit, a security team discovered that a development team was putting IAM user secret access keys in their code and then committing it to an AWS CodeCommit repository. The security team wants to automatically find and remediate instances of this security vulnerability. Which solution will ensure that the credentials are appropriately secured automatically?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Run a script nightly using AWS Systems Manager Run Command to search for credentials on the development instances. If found, use AWS Secrets Manager to rotate the credentials",
+                    "is_correct": false,
+                    "explanation": "Running script nightly is less immediate and does not prevent exposure between runs; rotating credentials only after detection delays mitigation."
+                  },
+                  {
+                    "content": "Use a scheduled AWS Lambda function to download and scan the application code from CodeCommit. If credentials are found, generate new credentials and store them in AWS KMS.",
+                    "is_correct": false,
+                    "explanation": "Storing new credentials in AWS KMS is incorrect as KMS is for encryption keys, not secret management; no mention of disabling old credentials."
+                  },
+                  {
+                    "content": "Configure Amazon Macie to scan for credentials in CodeCommit repositories. If credentials are found, trigger an AWS Lambda function to disable the credentials and notify the user.",
+                    "is_correct": false,
+                    "explanation": "Amazon Macie is primarily for data classification and discovery in S3, not CodeCommit repositories; less direct remediation mechanisms than option D."
+                  },
+                  {
+                    "content": "Configure a CodeCommit trigger to invoke an AWS Lambda function to scan new code submissions for credentials. If credentials are found, disable them in AWS IAM and notify the user.",
+                    "is_correct": true,
+                    "explanation": "Using a CodeCommit trigger to scan new code submissions ensures automatic detection of credentials at the time of commit, preventing further exposurDisabling compromised IAM credentials immediately enhances security by preventing unauthorized access. Notifying the user promotes awareness and encourages best security practices. This approach aligns with security best practices by handling detection and remediation automatically and promptly."
+                  }
+                ]
+              },
+              {
+                "content": "A company is developing a gene reporting device that will collect genomic information to assist researchers with collecting large samples of data from a diverse population. The device will push 8 KB of genomic data every second to a data platform that will need to process and analyze the data and provide information back to researchers. The data platform must meet the following requirements: • Provide near-real-time analytics of the inbound genomic data • Ensure the data is flexible, parallel, and durable • Deliver results of processing to a data warehouse Which strategy should a solutions architect use to meet these requirements?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Use Amazon Kinesis Data Firehose to collect the inbound sensor data, analyze the data with Kinesis clients, and save the results to an Amazon RDS instance.",
+                    "is_correct": false,
+                    "explanation": "Amazon Kinesis Data Firehose is primarily for loading streaming data into destinations but does not natively support analysis with Kinesis clients; also, Amazon RDS is less suitable than Redshift for large-scale analytics and warehousing."
+                  },
+                  {
+                    "content": "Use Amazon Kinesis Data Streams to collect the inbound sensor data, analyze the data with Kinesis clients, and save the results to an Amazon Redshift cluster using Amazon EMR.",
+                    "is_correct": true,
+                    "explanation": "Amazon Kinesis Data Streams is designed to collect and process large streams of data records in real time, fitting the near-real-time analytics requirement. Kinesis clients using the Kinesis Client Library can analyze the inbound data efficiently. Saving the processed data results to an Amazon Redshift cluster aligns with the requirement to deliver results to a data warehousUsing Amazon EMR with Redshift allows scalable and parallel processing and analysis, ensuring flexibility and durability."
+                  },
+                  {
+                    "content": "Use Amazon S3 to collect the inbound device data, analyze the data from Amazon SQS with Kinesis, and save the results to an Amazon Redshift cluster.",
+                    "is_correct": false,
+                    "explanation": "Using Amazon S3 for collecting inbound device data does not provide near-real-time ingestion and processing required; integrating SQS and Kinesis adds unnecessary complexity and latency."
+                  },
+                  {
+                    "content": "Use an Amazon API Gateway to put requests into an Amazon SQS queue, analyze the data with an AWS Lambda function, and save the results to an Amazon Redshift cluster using Amazon EMR.",
+                    "is_correct": false,
+                    "explanation": "Using API Gateway and SQS introduces extra latency and complexity compared to Kinesis Data Streams, and processing via Lambda may not handle large-scale parallel streaming analytics as effectively as Kinesis with EMR."
+                  }
+                ]
+              },
+              {
+                "content": "A company recently started hosting new application workloads in the AWS Cloud. The company is using Amazon EC2 instances. Amazon Elastic File System (Amazon EFS) file systems, and Amazon RDS DB instances. To meet regulatory and business requirements, the company must make the following changes for data backups: • Backups must be retained based on custom daily, weekly, and monthly requirements. • Backups must be replicated to at least one other AWS Region immediately after captur• The backup solution must provide a single source of backup status across the AWS environment. • The backup solution must send immediate notifications upon failure of any resource backup. Which combination of steps will meet these requirements with the LEAST amount of operational overhead? (Choose three.)",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {
+                    "content": "Create an AWS Backup plan with a backup rule for each of the retention requirements.",
+                    "is_correct": true,
+                    "explanation": "AWS Backup supports multiple rules per plan — one rule for daily, one for weekly, one for monthly, each with custom retention"
+                  },
+                  {
+                    "content": "Configure an AWS Backup plan to copy backups to another Region.",
+                    "is_correct": true,
+                    "explanation": "AWS Backup has built-in cross-region copy configured directly in the backup plan — no custom code needed"
+                  },
+                  {
+                    "content": "Create an AWS Lambda function to replicate backups to another Region and send notification if a failure occurs.",
+                    "is_correct": false,
+                    "explanation": "Custom Lambda introduces unnecessary operational overhead compared to native AWS Backup features."
+                  },
+                  {
+                    "content": "Add an Amazon Simple Notification Service (Amazon SNS) topic to the backup plan to send a notification for finished jobs that have any status except BACKUP_JOB_COMPLETED.",
+                    "is_correct": true,
+                    "explanation": "AWS Backup natively integrates with SNS. Filtering for any status except BACKUP_JOB_COMPLETED catches all failure scenarios "
+                  },
+                  {
+                    "content": "Create an Amazon Data Lifecycle Manager (Amazon DLM) snapshot lifecycle policy for each of the retention requirements.",
+                    "is_correct": false,
+                    "explanation": "DLM only manages EBS snapshots — does NOT support EFS or RDS. Also creates separate silos, not a single source of backup status"
+                  },
+                  {
+                    "content": "Set up RDS snapshots on each database.",
+                    "is_correct": false,
+                    "explanation": "Manual RDS snapshots per database = high overhead, no centralized visibility ,doesn't cover EC2 or EFS"
+                  }
+                ]
+              },
+              {
+                "content": "A company has more than 10,000 sensors that send data to an on-premises Apache Kafka server by using the Message Queuing Telemetry Transport (MQTT) protocol. The on-premises Kafka server transforms the data and then stores the results as objects in an Amazon S3 bucket. Recently, the Kafka server crashed. The company lost sensor data while the server was being restored. A solutions architect must create a new design on AWS that is highly available and scalable to prevent a similar occurrencWhich solution will meet these requirements?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Launch two Amazon EC2 instances to host the Kafka server in an active/standby configuration across two Availability Zones. Create a domain name in Amazon Route 53. Create a Route 53 failover policy. Route the sensors to send the data to the domain name.",
+                    "is_correct": false,
+                    "explanation": "Running Kafka on EC2 instances requires managing availability and failover manually, which is less scalable and less highly available than managed services."
+                  },
+                  {
+                    "content": "Migrate the on-premises Kafka server to Amazon Managed Streaming for Apache Kafka (Amazon MSK). Create a Network Load Balancer (NLB) that points to the Amazon MSK broker. Enable NLB health checks. Route the sensors to send the data to the NLB.",
+                    "is_correct": false,
+                    "explanation": "Using an NLB for Amazon MSK is not a typical or recommended solution; Amazon MSK clients connect directly to brokers, and NLB health checks do not ensure better high availability for sensors using MQTT."
+                  },
+                  {
+                    "content": "Deploy AWS IoT Core, and connect it to an Amazon Kinesis Data Firehose delivery stream. Use an AWS Lambda function to handle data transformation. Route the sensors to send the data to AWS IoT Core.",
+                    "is_correct": true,
+                    "explanation": "AWS IoT Core is a managed service designed to securely ingest data from IoT devices using MQTT, the protocol used by the sensors. Amazon Kinesis Data Firehose is a fully managed service for reliably loading streaming data into data stores such as Amazon S3, providing scalability and high availability. Using AWS Lambda for data transformation leverages managed services to handle processing without managing infrastructurThis solution avoids self-managing Kafka clusters or EC2 instances, thus reducing the risk of single points of failure and increasing scalability and availability."
+                  },
+                  {
+                    "content": "Deploy AWS IoT Core, and launch an Amazon EC2 instance to host the Kafka server. Configure AWS IoT Core to send the data to the EC2 instancRoute the sensors to send the data to AWS IoT Core.",
+                    "is_correct": false,
+                    "explanation": "Hosting Kafka on an EC2 instance under AWS IoT Core reintroduces the single point of failure and operational overhead that caused the initial problem."
+                  }
+                ]
+              },
+              {
+                "content": "A company is designing an AWS Organizations structure. The company wants to standardize a process to apply tags across the entire organization. The company will require tags with specific values when a user creates a new resource. Each of the company's OUs will have unique tag values. Which solution will meet these requirements?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Use an SCP to deny the creation of resources that do not have the required tags. Create a tag policy that includes the tag values that the company has assigned to each OU. Attach the tag policies to the OUs.",
+                    "is_correct": true,
+                    "explanation": "Using an SCP (Service Control Policy) to deny resource creation without required tags enforces strict compliance with tagging policies at the OU level. Tag policies allow standardizing tag keys and values and are attachable to OUs for OU-specific tag value enforcement. Attaching tag policies directly to OUs ensures unique tag values per OU as required. Denying creation of resources missing required tags follows best practice of enforcing security and governance controls via SCPs."
+                  },
+                  {
+                    "content": "Use an SCP to deny the creation of resources that do not have the required tags. Create a tag policy that includes the tag values that the company has assigned to each OU. Attach the tag policies to the organization's management account.",
+                    "is_correct": false,
+                    "explanation": "Attaching tag policies only to the management account does not enforce OU-specific tag values as required by the question."
+                  },
+                  {
+                    "content": "Use an SCP to allow the creation of resources only when the resources have the required tags. Create a tag policy that includes the tag values that the company has assigned to each OU. Attach the tag policies to the OUs.",
+                    "is_correct": false,
+                    "explanation": "SCPs cannot explicitly allow conditions; they only deny. Therefore, using SCP to allow creation only with required tags is not correct."
+                  },
+                  {
+                    "content": "Use an SCP to deny the creation of resources that do not have the required tags. Define the list of tags. Attach the SCP to the OUs.",
+                    "is_correct": false,
+                    "explanation": "Defining only the list of tags without a tag policy and relying on SCP alone does not fully enforce the required tag values per OU."
+                  }
+                ]
+              },
+              {
+                "content": "A company has built a high performance computing (HPC) cluster in AWS for a tightly coupled workload that generates a large number of shared files stored in Amazon EFS. The cluster was performing well when the number of Amazon EC2 instances in the cluster was 100. However, when the company increased the cluster size to 1.000 EC2 instances, overall performance was well below expectations. Which collection of design choices should a solutions architect make to achieve the maximum performance from the HPC cluster? (Choose three.)",
+                "image_url": "",
+                "is_multiple_choice": true,
+                "answers": [
+                  {
+                    "content": "Ensure the HPC cluster is launched within a single Availability Zone.",
+                    "is_correct": true,
+                    "explanation": "Single AZ = minimum latency between nodes. Tightly coupled HPC is extremely latency-sensitive. EFA also requires same-AZ placement"
+                  },
+                  {
+                    "content": "Launch the EC2 instances and attach elastic network interfaces in multiples of four.",
+                    "is_correct": false,
+                    "explanation": "Attaching ENIs in multiples of four is not an HPC best practice — provides no meaningful benefit for cluster communication"
+                  },
+                  {
+                    "content": "Select EC2 instance types with an Elastic Fabric Adapter (EFA) enabled.",
+                    "is_correct": true,
+                    "explanation": "EFA enables OS-bypass networking for MPI/tightly coupled workloads —  dramatically reduces node-to-node latency at scale"
+                  },
+                  {
+                    "content": "Ensure the cluster is launched across multiple Availability Zones.",
+                    "is_correct": false,
+                    "explanation": "Multi-AZ increases inter-node latency — the exact opposite of what tightly coupled HPC needs. EFA does not work cross-AZ"
+                  },
+                  {
+                    "content": "Replace Amazon EFS with multiple Amazon EBS volumes in a RAID array.",
+                    "is_correct": false,
+                    "explanation": "EBS volumes cannot be shared across 1,000 instances (multi-attach is limited  to ~16 instances for io2). RAID doesn't solve the shared-access problem"
+                  },
+                  {
+                    "content": "Replace Amazon EFS with Amazon FSx for Lustre.",
+                    "is_correct": true,
+                    "explanation": "FSx for Lustre is purpose-built for HPC — delivers hundreds of GB/s  throughput vs EFS which is a general-purpose NFS"
+                  }
+                ]
+              },
+              {
+                "content": "A company wants to use AWS for disaster recovery for an on-premises application. The company has hundreds of Windows-based servers that run the application. All the servers mount a common sharThe company has an RTO of 15 minutes and an RPO of 5 minutes. The solution must support native failover and fallback capabilities. Which solution will meet these requirements MOST cost-effectively?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Create an AWS Storage Gateway File Gateway. Schedule daily Windows server backups. Save the data to Amazon S3. During a disaster, recover the on-premises servers from the backup. During tailback, run the on-premises servers on Amazon EC2 instances.",
+                    "is_correct": false,
+                    "explanation": "Daily backups do not meet the 5-minute RPO or 15-minute RTO, nor provide native failover/fallback."
+                  },
+                  {
+                    "content": "Create a set of AWS CloudFormation templates to create infrastructurReplicate all data to Amazon Elastic File System (Amazon EFS) by using AWS DataSync. During a disaster, use AWS CodePipeline to deploy the templates to restore the on-premises servers. Fail back the data by using DataSync.",
+                    "is_correct": false,
+                    "explanation": "Using CloudFormation and DataSync for replication is complex and may not meet tight RTO/RPO or native failover/fallback requirements."
+                  },
+                  {
+                    "content": "Create an AWS Cloud Development Kit (AWS CDK) pipeline to stand up a multi-site active-active environment on AWS. Replicate data into Amazon S3 by using the s3 sync command. During a disaster, swap DNS endpoints to point to AWS. Fail back the data by using the s3 sync command.",
+                    "is_correct": false,
+                    "explanation": "Manual data sync and DNS swap lacks native failover and fallback, risking longer RTO and higher operational complexity."
+                  },
+                  {
+                    "content": "Use AWS Elastic Disaster Recovery to replicate the on-premises servers. Replicate data to an Amazon FSx for Windows File Server file system by using AWS DataSync. Mount the file system to AWS servers. During a disaster, fail over the on-premises servers to AWS. Fail back to new or existing servers by using Elastic Disaster Recovery.",
+                    "is_correct": true,
+                    "explanation": "AWS Elastic Disaster Recovery provides continuous replication of on-premises servers, enabling low Recovery Time Objective (RTO) and Recovery Point Objective (RPO). Using Amazon FSx for Windows File Server supports Windows workloads and common share requirements. Failover and fallback are natively supported by Elastic Disaster Recovery, meeting the need for native failover and fallback capabilities. This approach is more cost-effective and operationally sound than maintaining extensive backups or manually deploying infrastructure through templates or custom pipelines."
+                  }
+                ]
+              },
+              {
+                "content": "A company is migrating its development and production workloads to a new organization in AWS Organizations. The company has created a separate member account for development and a separate member account for production. Consolidated billing is linked to the management account. In the management account, a solutions architect needs to create an IAM user that can stop or terminate resources in both member accounts. Which solution will meet this requirement?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Create an IAM user and a cross-account role in the management account. Configure the cross-account role with least privilege access to the member accounts.",
+                    "is_correct": false,
+                    "explanation": "Creating a cross-account role in the management account is incorrect; roles should be created in member accounts to allow access from management account users."
+                  },
+                  {
+                    "content": "Create an IAM user in each member account. In the management account, create a cross-account role that has least privilege access. Grant the IAM users access to the cross-account role by using a trust policy.",
+                    "is_correct": false,
+                    "explanation": "Creating IAM users in each member account contradicts best practices to minimize IAM users and prefer centralized access management."
+                  },
+                  {
+                    "content": "Create an IAM user in the management account. In the member accounts, create an IAM group that has least privilege access. Add the IAM user from the management account to each IAM group in the member accounts.",
+                    "is_correct": false,
+                    "explanation": "An IAM user from one account cannot be added to an IAM group in another account; IAM groups are account-specific."
+                  },
+                  {
+                    "content": "Create an IAM user in the management account. In the member accounts, create cross-account roles that have least privilege access. Grant the IAM user access to the roles by using a trust policy.",
+                    "is_correct": true,
+                    "explanation": "Creating an IAM user in the management account and cross-account roles in the member accounts aligns with best practices for managing access across AWS accounts securely. Cross-account roles with least privilege allow the IAM user in the management account to assume roles in member accounts and perform required actions without needing IAM users in each member account. Granting the IAM user access to the cross-account roles by using a trust policy leverages the managed AWS service model for secure and auditable access. This approach avoids creating multiple IAM users in member accounts, which AWS recommends minimizing for security. The provided facts emphasize the importance of removing unused IAM users and suggest using federated or temporary credentials, so cross-account roles with temporary credentials are preferable."
+                  }
+                ]
+              },
+              {
+                "content": "A company needs to establish a connection from its on-premises data center to AWS. The company needs to connect all of its VPCs that are located in different AWS Regions with transitive routing capabilities between VPC networks. The company also must reduce network outbound traffic costs, increase bandwidth throughput, and provide a consistent network experience for end users. Which solution will meet these requirements?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Create an AWS Site-to-Site VPN connection between the on-premises data center and a new central VPC. Create VPC peering connections that initiate from the central VPC to all other VPCs.",
+                    "is_correct": false,
+                    "explanation": "VPC peering does not support transitive routing between VPCs in different regions efficiently and increases management overhead."
+                  },
+                  {
+                    "content": "Create an AWS Direct Connect connection between the on-premises data center and AWS. Provision a transit VIF, and connect it to a Direct Connect gateway. Connect the Direct Connect gateway to all the other VPCs by using a transit gateway in each Region.",
+                    "is_correct": true,
+                    "explanation": "AWS Direct Connect provides more consistent network experiences and higher bandwidth throughput than VPN connections, meeting the requirement for reduced network outbound costs and increased bandwidth. Using a transit VIF and Direct Connect gateway connected to transit gateways enables transitive routing between VPCs across different regions. This setup is a managed AWS solution that supports multiregional VPC connectivity with transitive routing, fulfilling the core requirements. Using Direct Connect with transit gateway is a standard AWS best practice for connecting on-premises data centers to multiple VPCs regionally."
+                  },
+                  {
+                    "content": "Create an AWS Site-to-Site VPN connection between the on-premises data center and a new central VPUse a transit gateway with dynamic routing. Connect the transit gateway to all other VPCs.",
+                    "is_correct": false,
+                    "explanation": "Site-to-Site VPN provides less consistent network experience and lower bandwidth compared to Direct Connect, not meeting throughput and cost requirements."
+                  },
+                  {
+                    "content": "Create an AWS Direct Connect connection between the on-premises data center and AWS. Establish an AWS Site-to-Site VPN connection between all VPCs in each Region. Create VPC peering connections that initiate from the central VPC to all other VPCs.",
+                    "is_correct": false,
+                    "explanation": "Combining Direct Connect with multiple Site-to-Site VPN connections and VPC peering increases complexity and does not optimize for transitive routing or reduce outbound traffic costs."
+                  }
+                ]
+              },
+              {
+                "content": "A company has an on-premises Microsoft SQL Server database that writes a nightly 200 GB export to a local drivThe company wants to move the backups to more robust cloud storage on Amazon S3. The company has set up a 10 Gbps AWS Direct Connect connection between the on-premises data center and AWS. Which solution meets these requirements MOST cost-effectively?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Create a new S3 bucket. Deploy an AWS Storage Gateway file gateway within the VPC that is connected to the Direct Connect connection. Create a new SMB file sharWrite nightly database exports to the new SMB file share.",
+                    "is_correct": true,
+                    "explanation": "AWS Storage Gateway file gateway enables direct writes to Amazon S3, which is cost-effective for storing large database backups as S3 is designed for durable, scalable storagS3 File Gateway is a recommended and common solution specifically for database backups, providing both short- and long-term retention with lifecycle options to reduce costs. Using Storage Gateway avoids the higher costs of FSx file system deployments and the complexity of managing multi-AZ setups while leveraging the existing Direct Connect link. Volume Gateway requires additional steps to automate data copies from on-premises storage to S3, making file gateway more direct and simpler."
+                  },
+                  {
+                    "content": "Create an Amazon FSx for Windows File Server Single-AZ file system within the VPC that is connected to the Direct Connect connection. Create a new SMB file sharWrite nightly database exports to an SMB file share on the Amazon FSx file system. Enable nightly backups.",
+                    "is_correct": false,
+                    "explanation": "FSx Single-AZ incurs higher costs with less durability compared to S3 with Storage Gateway and does not leverage the cost efficiency of S3 storage for backups."
+                  },
+                  {
+                    "content": "Create an Amazon FSx for Windows File Server Multi-AZ file system within the VPC that is connected to the Direct Connect connection. Create a new SMB file sharWrite nightly database exports to an SMB file share on the Amazon FSx file system. Enable nightly backups.",
+                    "is_correct": false,
+                    "explanation": "FSx Multi-AZ further increases costs and complexity with high availability that may not be needed just for backup storage compared to S3 File Gateway."
+                  },
+                  {
+                    "content": "Create a new S3 bucket. Deploy an AWS Storage Gateway volume gateway within the VPC that is connected to the Direct Connect connection. Create a new SMB file sharWrite nightly database exports to the new SMB file share on the volume gateway, and automate copies of this data to an S3 bucket.",
+                    "is_correct": false,
+                    "explanation": "Storage Gateway volume gateway involves extra steps to copy data to S3, adding complexity and costs compared to the direct S3 integration of the file gateway."
+                  }
+                ]
+              },
+              {
+                "content": "A company has Linux-based Amazon EC2 instances. Users must access the instances by using SSH with EC2 SSH key pairs. Each machine requires a unique EC2 key pair. The company wants to implement a key rotation policy that will, upon request, automatically rotate all the EC2 key pairs and keep the keys in a securely encrypted placThe company will accept less than 1 minute of downtime during key rotation. Which solution will meet these requirements?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Store all the keys in AWS Secrets Manager. Define a Secrets Manager rotation schedule to invoke an AWS Lambda function to generate new key pairs. Replace public keys on EC2 instances. Update the private keys in Secrets Manager.",
+                    "is_correct": true,
+                    "explanation": "AWS Secrets Manager is the preferred service for securely managing and rotating secrets such as SSH private keys. Defining a Secrets Manager rotation schedule that invokes a Lambda function aligns with using managed services designed for automatic, secure rotations with minimal downtimReplacing public keys on EC2 instances via automation ensures secure, up-to-date key pairs are used without manual intervention, meeting the requirement for less than 1 minute of downtime."
+                  },
+                  {
+                    "content": "Store all the keys in Parameter Store, a capability of AWS Systems Manager, as a string. Define a Systems Manager maintenance window to invoke an AWS Lambda function to generate new key pairs. Replace public keys on EC2 instances. Update the private keys in Parameter Store.",
+                    "is_correct": false,
+                    "explanation": "Using Parameter Store as a plain string for private keys is less secure and not preferred over Secrets Manager for secret rotation."
+                  },
+                  {
+                    "content": "Import the EC2 key pairs into AWS Key Management Service (AWS KMS). Configure automatic key rotation for these key pairs. Create an Amazon EventBridge scheduled rule to invoke an AWS Lambda function to initiate the key rotation in AWS KMS.",
+                    "is_correct": false,
+                    "explanation": "AWS KMS does not manage EC2 SSH key pairs or perform key rotation for EC2 key pairs; it handles cryptographic keys for encryption but is not applicable here."
+                  },
+                  {
+                    "content": "Add all the EC2 instances to Fleet Manager, a capability of AWS Systems Manager. Define a Systems Manager maintenance window to issue a Systems Manager Run Command document to generate new key pairs and to rotate public keys to all the instances in Fleet Manager.",
+                    "is_correct": false,
+                    "explanation": "Fleet Manager and Systems Manager Run Command do not handle secure storage or automated rotation of private keys, making this less secure and less automated."
+                  }
+                ]
+              },
+              {
+                "content": "A company wants to containerize a multi-tier web application and move the application from an on-premises data center to AWS. The application includes web. application, and database tiers. The company needs to make the application fault tolerant and scalablSome frequently accessed data must always be available across application servers. Frontend web servers need session persistence and must scale to meet increases in traffic. Which solution will meet these requirements with the LEAST ongoing operational overhead?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Run the application on Amazon Elastic Container Service (Amazon ECS) on AWS FargatUse Amazon Elastic File System (Amazon EFS) for data that is frequently accessed between the web and application tiers. Store the frontend web server session data in Amazon Simple Queue Service (Amazon SQS).",
+                    "is_correct": false,
+                    "explanation": "Amazon SQS is a message queuing service, not suitable for session persistence required by frontend web servers."
+                  },
+                  {
+                    "content": "Run the application on Amazon Elastic Container Service (Amazon ECS) on Amazon EC2. Use Amazon ElastiCache for Redis to cache frontend web server session data. Use Amazon Elastic Block Store (Amazon EBS) with Multi-Attach on EC2 instances that are distributed across multiple Availability Zones.",
+                    "is_correct": false,
+                    "explanation": "Using ECS on EC2 increases operational overhead; EBS Multi-Attach has limitations and is less suited for shared access compared to EFS; caching session data in ElastiCache is viable but ECS on EC2 is less preferred operationally."
+                  },
+                  {
+                    "content": "Run the application on Amazon Elastic Kubernetes Service (Amazon EKS). Configure Amazon EKS to use managed node groups. Use ReplicaSets to run the web servers and applications. Create an Amazon Elastic File System (Amazon EFS) file system. Mount the EFS file system across all EKS pods to store frontend web server session data.",
+                    "is_correct": false,
+                    "explanation": "Mounting EFS on all pods for session persistence can cause concurrency and performance issues; DynamoDB is more suited for scalable, persistent session data; also, EKS with ReplicaSets without managed node groups increases operational overhead."
+                  },
+                  {
+                    "content": "Deploy the application on Amazon Elastic Kubernetes Service (Amazon EKS). Configure Amazon EKS to use managed node groups. Run the web servers and application as Kubernetes deployments in the EKS cluster. Store the frontend web server session data in an Amazon DynamoDB tablCreate an Amazon Elastic File System (Amazon EFS) volume that all applications will mount at the time of deployment.",
+                    "is_correct": true,
+                    "explanation": "Running the application on Amazon EKS with managed node groups provides a managed, fault-tolerant, and scalable container orchestration service, reducing operational overhead compared to self-managed infrastructurStoring frontend web server session data in Amazon DynamoDB leverages a fully managed, highly available, and scalable database service designed for low-latency access, which is ideal for session persistence and scaling needs. Using Amazon EFS for shared data enables scalable, fault-tolerant, and always-available access across all application servers, supporting the requirement for frequently accessed data consistency. This approach avoids manual management of servers (as in ECS on EC2) and uses purpose-built managed services for data sharing and session persistence, aligning with security and operational best practices."
+                  }
+                ]
+              },
+              {
+                "content": "A company provides auction services for artwork and has users across North America and EuropThe company hosts its application in Amazon EC2 instances in the us-east-1 Region. Artists upload photos of their work as large-sizhigh-resolution image files from their mobile phones to a centralized Amazon S3 bucket created in the us-east-1 Region. The users in Europe are reporting slow performance for their image uploads. How can a solutions architect improve the performance of the image upload process?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Redeploy the application to use S3 multipart uploads.",
+                    "is_correct": false,
+                    "explanation": "Multipart uploads improve the efficiency of uploading large files but do not reduce latency for geographically distant users."
+                  },
+                  {
+                    "content": "Create an Amazon CloudFront distribution and point to the application as a custom origin.",
+                    "is_correct": false,
+                    "explanation": "CloudFront distribution with the application as a custom origin improves content delivery to end users but does not accelerate transfers to S3."
+                  },
+                  {
+                    "content": "Configure the buckets to use S3 Transfer Acceleration.",
+                    "is_correct": true,
+                    "explanation": "S3 Transfer Acceleration uses Amazon CloudFront's globally distributed edge locations to accelerate uploads, improving performance for users far from the bucket's region. This solution addresses the latency that European users experience when uploading to a bucket in us-east-1 by optimizing transfer routes. Using a managed AWS service designed specifically to improve S3 upload performance aligns with best practices."
+                  },
+                  {
+                    "content": "Create an Auto Scaling group for the EC2 instances and create a scaling policy.",
+                    "is_correct": false,
+                    "explanation": "Auto Scaling EC2 instances helps with application scalability but does not improve the upload performance to S3 from distant clients."
+                  }
+                ]
+              },
+              {
+                "content": "A company has hundreds of AWS accounts. The company uses an organization in AWS Organizations to manage all the accounts. The company has turned on all features. A finance team has allocated a daily budget for AWS costs. The finance team must receive an email notification if the organization's AWS costs exceed 80% of the allocated budget. A solutions architect needs to implement a solution to track the costs and deliver the notifications. Which solution will meet these requirements?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "In the organization's management account, use AWS Budgets to create a budget that has a daily period. Add an alert threshold and set the value to 80%. Use Amazon Simple Notification Service (Amazon SNS) to notify the finance team.",
+                    "is_correct": true,
+                    "explanation": "AWS Budgets supports creating budgets with a daily granularity. AWS Budgets can send alerts when costs exceed a specified threshold, here 80%. Amazon SNS enables email notifications to the finance team. This approach uses a managed AWS service designed explicitly for budgets and cost alerts. The solution is implemented in the organization's management account, which aligns with AWS Organizations centralized billing practices."
+                  },
+                  {
+                    "content": "In the organization's management account, set up the organizational view feature for AWS Trusted Advisor. Create an organizational view report for cost optimization. Set an alert threshold of 80%. Configure notification preferences. Add the email addresses of the finance team.",
+                    "is_correct": false,
+                    "explanation": "AWS Trusted Advisor does not provide daily budget alerts or threshold notifications specifically for organizational cost budgets."
+                  },
+                  {
+                    "content": "Register the organization with AWS Control Tower. Activate the optional cost control (guardrail). Set a control (guardrail) parameter of 80%. Configure control (guardrail) notification preferences. Use Amazon Simple Notification Service (Amazon SNS) to notify the finance team.",
+                    "is_correct": false,
+                    "explanation": "AWS Control Tower does not include a cost control guardrail with cost threshold alerting functionality."
+                  },
+                  {
+                    "content": "Configure the member accounts to save a daily AWS Cost and Usage Report to an Amazon S3 bucket in the organization's management account. Use Amazon EventBridge to schedule a daily Amazon Athena query to calculate the organization's costs. Configure Athena to send an Amazon CloudWatch alert if the total costs are more than 80% of the allocated budget. Use Amazon Simple Notification Service (Amazon SNS) to notify the finance team.",
+                    "is_correct": false,
+                    "explanation": "This is a complex, manual solution that requires custom querying and alerting; it is not preferred over managed budget alerting services."
+                  }
+                ]
+              },
+              {
+                "content": "A company runs many workloads on AWS and uses AWS Organizations to manage its accounts. The workloads are hosted on Amazon EC2. AWS Fargatand AWS Lambda. Some of the workloads have unpredictable demand. Accounts record high usage in some months and low usage in other months. The company wants to optimize its compute costs over the next 3 years. A solutions architect obtains a 6-month average for each of the accounts across the organization to calculate usagWhich solution will provide the MOST cost savings for all the organization's compute usage?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Purchase Reserved Instances for the organization to match the size and number of the most common EC2 instances from the member accounts.",
+                    "is_correct": false,
+                    "explanation": "Reserved Instances cover only EC2 and do not optimize costs for Fargate or Lambda workloads."
+                  },
+                  {
+                    "content": "Purchase a Compute Savings Plan for the organization from the management account by using the recommendation at the management account level.",
+                    "is_correct": true,
+                    "explanation": "Compute Savings Plans apply across EC2, Fargate, and Lambda, covering all workload types, which leads to the most comprehensive cost optimization. Purchasing a Compute Savings Plan at the management account level in AWS Organizations enables consolidated savings across all accounts and workloads. Reserved Instances are limited to EC2 only and do not cover Fargate or Lambda workloads, thus providing less overall savings for a mixed compute environment. Using Compute Optimizer for right-sizing can help reduce unnecessary spending but does not directly address commitment-based savings plans."
+                  },
+                  {
+                    "content": "Purchase Reserved Instances for each member account that had high EC2 usage according to the data from the last 6 months.",
+                    "is_correct": false,
+                    "explanation": "Purchasing Reserved Instances individually per account ignores consolidated purchasing benefits and does not cover all compute services."
+                  },
+                  {
+                    "content": "Purchase an EC2 Instance Savings Plan for each member account from the management account based on EC2 usage data from the last 6 months.",
+                    "is_correct": false,
+                    "explanation": "EC2 Instance Savings Plans only apply to EC2 and do not cover Fargate or Lambda, missing cost savings opportunities."
+                  }
+                ]
+              },
+              {
+                "content": "A company is developing a new on-demand video application that is based on microservices. The application will have 5 million users at launch and will have 30 million users after 6 months. The company has deployed the application on Amazon Elastic Container Service (Amazon ECS) on AWS FargatThe company developed the application by using ECS services that use the HTTPS protocol. A solutions architect needs to implement updates to the application by using blue/green deployments. The solution must distribute traffic to each ECS service through a load balancer. The application must automatically adjust the number of tasks in response to an Amazon CloudWatch alarm. Which solution will meet these requirements?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Configure the ECS services to use the blue/green deployment type and a Network Load Balancer. Request increases to the service quota for tasks per service to meet the demand.",
+                    "is_correct": false,
+                    "explanation": "Network Load Balancer does not support HTTP/HTTPS features required for blue/green ECS deployments."
+                  },
+                  {
+                    "content": "Configure the ECS services to use the blue/green deployment type and a Network Load Balancer. Implement Auto Scaling group for each ECS service by using the Cluster Autoscaler.",
+                    "is_correct": false,
+                    "explanation": "Cluster Autoscaler and Auto Scaling groups are not applicable in a Fargate environment, and Network Load Balancer is not suited for blue/green deployments."
+                  },
+                  {
+                    "content": "Configure the ECS services to use the blue/green deployment type and an Application Load Balancer. Implement an Auto Scaling group for each ECS service by using the Cluster Autoscaler.",
+                    "is_correct": false,
+                    "explanation": "Cluster Autoscaler and Auto Scaling groups are not relevant for Fargate; managing scaling should be done via Service Auto Scaling."
+                  },
+                  {
+                    "content": "Configure the ECS services to use the blue/green deployment type and an Application Load Balancer. Implement Service Auto Scaling for each ECS service.",
+                    "is_correct": true,
+                    "explanation": "Amazon ECS supports blue/green deployments natively when integrated with an Application Load Balancer, which operates at the HTTP/HTTPS layer and supports routing decisions required for blue/green deployments. Service Auto Scaling is the managed and recommended way to automatically adjust the number of ECS tasks in response to CloudWatch alarms without manual intervention or complex autoscaling integration. Network Load Balancer is typically used for TCP/UDP traffic and does not provide the advanced routing capabilities needed for HTTP/HTTPS blue/green deployments in ECS services. Using Service Auto Scaling aligns with best practices to rely on managed services for scalability rather than manual Auto Scaling groups or cluster autoscalers in a Fargate environment."
+                  }
+                ]
+              },
+              {
+                "content": "A company uses a Grafana data visualization solution that runs on a single Amazon EC2 instance to monitor the health of the company's AWS workloads. The company has invested time and effort to create dashboards that the company wants to preservThe dashboards need to be highly available and cannot be down for longer than 10 minutes. The company needs to minimize ongoing maintenancWhich solution will meet these requirements with the LEAST operational overhead?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Migrate to Amazon CloudWatch dashboards. Recreate the dashboards to match the existing Grafana dashboards. Use automatic dashboards where possible.",
+                    "is_correct": false,
+                    "explanation": "Recreating dashboards in CloudWatch is manual and does not preserve the existing Grafana dashboards, increasing operational effort and risk of errors."
+                  },
+                  {
+                    "content": "Create an Amazon Managed Grafana workspacConfigure a new Amazon CloudWatch data sourcExport dashboards from the existing Grafana instancImport the dashboards into the new workspace.",
+                    "is_correct": true,
+                    "explanation": "Amazon Managed Grafana is a managed service designed to provide high availability and minimize operational overhead. Migrating to a managed Grafana workspace preserves existing dashboards by allowing export and import. Managed service removes the need for manual maintenance of EC2 instances and reduces downtime risks, meeting the requirement for less than 10 minutes downtimConfiguring a CloudWatch data source integrates with AWS workloads natively."
+                  },
+                  {
+                    "content": "Create an AMI that has Grafana pre-installed. Store the existing dashboards in Amazon Elastic File System (Amazon EFS). Create an Auto Scaling group that uses the new AMI. Set the Auto Scaling group's minimum, desired, and maximum number of instances to onCreate an Application Load Balancer that serves at least two Availability Zones.",
+                    "is_correct": false,
+                    "explanation": "Using an AMI with Auto Scaling and EFS still requires manual management of EC2 instances and maintenance, increasing operational overhead."
+                  },
+                  {
+                    "content": "Configure AWS Backup to back up the EC2 instance that runs Grafana once each hour. Restore the EC2 instance from the most recent snapshot in an alternate Availability Zone when required.",
+                    "is_correct": false,
+                    "explanation": "Backing up and restoring EC2 instances is manual and results in significant downtime during restoration, exceeding the 10-minute requirement."
+                  }
+                ]
+              },
+              {
+                "content": "A company uses AWS Organizations to manage its AWS accounts. The company needs a list of all its Amazon EC2 instances that have underutilized CPU or memory usagThe company also needs recommendations for how to downsize these underutilized instances. Which solution will meet these requirements with the LEAST effort?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Install a CPU and memory monitoring tool from AWS Marketplace on all the EC2 instances. Store the findings in Amazon S3. Implement a Python script to identify underutilized instances. Reference EC2 instance pricing information for recommendations about downsizing options.",
+                    "is_correct": false,
+                    "explanation": "Relies on a third-party tool and custom scripts, which increases operational effort and complexity."
+                  },
+                  {
+                    "content": "Install the Amazon CloudWatch agent on all the EC2 instances by using AWS Systems Manager. Retrieve the resource optimization recommendations from AWS Cost Explorer in the organization's management account. Use the recommendations to downsize underutilized instances in all accounts of the organization.",
+                    "is_correct": true,
+                    "explanation": "This solution meets the requirements with the least effort because it leverages AWS services specifically designed for this purpose within an AWS Organizations context.1.  Install the Amazon CloudWatch agent on all EC2 instances using AWS Systems Manager: This is the recommended and least-effort way to gather detailed memory and disk metrics (which are not collected by default CloudWatch monitoring) across many instances. AWS Systems Manager makes this deployment scalable and easy."
+                  },
+                  {
+                    "content": "Install the Amazon CloudWatch agent on all the EC2 instances by using AWS Systems Manager. Retrieve the resource optimization recommendations from AWS Cost Explorer in each account of the organization. Use the recommendations to downsize underutilized instances in all accounts of the organization.",
+                    "is_correct": false,
+                    "explanation": "While it correctly uses the CloudWatch agent and AWS Cost Explorer, retrieving recommendations in each account of the organization means the company must individually access or query every member account to gather the full list. AWS Cost Explorer is capable of aggregating these recommendations in the management account for the organization"
+                  },
+                  {
+                    "content": "Install the Amazon CloudWatch agent on all the EC2 instances by using AWS Systems Manager. Create an AWS Lambda function to extract CPU and memory usage from all the EC2 instances. Store the findings as files in Amazon S3. Use Amazon Athena to find underutilized instances. Reference EC2 instance pricing information for recommendations about downsizing options.",
+                    "is_correct": false,
+                    "explanation": "Involves building custom Lambda functions and manual data processing, which is more effort and less efficient than managed solutions."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

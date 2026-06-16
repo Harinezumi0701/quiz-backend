@@ -1,0 +1,45 @@
+[
+  {
+    "categories": [
+      {
+        "name": "Amazon's AWS Certified Solutions Architect - Professional",
+        "tests": [
+          {
+            "name": "SAP-C02 Day1",
+            "description": "",
+            "time_limit": 60,
+            "questions": [
+              {
+                "content": "A company runs an ecommerce web application on AWS. The web application is hosted as a static website on Amazon S3 with Amazon CloudFront for content delivery. An Amazon API Gateway API invokes AWS Lambda functions to handle user requests and order processing for the web application The Lambda functions store data in an Amazon ROS for MySQL DB cluster that uses On-Demand instances. The DB cluster usage has been consistent in the past 12 months.  Recently, the website has experienced SQL injection and web exploit attempts. Customers also report that order processing time has increased during periods of peak usagDuring these periods, the Lambda functions often have cold starts. As the company grows, the company needs to ensure scalability and low-latency access during traffic peaks. The company also must optimize the database costs and add protection against the SQL injection and web exploit attempts.  Which solution will meet these requirements?",
+                "image_url": "",
+                "is_multiple_choice": false,
+                "answers": [
+                  {
+                    "content": "Configure the Lambda functions to have an increased timeout value during peak periods. Use RDS Reserved Instances for the databasUse CloudFront and subscribe to AWS Shield Advanced to protect against the SQL injection and web exploit attempts.",
+                    "is_correct": false,
+                    "explanation": "Increasing Lambda timeout does not reduce cold starts; AWS Shield Advanced does not specifically mitigate SQL injection attacks."
+                  },
+                  {
+                    "content": "Increase the memory of the Lambda functions, Transition to Amazon Redshift for the databasIntegrate Amazon Inspector with CloudFront to protect against the SQL injection and web exploit attempts.",
+                    "is_correct": false,
+                    "explanation": "Amazon Redshift is designed for analytics, not transactional workloads like order processing; Amazon Inspector does not integrate with CloudFront for web exploit protection."
+                  },
+                  {
+                    "content": "Use Lambda functions with provisioned concurrency for compute during peak periods, Transition to Amazon Aurora Serverless for the databasUse CloudFront and subscribe to AWS Shield Advanced to protect against the SQL injection and web exploit attempts.",
+                    "is_correct": false,
+                    "explanation": "Amazon Aurora Serverless may not be the best cost optimization for consistently used workloads; AWS Shield Advanced is less suitable than AWS WAF for SQL injection prevention."
+                  },
+                  {
+                    "content": "Use Lambda functions with provisioned concurrency for compute during peak periods. Use RDS Reserved Instances for the databasIntegrate AWS WAF with CloudFront to protect against the SQL injection and web exploit attempts.",
+                    "is_correct": true,
+                    "explanation": "Using Lambda functions with provisioned concurrency reduces cold starts and improves latency during peak periods, addressing the order processing time issuUsing RDS Reserved Instances optimizes cost for a database with consistent usage over 12 months. Integrating AWS WAF with CloudFront provides targeted protection against SQL injection and web exploits, aligning with security best practices for web application protection. AWS Shield Advanced provides DDoS protection but does not specifically address SQL injection, whereas AWS WAF is designed for application-layer security."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

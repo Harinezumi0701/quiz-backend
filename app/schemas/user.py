@@ -1,5 +1,5 @@
 # app/schemas/user.py
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import List, Optional
 from uuid import UUID
 from datetime import date
@@ -39,6 +39,9 @@ class UserOut(BaseModel):
     )
     role_id: Optional[UUID] = Field(
         None, description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
+    )
+    role_name: Optional[str] = Field(
+        None, description="Role name", example="user"
     )
     permissions: List[str] = Field(
         default_factory=list,
@@ -118,6 +121,13 @@ class UserCreateRequest(BaseModel):
         None, description="Join date", example="2024-01-01"
     )
 
+    @field_validator("birthday", "join_date", mode="before")
+    @classmethod
+    def empty_str_to_none(cls, v):
+        if v == "":
+            return None
+        return v
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -167,6 +177,13 @@ class UserUpdateRequest(BaseModel):
     role_id: Optional[UUID] = Field(
         None, description="Role ID", example="550e8400-e29b-41d4-a716-446655440000"
     )
+
+    @field_validator("birthday", "join_date", mode="before")
+    @classmethod
+    def empty_str_to_none(cls, v):
+        if v == "":
+            return None
+        return v
 
     class Config:
         json_schema_extra = {

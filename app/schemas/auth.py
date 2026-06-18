@@ -83,3 +83,15 @@ class RevokeTokenRequest(BaseModel):
                 "refresh_token": "dGhpc2lzYXJlZnJlc2h0b2tlbg"
             }
         }
+
+
+class ActivateAccountRequest(BaseModel):
+    """Request schema for account activation"""
+    token: str = Field(..., description="Activation token received by email")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "token": "abc123xyz..."
+            }
+        }

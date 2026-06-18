@@ -8,12 +8,11 @@ from botocore.exceptions import ClientError
 
 load_dotenv()
 
-S3_ACCOUNT_ID = os.getenv("S3_ACCOUNT_ID")
 S3_ACCESS_KEY_ID = os.getenv("S3_ACCESS_KEY_ID")
 S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY")
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
-S3_PUBLIC_URL = os.getenv("S3_PUBLIC_URL", "")
-S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL", f"https://{S3_ACCOUNT_ID}.r2.cloudflarestorage.com")
+S3_REGION = os.getenv("S3_REGION", "ap-southeast-1")
+CLOUDFRONT_DOMAIN = os.getenv("CLOUDFRONT_DOMAIN", "")
 
 DEFAULT_EXPIRES_IN = 3600
 MAX_EXPIRES_IN = 604800
@@ -21,15 +20,15 @@ MAX_EXPIRES_IN = 604800
 
 def get_s3_client():
     """Create and return S3 client"""
-    if not all([S3_ACCOUNT_ID, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME]):
+    if not all([S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME]):
         raise ValueError("S3 configuration is incomplete. Please check environment variables.")
-    
+
     return boto3.client(
         service_name="s3",
-        endpoint_url=S3_ENDPOINT_URL,
         aws_access_key_id=S3_ACCESS_KEY_ID,
         aws_secret_access_key=S3_SECRET_ACCESS_KEY,
-        region_name="auto"
+        region_name=S3_REGION,
+        config=Config(signature_version="s3v4"),
     )
 
 
@@ -38,19 +37,19 @@ def generate_presigned_url(
     prefix: str = "uploads",
     content_type: Optional[str] = None,
     expires_in: int = DEFAULT_EXPIRES_IN
-) -> tuple[str, str]:
+) -> tuple[str, str, str]:
     """
     Generate a presigned URL for uploading a file to S3 Storage.
-    
+
     Args:
         filename: Original filename
         prefix: Prefix path for the file in S3 storage (default: "uploads")
         content_type: Content type of the file (e.g., 'image/jpeg')
         expires_in: URL expiration time in seconds (default: 3600, max: 604800)
-    
+
     Returns:
-        tuple: (presigned_url, file_key)
-    
+        tuple: (presigned_url, file_key, public_url)
+
     Raises:
         ValueError: If S3 configuration is incomplete
         ClientError: If presigned URL generation fails
@@ -84,7 +83,12 @@ def generate_presigned_url(
             ExpiresIn=expires_in
         )
         
-        return presigned_url, file_key
+        if CLOUDFRONT_DOMAIN:
+            public_url = f"https://{CLOUDFRONT_DOMAIN}/{file_key}"
+        else:
+            public_url = f"https://{S3_BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{file_key}"
+
+        return presigned_url, file_key, public_url
     
     except ClientError as e:
         raise Exception(f"Failed to generate presigned URL: {str(e)}")

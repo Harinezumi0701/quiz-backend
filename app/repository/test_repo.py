@@ -96,6 +96,7 @@ def get_all_tests(
     page: int = 1,
     page_size: int = 10,
     request_params: Optional[Dict[str, Any]] = None,
+    allowed_category_ids: Optional[list] = None,
 ) -> Tuple[list, int]:
     """
     Get all tests with optional filtering and pagination.
@@ -105,12 +106,19 @@ def get_all_tests(
         page: Page number (1-indexed)
         page_size: Number of items per page
         request_params: Optional dict of request parameters for multiple filters
+        allowed_category_ids: If provided, restrict results to tests in these categories
 
     Returns:
         Tuple of (tests list, total count)
     """
     # Base query
     query = db.query(Test).filter(Test.deleted_at.is_(None)).order_by(Test.created_at.desc())
+
+    # Apply category-based access filter for restricted users
+    if allowed_category_ids is not None:
+        if not allowed_category_ids:
+            return [], 0
+        query = query.filter(Test.category_id.in_(allowed_category_ids))
 
     # Define search configuration
     search_config = {

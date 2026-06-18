@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, TIMESTAMP, Date, ForeignKey, text
+from sqlalchemy import Boolean, Column, String, TIMESTAMP, Date, ForeignKey, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from app.db.base import Base
@@ -19,10 +19,13 @@ class User(Base):
     job_title = Column(String(100), nullable=True)
     company = Column(String(100), nullable=True)
     join_date = Column(Date, nullable=True)
+    is_active = Column(Boolean, nullable=False, server_default=text("TRUE"))
+    activation_token = Column(String(255), nullable=True, index=True, unique=True)
+    activation_expires_at = Column(TIMESTAMP, nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
     deleted_at = Column(TIMESTAMP, nullable=True)
-    
+
     role_obj = relationship("Role", back_populates="users")
     submissions = relationship("Submission", back_populates="user")
     submission_history = relationship("SubmissionHistory", back_populates="user")

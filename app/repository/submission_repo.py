@@ -1,7 +1,8 @@
 # app/repository/submission_repo.py
+from datetime import datetime, timezone
 from sqlalchemy.orm import Session
-from sqlalchemy import func
-from typing import List
+from sqlalchemy import func, asc, desc, select
+from typing import List, Optional
 from uuid import UUID
 from app.models.submissions import Submission
 from app.models.questions import Question
@@ -166,6 +167,166 @@ def get_user_statistics_by_test(db: Session, user_id: UUID):
         })
 
     return result
+
+
+def get_submission_history_by_id(db: Session, submission_history_id: UUID, user_id: UUID):
+    """Get a single submission history record with full details, verified to belong to user."""
+    record = (
+        db.query(SubmissionHistory)
+        .filter(
+            SubmissionHistory.id == submission_history_id,
+            SubmissionHistory.user_id == user_id,
+        )
+        .first()
+    )
+    if not record:
+        return None
+
+    submissions_data = []
+    correct_count = 0
+    for sub in record.submissions:
+        if sub.is_correct:
+            correct_count += 1
+        question = sub.question
+        submissions_data.append({
+            "id": sub.id,
+            "question_id": sub.question_id,
+            "answer_id": sub.answer_id,
+            "is_correct": sub.is_correct,
+            "answered_at": datetime_to_timestamp(sub.answered_at),
+            "category": question.category if question else None,
+            "test_name": question.test if question else None,
+            "question_preview": question.content if question else None,
+        })
+
+    return {
+        "id": record.id,
+        "submitted_at": datetime_to_timestamp(record.submitted_at),
+        "submission_count": record.submission_count,
+        "correct_count": correct_count,
+        "wrong_count": record.submission_count - correct_count,
+        "submissions": submissions_data,
+    }
+
+
+def get_user_submission_history(
+    db: Session,
+    user_id: UUID,
+    page: int = 1,
+    page_size: int = 10,
+    search: Optional[str] = None,
+    sort_by: str = "submitted_at",
+    sort_order: str = "desc",
+    date_from: Optional[int] = None,
+    date_to: Optional[int] = None,
+    category: Optional[str] = None,
+):
+    """Get paginated, filterable, sortable submission history for a user."""
+    offset = (page - 1) * page_size
+
+    query = db.query(SubmissionHistory).filter(SubmissionHistory.user_id == user_id)
+
+    # Filter by date range (Unix timestamps)
+    if date_from is not None:
+        dt_from = datetime.fromtimestamp(date_from, tz=timezone.utc).replace(tzinfo=None)
+        query = query.filter(SubmissionHistory.submitted_at >= dt_from)
+    if date_to is not None:
+        dt_to = datetime.fromtimestamp(date_to, tz=timezone.utc).replace(tzinfo=None)
+        query = query.filter(SubmissionHistory.submitted_at <= dt_to)
+
+    # Filter by test name (search)
+    if search:
+        search_subq = (
+            db.query(Submission.submission_history_id)
+            .join(Question, Submission.question_id == Question.id)
+            .join(Test, Question.test_id == Test.id)
+            .filter(Test.name.ilike(f"%{search}%"), Test.deleted_at.is_(None))
+            .subquery()
+        )
+        query = query.filter(SubmissionHistory.id.in_(search_subq))
+
+    # Filter by category
+    if category:
+        cat_subq = (
+            db.query(Submission.submission_history_id)
+            .join(Question, Submission.question_id == Question.id)
+            .join(Category, Question.category_id == Category.id)
+            .filter(Category.name.ilike(f"%{category}%"), Category.deleted_at.is_(None))
+            .subquery()
+        )
+        query = query.filter(SubmissionHistory.id.in_(cat_subq))
+
+    total = query.count()
+
+    # Sorting
+    if sort_by == "test_name":
+        sort_col = (
+            select(Test.name)
+            .join(Question, Question.test_id == Test.id)
+            .join(Submission, Submission.question_id == Question.id)
+            .where(Submission.submission_history_id == SubmissionHistory.id)
+            .limit(1)
+            .correlate(SubmissionHistory)
+            .scalar_subquery()
+        )
+    elif sort_by == "category":
+        sort_col = (
+            select(Category.name)
+            .join(Question, Question.category_id == Category.id)
+            .join(Submission, Submission.question_id == Question.id)
+            .where(Submission.submission_history_id == SubmissionHistory.id)
+            .limit(1)
+            .correlate(SubmissionHistory)
+            .scalar_subquery()
+        )
+    else:
+        sort_col = SubmissionHistory.submitted_at
+
+    order_fn = asc if sort_order == "asc" else desc
+    query = query.order_by(order_fn(sort_col))
+
+    history_records = (
+        query
+        .offset(offset)
+        .limit(page_size)
+        .all()
+    )
+
+    result = []
+    for record in history_records:
+        submissions_data = []
+        correct_count = 0
+        for sub in record.submissions:
+            if sub.is_correct:
+                correct_count += 1
+            question = sub.question
+            submissions_data.append({
+                "id": sub.id,
+                "question_id": sub.question_id,
+                "answer_id": sub.answer_id,
+                "is_correct": sub.is_correct,
+                "answered_at": datetime_to_timestamp(sub.answered_at),
+                "category": question.category if question else None,
+                "test_name": question.test if question else None,
+                "question_preview": question.content if question else None,
+            })
+
+        result.append({
+            "id": record.id,
+            "submitted_at": datetime_to_timestamp(record.submitted_at),
+            "submission_count": record.submission_count,
+            "correct_count": correct_count,
+            "wrong_count": record.submission_count - correct_count,
+            "submissions": submissions_data,
+        })
+
+    return result, total
+
+
+def delete_user_submissions(db: Session, user_id: UUID) -> None:
+    """Hard delete all submissions and submission_history records for a user."""
+    db.query(Submission).filter(Submission.user_id == user_id).delete(synchronize_session=False)
+    db.query(SubmissionHistory).filter(SubmissionHistory.user_id == user_id).delete(synchronize_session=False)
 
 
 def get_user_recent_activity(db: Session, user_id: UUID, limit: int = 10):

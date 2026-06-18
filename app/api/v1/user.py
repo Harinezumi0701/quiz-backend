@@ -144,6 +144,7 @@ def read_user(user_identifier: str, db: Session = Depends(get_db)):
         "company": user.company,
         "join_date": user.join_date,
         "role_id": user.role_id,
+        "role_name": user.role_obj.name if user.role_obj else None,
         "permissions": permissions,
     }
     
@@ -215,6 +216,8 @@ def create_user(
         "job_title": new_user.job_title,
         "company": new_user.company,
         "join_date": new_user.join_date,
+        "role_id": new_user.role_id,
+        "role_name": new_user.role_obj.name if new_user.role_obj else None,
         "permissions": permissions,
     }
 
@@ -301,6 +304,8 @@ def update_user(
         "job_title": updated_user.job_title,
         "company": updated_user.company,
         "join_date": updated_user.join_date,
+        "role_id": updated_user.role_id,
+        "role_name": updated_user.role_obj.name if updated_user.role_obj else None,
         "permissions": permissions,
     }
 
@@ -490,6 +495,8 @@ def assign_role(
         "job_title": updated_user.job_title,
         "company": updated_user.company,
         "join_date": updated_user.join_date,
+        "role_id": updated_user.role_id,
+        "role_name": updated_user.role_obj.name if updated_user.role_obj else None,
         "permissions": permissions,
     }
 

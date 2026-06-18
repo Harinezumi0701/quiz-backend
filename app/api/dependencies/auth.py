@@ -9,10 +9,11 @@ from app.models.users import User
 from app.constants import (
     ERROR_COULD_NOT_VALIDATE_CREDENTIALS,
     ERROR_USER_NOT_FOUND,
+    ERROR_ACCOUNT_NOT_ACTIVATED,
     JWT_TOKEN_TYPE,
 )
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 
 def get_current_user(
@@ -26,8 +27,15 @@ def get_current_user(
     Returns the User object if authentication is successful.
 
     Raises:
-        HTTPException: If token is invalid or user not found.
+        HTTPException: If token is missing, invalid, or user not found.
     """
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ERROR_COULD_NOT_VALIDATE_CREDENTIALS,
+            headers={"WWW-Authenticate": JWT_TOKEN_TYPE},
+        )
+
     token = credentials.credentials
 
     # Decode the token
@@ -46,6 +54,12 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ERROR_USER_NOT_FOUND,
             headers={"WWW-Authenticate": JWT_TOKEN_TYPE},
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=ERROR_ACCOUNT_NOT_ACTIVATED,
         )
 
     return user

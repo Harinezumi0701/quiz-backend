@@ -6,6 +6,7 @@ class PresignedUrlData(BaseModel):
     """Schema for presigned URL data"""
     url: str = Field(..., description="Presigned URL for uploading file", example="https://s3.example.com/presigned-url")
     key: str = Field(..., description="File key in S3 storage", example="uploads/file-123.jpg")
+    public_url: str = Field(..., description="Public URL for accessing the file after upload", example="https://d2vp1l98shrrp4.cloudfront.net/uploads/file-123.jpg")
     expires_in: int = Field(..., description="URL expiration time in seconds", example=3600)
 
 

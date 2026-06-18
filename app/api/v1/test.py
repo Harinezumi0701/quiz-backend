@@ -11,15 +11,17 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 from typing import Optional
+from uuid import UUID
 from app.schemas.test import (
     TestDetailListResponse,
     TestDetailResponse,
     TestCreateRequest,
     TestUpdateRequest,
 )
-from app.schemas.submission import SubmissionBulkCreate, SubmissionListResponse
+from app.schemas.submission import SubmissionBulkCreate, SubmissionListResponse, SubmissionHistoryResponse
 from app.schemas.http_response import ErrorResponse
 from app.services import category_service, submission_service
+from app.repository import submission_repo
 from app.db.session import get_db
 from app.utils.search_pagination import get_pagination_meta
 from app.api.dependencies.auth import get_current_user
@@ -72,11 +74,13 @@ def get_all_tests(
     Requires permission: tests::read
     """
     request_params = dict(request.query_params)
+
     tests, total = category_service.get_all_tests(
         db,
         page=page,
         page_size=page_size,
         request_params=request_params,
+        allowed_category_ids=None,
     )
 
     meta = get_pagination_meta(total, page, page_size)
@@ -186,6 +190,49 @@ def submit_test_submissions(
         db, current_user.id, bulk_data.submissions
     )
     return SubmissionListResponse(data=submissions, meta={})
+
+
+@router.get(
+    "/{test_id}/submit/{submission_history_id}",
+    response_model=SubmissionHistoryResponse,
+    summary="Get test submission result",
+    description="Get the result of a specific submission history for a test (requires authentication)",
+    responses={
+        200: {"description": "Submission result"},
+        401: {"description": "Unauthorized access", "model": ErrorResponse},
+        404: {"description": "Submission not found", "model": ErrorResponse},
+    },
+)
+def get_test_submission_result(
+    test_id: str = Path(..., description="Test ID"),
+    submission_history_id: str = Path(..., description="Submission History ID"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Get the result of a specific submission history record.
+
+    - **test_id**: Test UUID
+    - **submission_history_id**: Submission History UUID
+
+    Requires authentication token in header: `Authorization: Bearer <token>`
+    """
+    try:
+        sh_uuid = UUID(submission_history_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid submission history ID format: {submission_history_id}",
+        )
+
+    result = submission_repo.get_submission_history_by_id(db, sh_uuid, current_user.id)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Submission not found",
+        )
+
+    return SubmissionHistoryResponse(data=result, meta={})
 
 
 @router.post(

@@ -51,17 +51,18 @@ def generate_presigned_url(
     Returns a presigned URL that can be used to upload the file directly to S3 Storage.
     """
     try:
-        presigned_url, file_key = s3_service.generate_presigned_url(
+        presigned_url, file_key, public_url = s3_service.generate_presigned_url(
             filename=request.filename,
             prefix=request.prefix,
             content_type=request.content_type,
             expires_in=request.expires_in
         )
-        
+
         return PresignedUrlResponse(
             data=PresignedUrlData(
                 url=presigned_url,
                 key=file_key,
+                public_url=public_url,
                 expires_in=request.expires_in
             ),
             meta={}

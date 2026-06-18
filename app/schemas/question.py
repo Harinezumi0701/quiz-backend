@@ -37,7 +37,12 @@ class QuestionWithAnswers(BaseModel):
 
 
 class QuestionListResponse(SuccessResponse[List[Question]]):
-    """Response schema for list of questions"""
+    """Response schema for list of questions (with answer_count, no full answers)"""
+    pass
+
+
+class QuestionWithAnswersListResponse(SuccessResponse[List[QuestionWithAnswers]]):
+    """Response schema for list of questions with full answers"""
     pass
 
 

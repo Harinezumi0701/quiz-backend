@@ -12,22 +12,48 @@ def get_user_by_email(db: Session, email: str) -> User | None:
     return db.query(User).filter(User.email == email).first()
 
 
-def create_user(db: Session, email: str, full_name: str, hashed_password: str) -> User:
+def create_user(
+    db: Session,
+    email: str,
+    full_name: str,
+    hashed_password: str,
+    is_active: bool = False,
+    activation_token: str | None = None,
+    activation_expires_at: datetime | None = None,
+) -> User:
     """Create a new user."""
     user_id = generate_unique_user_id(db)
-    
+
     # Get default role if exists
     default_role = get_default_role(db)
     role_id = default_role.id if default_role else None
-    
+
     user = User(
         user_id=user_id,
         email=email,
         full_name=full_name,
         password=hashed_password,
-        role_id=role_id
+        role_id=role_id,
+        is_active=is_active,
+        activation_token=activation_token,
+        activation_expires_at=activation_expires_at,
     )
     db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def get_user_by_activation_token(db: Session, token: str) -> User | None:
+    """Get a user by activation token."""
+    return db.query(User).filter(User.activation_token == token).first()
+
+
+def activate_user(db: Session, user: User) -> User:
+    """Mark user as active and clear activation token fields."""
+    user.is_active = True
+    user.activation_token = None
+    user.activation_expires_at = None
     db.commit()
     db.refresh(user)
     return user

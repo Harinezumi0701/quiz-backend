@@ -1,6 +1,6 @@
 # app/schemas/submission.py
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from app.schemas.http_response import SuccessResponse
 
@@ -119,6 +119,44 @@ class DashboardData(BaseModel):
     by_category: List[CategoryStatistics] = Field(..., description="Statistics by category")
     by_test: dict[str, List[TestStatistics]] = Field(..., description="Statistics by test grouped by category")
     recent_activity: List[RecentActivity] = Field(..., description="Recent activity")
+
+
+class SubmissionHistoryItem(BaseModel):
+    """Schema for a single submission within a history record"""
+    id: UUID
+    question_id: UUID
+    answer_id: UUID
+    is_correct: bool
+    answered_at: Optional[int] = None
+    category: Optional[str] = None
+    test_name: Optional[str] = None
+    question_preview: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class SubmissionHistoryOut(BaseModel):
+    """Schema for a submission history record"""
+    id: UUID
+    submitted_at: Optional[int] = None
+    submission_count: int
+    correct_count: int
+    wrong_count: int
+    submissions: List[SubmissionHistoryItem]
+
+    class Config:
+        from_attributes = True
+
+
+class SubmissionHistoryListResponse(SuccessResponse[List[SubmissionHistoryOut]]):
+    """Response schema for submission history list"""
+    pass
+
+
+class SubmissionHistoryResponse(SuccessResponse[SubmissionHistoryOut]):
+    """Response schema for single submission history record"""
+    pass
 
 
 class SubmissionResponse(SuccessResponse[SubmissionOut]):

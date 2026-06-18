@@ -1,13 +1,15 @@
 # app/api/v1/me.py
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 from app.schemas.user import UserResponse, UserUpdateRequest, ChangePasswordRequest
-from app.schemas.submission import DashboardResponse
+from app.schemas.submission import DashboardResponse, SubmissionHistoryListResponse
 from app.schemas.http_response import ErrorResponse
 from app.services import submission_service, user_service, permission_service
+from app.repository import submission_repo
 from app.db.session import get_db
 from app.api.dependencies.auth import get_current_user
 from app.models.users import User
+from app.utils.search_pagination import get_pagination_meta
 
 router = APIRouter()
 
@@ -51,9 +53,11 @@ def read_current_user(
         "job_title": current_user.job_title,
         "company": current_user.company,
         "join_date": current_user.join_date,
+        "role_id": current_user.role_id,
+        "role_name": current_user.role_obj.name if current_user.role_obj else None,
         "permissions": permissions,
     }
-    
+
     return UserResponse(data=user_data, meta={})
 
 
@@ -114,6 +118,7 @@ def update_current_user(
         "company": updated_user.company,
         "join_date": updated_user.join_date,
         "role_id": updated_user.role_id,
+        "role_name": updated_user.role_obj.name if updated_user.role_obj else None,
         "permissions": permissions,
     }
     
@@ -150,6 +155,51 @@ def get_dashboard(
     """
     dashboard_data = submission_service.get_user_dashboard_data(db, current_user.id)
     return DashboardResponse(data=dashboard_data, meta={})
+
+
+@router.get(
+    "/submission-history",
+    response_model=SubmissionHistoryListResponse,
+    summary="Get current user submission history",
+    description="Get paginated submission history for the currently logged in user (requires authentication)",
+    responses={
+        200: {"description": "Submission history"},
+        401: {"description": "Unauthorized access", "model": ErrorResponse},
+    },
+)
+def get_submission_history(
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    search: str = Query(None, description="Search by test name"),
+    sort_by: str = Query("submitted_at", description="Sort field: submitted_at | test_name | category"),
+    sort_order: str = Query("desc", description="Sort order: asc | desc"),
+    date_from: int = Query(None, description="Filter from date (Unix timestamp)"),
+    date_to: int = Query(None, description="Filter to date (Unix timestamp)"),
+    category: str = Query(None, description="Filter by category name"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Get submission history for the current user.
+
+    Each record represents one submit action and contains the list of submitted answers.
+
+    Requires authentication token in header: `Authorization: Bearer <token>`
+    """
+    history, total = submission_repo.get_user_submission_history(
+        db,
+        current_user.id,
+        page=page,
+        page_size=page_size,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        date_from=date_from,
+        date_to=date_to,
+        category=category,
+    )
+    meta = get_pagination_meta(total, page, page_size)
+    return SubmissionHistoryListResponse(data=history, meta=meta)
 
 
 @router.put(
